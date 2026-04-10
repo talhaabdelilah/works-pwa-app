@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>نظام إدارة المشاريع</title>
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مدير المشاريع">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Cairo', 'Tahoma', sans-serif; }
+        body { background: #eef2f5; padding: 8px; min-height: 100vh; }
+        .app-container { max-width: 100%; margin: 0 auto; }
+        .main-header { background: #1e293b; color: white; padding: 10px 14px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; position: sticky; top: 0; z-index: 100; }
+        .main-header h1 { font-size: 1rem; }
+        .user-info { font-size: 0.7rem; background: #334155; padding: 4px 10px; border-radius: 30px; }
+        .logout-btn { background: #ef4444; border: none; padding: 5px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
+        .btn-primary { background: #10b981; border: none; padding: 6px 14px; border-radius: 30px; color: white; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
+        .btn-secondary { background: #3b82f6; border: none; padding: 5px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
+        .btn-outline { background: white; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 30px; cursor: pointer; font-size: 0.65rem; }
+        .btn-danger { background: #ef4444; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
+        .btn-warning { background: #f59e0b; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
+        .btn-info { background: #8b5cf6; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 6px; border-radius: 40px; position: sticky; top: 60px; z-index: 99; }
+        .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
+        .tab-btn.active { background: #3b82f6; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .sync-status { font-size: 0.6rem; text-align: center; padding: 4px; border-radius: 20px; margin-bottom: 8px; }
+        .sync-status.online { background: #d1fae5; color: #065f46; }
+        .sync-status.offline { background: #fee2e2; color: #b91c1c; }
+        .sync-status.syncing { background: #fef3c7; color: #92400e; }
+
+        .customers-grid, .projects-grid { display: flex; flex-direction: column; gap: 8px; }
+        .customer-folder, .project-card { background: white; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-right: 3px solid #3b82f6; }
+        .project-card { border-right-color: #f59e0b; }
+        .folder-icon { font-size: 1.6rem; }
+        .customer-info, .project-info { flex: 1; }
+        .customer-name, .project-name { font-size: 0.85rem; font-weight: bold; }
+        .customer-stats, .project-total { font-size: 0.6rem; color: #475569; }
+        .breadcrumb { background: #f8fafc; padding: 6px 10px; border-radius: 30px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.7rem; }
+        .project-detail-card { background: white; border-radius: 16px; padding: 12px; }
+        .info-bar { background: #f1f5f9; padding: 10px; border-radius: 14px; margin-bottom: 12px; }
+        .info-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+        .info-item { background: white; padding: 4px 8px; border-radius: 20px; flex: 1; min-width: 100px; }
+        .info-label { font-size: 0.55rem; color: #475569; }
+        .info-value { font-size: 0.8rem; font-weight: bold; }
+        .price-per-meter-box { background: #dbeafe; padding: 6px 10px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+        .price-per-meter-box input { width: 80px; padding: 4px; border-radius: 30px; border: 1px solid #94a3b8; text-align: center; font-size: 0.7rem; }
+        .grand-total { font-size: 1rem; font-weight: bold; color: #b45309; }
+        .payments-section { background: #fef3c7; padding: 10px; border-radius: 14px; margin: 12px 0; }
+        .payments-section h4 { font-size: 0.75rem; margin-bottom: 8px; color: #92400e; }
+        .payments-table { width: 100%; font-size: 0.6rem; border-collapse: collapse; }
+        .payments-table th, .payments-table td { border: 1px solid #fde68a; padding: 4px; text-align: center; }
+        .table-wrapper { overflow-x: auto; margin: 8px 0; }
+        .rooms-table { width: 100%; min-width: 450px; border-collapse: collapse; font-size: 0.65rem; }
+        .rooms-table th, .rooms-table td { border: 1px solid #e2e8f0; padding: 6px 4px; text-align: center; }
+        .rooms-table th { background: #f1f5f9; }
+        .rooms-table input, .rooms-table select { padding: 4px; border-radius: 6px; border: 1px solid #cbd5e1; width: 75px; text-align: center; font-size: 0.65rem; }
+        .rooms-table input[type="number"] { -moz-appearance: textfield; }
+        .rooms-table input[type="number"]::-webkit-inner-spin-button,
+        .rooms-table input[type="number"]::-webkit-outer-spin-button { opacity: 0.5; }
+        .delete-room-btn { background: #ef4444; border: none; padding: 3px 8px; border-radius: 20px; color: white; cursor: pointer; }
+        .btn-add-room { background: #8b5cf6; width: 100%; margin: 8px 0; padding: 8px; }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; position: sticky; top: 110px; background: #eef2f5; padding: 8px 0; z-index: 98; }
+        .search-box input { width: 150px; padding: 5px 8px; border: 1px solid #ddd; border-radius: 20px; font-size: 0.7rem; }
+        .workers-table-wrapper { overflow-x: auto; margin: 8px 0; max-height: 60vh; overflow-y: auto; }
+        .workers-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        .workers-table th, .workers-table td { border: 1px solid #ddd; padding: 8px 4px; text-align: center; }
+        .workers-table th { background: #34495e; color: white; font-size: 0.65rem; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+        .attendance-check { width: 18px; height: 18px; cursor: pointer; accent-color: #27ae60; }
+        .editable { width: 55px; padding: 4px; text-align: center; border: 1px solid #ccc; border-radius: 6px; font-size: 0.65rem; }
+        .name-input { width: 80px; }
+        .total-cell { background: #e8f5e9; font-weight: bold; }
+        .delete-btn { background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; }
+
+        @media (max-width: 700px) {
+            .workers-table thead { display: none; }
+            .workers-table, .workers-table tbody, .workers-table tr, .workers-table td { display: block; width: 100%; }
+            .workers-table tr { background: white; margin-bottom: 12px; border-radius: 16px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+            .workers-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; border: none; border-bottom: 1px solid #f0f0f0; }
+            .workers-table td::before { content: attr(data-label); font-weight: bold; font-size: 0.65rem; color: #475569; margin-left: 10px; }
+        }
+
+        .archive-panel { background: #ecf0f1; border-radius: 12px; padding: 8px; margin-bottom: 10px; display: none; }
+        .archive-panel.show { display: block; }
+        .archive-list { max-height: 150px; overflow-y: auto; }
+        .archive-item { background: white; padding: 6px 10px; margin: 4px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+
+        .person-selector { background: white; padding: 10px; border-radius: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border: 1px solid #e2e8f0; }
+        .person-selector select { flex: 1; padding: 8px 12px; border-radius: 30px; border: 1px solid #cbd5e1; background: white; font-size: 0.75rem; }
+        .accounting-table { width: 100%; min-width: 350px; border-collapse: collapse; font-size: 0.7rem; }
+        .accounting-table th, .accounting-table td { border: 1px solid #ddd; padding: 8px 6px; text-align: center; }
+        .accounting-table th { background: #f1f5f9; position: sticky; top: 0; }
+        .accounting-table input { width: 90px; padding: 6px; border-radius: 8px; border: 1px solid #ccc; text-align: center; font-size: 0.7rem; }
+        .summary { background: #f8fafc; padding: 12px; border-radius: 16px; margin-top: 12px; }
+        .summary-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.75rem; }
+        .profit.positive { color: #10b981; font-weight: bold; }
+        .profit.negative { color: #ef4444; font-weight: bold; }
+        .empty-message { text-align: center; padding: 20px; background: white; border-radius: 20px; color: #64748b; font-size: 0.75rem; }
+
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .login-card { background: white; padding: 20px; border-radius: 24px; width: 90%; max-width: 340px; text-align: center; }
+        .login-card input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 12px; font-size: 14px; }
+        .error-msg { color: red; font-size: 0.7rem; margin-top: 6px; }
+        .password-field { position: relative; width: 100%; }
+        .password-field input { width: 100%; padding: 12px; padding-left: 45px; }
+        .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; background: none; border: none; font-size: 1.2rem; }
+        .remember-me { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin: 10px 0; font-size: 0.75rem; }
+        .remember-me input { width: auto; margin: 0; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-content { background: white; border-radius: 20px; padding: 16px; width: 90%; max-width: 500px; max-height: 80%; overflow-y: auto; }
+        .record-item { border-bottom: 1px solid #ddd; padding: 10px; margin: 5px 0; }
+
+        .back-notice { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.7rem; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .back-notice.show { opacity: 1; }
+
+        .firebase-success { background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
+        .firebase-success h3 { color: #065f46; font-size: 0.85rem; margin-bottom: 8px; }
+        .firebase-success p { font-size: 0.7rem; color: #065f46; }
+
+        .install-prompt { background: #e0e7ff; border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; }
+        .install-prompt button { background: #4f46e5; border: none; padding: 4px 12px; border-radius: 20px; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-overlay">
+    <div class="login-card">
+        <h2>📊 نظام إدارة المشاريع</h2>
+        <p style="font-size:12px; color:#666; margin-bottom:8px;">🔐 نظام متكامل للإدارة مع مزامنة سحابية</p>
+
+        <div id="installPrompt" class="install-prompt" style="display:none;">
+            <span>📱 ثبّت التطبيق على جهازك</span>
+            <button id="installBtn">تثبيت</button>
+        </div>
+
+        <div id="firebaseSuccess" class="firebase-success" style="display:none;">
+            <h3>✅ Firebase متصل بنجاح</h3>
+            <p>البيانات محفوظة في السحابة الخاصة بك</p>
+        </div>
+
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <div class="password-field">
+            <input type="password" id="loginPassword" placeholder="الرمز السري">
+            <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">👁️</button>
+        </div>
+        <div class="remember-me">
+            <input type="checkbox" id="rememberDevice" checked>
+            <label for="rememberDevice">تذكر هذا الجهاز</label>
+        </div>
+        <button onclick="login()" class="btn-primary" style="width:100%;margin-top:8px;">دخول</button>
+        <button onclick="showRegister()" class="btn-outline" style="width:100%;margin-top:8px;">إنشاء حساب جديد</button>
+        <button onclick="loginLocalOnly()" class="btn-outline" style="width:100%;margin-top:8px;background:#f0fdf4;">📱 تشغيل محلي (بدون سحابة)</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+</div>
+
+<div id="registerScreen" class="login-overlay" style="display:none;">
+    <div class="login-card">
+        <h2>📝 حساب جديد</h2>
+        <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+        <input type="text" id="regName" placeholder="الاسم الكامل">
+        <div class="password-field">
+            <input type="password" id="regPassword" placeholder="الرمز السري (6 أحرف على الأقل)">
+            <button type="button" class="toggle-password" onclick="togglePassword('regPassword')">👁️</button>
+        </div>
+        <div class="remember-me">
+            <input type="checkbox" id="regRememberDevice" checked>
+            <label for="regRememberDevice">تذكر هذا الجهاز</label>
+        </div>
+        <button onclick="register()" class="btn-primary" style="width:100%;margin-top:8px;">تسجيل</button>
+        <button onclick="hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">رجوع</button>
+        <div id="regError" class="error-msg"></div>
+    </div>
+</div>
+
+<div id="mainApp" style="display:none">
+    <div class="app-container">
+        <div class="main-header">
+            <h1>📁 نظام إدارة المشاريع</h1>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <span class="user-info" id="userNameDisplay"></span>
+                <span class="user-info" id="syncModeDisplay" style="background:#475569;"></span>
+                <button class="logout-btn" onclick="logout()">🚪 خروج</button>
+            </div>
+        </div>
+        <div id="syncStatus" class="sync-status online">💾 وضع التشغيل المحلي</div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showMainTab('projects')">📂 العملاء</button>
+            <button class="tab-btn" onclick="showMainTab('workers')">👥 العمال</button>
+            <button class="tab-btn" onclick="showMainTab('accounting')">💰 المحاسبة</button>
+        </div>
+
+        <div id="projectsTab" class="tab-content active">
+            <div id="customersScreen"><div style="margin-bottom:10px;"><button id="addCustomerBtn" class="btn-primary" style="width:100%;">➕ عميل جديد</button></div><div id="customersGrid" class="customers-grid"></div></div>
+            <div id="projectsScreen" style="display:none;"><div class="breadcrumb"><span>📂 <span id="currentCustomerNameSpan"></span></span><button id="addProjectFromProjects" class="btn-secondary">➕ مشروع جديد</button></div><div id="projectsGrid" class="projects-grid"></div></div>
+            <div id="projectDetailScreen" style="display:none;"><div class="breadcrumb"><span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span></div><div class="project-detail-card"><div class="info-bar"><div class="info-row"><div class="info-item"><span class="info-label">👤 العميل</span><span class="info-value" id="detailCustomerName"></span></div><div class="info-item"><span class="info-label">🏗️ المشروع</span><span class="info-value" id="detailProjectName"></span></div></div><div class="price-per-meter-box"><span>💰 سعر المتر:</span><input type="number" id="globalPricePerMeter" step="0.01" value="50"></div><div class="info-row"><div class="info-item"><span class="info-label">💵 إجمالي المشروع</span><span class="info-value grand-total" id="projectGrandTotal">0.00</span><span> دينار</span></div></div></div><div class="payments-section"><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;"><h4>💰 الدفعات المستلمة</h4><button id="addPaymentBtn" class="btn-secondary">➕ إضافة دفعة</button></div><div class="table-wrapper"><table class="payments-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="paymentsBody"></tbody></table></div><div><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span> دينار</div></div><button id="addRoomInProject" class="btn-primary btn-add-room">➕ إضافة غرفة</button><div class="table-wrapper"><table class="rooms-table"><thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></tr></thead><tbody id="roomsTableBody"></tbody></table></div><div class="action-buttons" style="display:flex; gap:8px; margin-top:12px;"><button id="saveProjectData" class="btn-secondary">💾 حفظ</button><button id="deleteProjectBtn" class="btn-danger">🗑️ حذف</button></div></div></div>
+        </div>
+
+        <div id="workersTab" class="tab-content">
+            <div class="toolbar">
+                <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 بحث" onkeyup="filterWorkers()"></div>
+                <div><button class="btn-primary" onclick="addNewWorker()">➕ إضافة عامل</button><button class="btn-warning" onclick="toggleArchivePanel()">📂 السجلات</button></div>
+            </div>
+            <div id="archivePanel" class="archive-panel"><div id="archiveList" class="archive-list"></div></div>
+            <div class="workers-table-wrapper">
+                <table class="workers-table">
+                    <thead>
+                        <tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المصروف</th><th>السعر</th><th>المجموع</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="workersTableBody"></tbody>
+                </table>
+            </div>
+            <div class="summary" style="margin-top:12px; background:#e8f5e9;"><div class="summary-item"><span>👥 إجمالي مستحقات العمال:</span><span id="workersTotal">0</span><span> دينار</span></div></div>
+        </div>
+
+        <div id="accountingTab" class="tab-content">
+            <div class="person-selector"><label>👤 الشخص:</label><select id="personSelect" onchange="switchPerson()"><option value="main">المدير الرئيسي</option></select><button class="btn-secondary" onclick="addNewPerson()">➕ شخص جديد</button></div>
+            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;"><button class="btn-primary" onclick="addAccountingRow()">➕ إضافة صف</button><button class="btn-danger" onclick="archiveAndClearAccounting()">📦 حذف وحفظ</button><button class="btn-info" onclick="showAccountingHistory()">📋 السجل</button></div>
+            <div class="table-wrapper">
+                <table class="accounting-table">
+                    <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr></thead>
+                    <tbody id="accountingBody"></tbody>
+                </table>
+            </div>
+            <div class="summary"><div class="summary-item"><span>📈 مجموع الإيرادات:</span><span id="totalRevenue">0</span></div><div class="summary-item"><span>📉 مجموع المصاريف:</span><span id="totalExpense">0</span></div><div class="summary-item"><span>💰 صافي الربح:</span><span id="netProfit" class="profit">0</span></div></div>
+        </div>
+    </div>
+</div>
+
+<div id="backNotice" class="back-notice">🔙 اضغط مرتين للرجوع</div>
+
+<script>
+    // ==================== إعدادات Firebase ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyA7hVCo7no6VlCTSDtvz0NEB1WS5bDRau0",
+        authDomain: "worksv3.firebaseapp.com",
+        projectId: "worksv3",
+        storageBucket: "worksv3.firebasestorage.app",
+        messagingSenderId: "672087668925",
+        appId: "1:672087668925:web:93f274851162c8ae15dfd4",
+        measurementId: "G-FKVTPN5Z61"
+    };
+
+    let auth = null;
+    let db = null;
+    let firebaseReady = false;
+
+    try {
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.database();
+        firebaseReady = true;
+        console.log("✅ Firebase initialized");
+        document.getElementById("firebaseSuccess").style.display = "block";
+    } catch(e) {
+        console.warn("⚠️ Firebase init failed:", e);
+    }
+
+    // ==================== PWA Installation ====================
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installPrompt = document.getElementById('installPrompt');
+        if(installPrompt) installPrompt.style.display = 'flex';
+    });
+
+    document.getElementById('installBtn')?.addEventListener('click', async () => {
+        if(deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if(outcome === 'accepted') {
+                document.getElementById('installPrompt').style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    });
+
+    // ==================== المتغيرات العامة ====================
+    let currentUser = null;
+    let isOnline = navigator.onLine;
+    let syncInProgress = false;
+    let navigationStack = [];
+    let useCloudSync = false;
+
+    function getDeviceId() {
+        let deviceId = localStorage.getItem('device_id');
+        if(!deviceId) {
+            deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', deviceId);
+        }
+        return deviceId;
+    }
+
+    const deviceId = getDeviceId();
+
+    let userData = {
+        customers: [], workers: [], accountingPersons: { main: { name: "المدير الرئيسي", rows: [] } },
+        currentPersonId: "main", nextCustId: 1, nextProjId: 100, nextRoomId: 1000,
+        currentWeekKey: "", workersArchives: [], accountingHistory: []
+    };
+
+    let currentCustomerId = null, currentProjectId = null;
+    const dayKeys = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+    const dayNames = ['سبت', 'أحد', 'إثن', 'ثلاث', 'أربع', 'خميس', 'جمعة'];
+
+    function getCurrentWeekKey() {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        let lastSaturday = new Date(today);
+        if (dayOfWeek === 6) lastSaturday = today;
+        else lastSaturday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+        const year = lastSaturday.getFullYear();
+        const startOfYear = new Date(year, 0, 1);
+        const days = Math.floor((lastSaturday - startOfYear) / (24 * 60 * 60 * 1000));
+        const weekNum = Math.ceil((days + 1) / 7);
+        return `${year}-W${weekNum.toString().padStart(2, '0')}`;
+    }
+
+    function updateSyncStatus(status, message) {
+        const el = document.getElementById("syncStatus");
+        if(el) { el.textContent = message; el.className = `sync-status ${status}`; }
+    }
+
+    function escapeHtml(s){ if(!s)return ''; return s.replace(/[&<>]/g,function(m){ return m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'; }); }
+
+    function saveToLocal() {
+        if(currentUser) {
+            localStorage.setItem(`data_${currentUser.uid}`, JSON.stringify({
+                customers: userData.customers,
+                workers: userData.workers,
+                accountingPersons: userData.accountingPersons,
+                currentPersonId: userData.currentPersonId,
+                nextCustId: userData.nextCustId,
+                nextProjId: userData.nextProjId,
+                nextRoomId: userData.nextRoomId,
+                currentWeekKey: userData.currentWeekKey,
+                workersArchives: userData.workersArchives,
+                accountingHistory: userData.accountingHistory
+            }));
+        }
+    }
+
+    function loadFromLocal() {
+        if(currentUser) {
+            const saved = localStorage.getItem(`data_${currentUser.uid}`);
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    userData.customers = data.customers || [];
+                    userData.workers = data.workers || [];
+                    userData.accountingPersons = data.accountingPersons || { main: { name: "المدير الرئيسي", rows: [] } };
+                    userData.currentPersonId = data.currentPersonId || "main";
+                    userData.nextCustId = data.nextCustId || 1;
+                    userData.nextProjId = data.nextProjId || 100;
+                    userData.nextRoomId = data.nextRoomId || 1000;
+                    userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
+                    userData.workersArchives = data.workersArchives || [];
+                    userData.accountingHistory = data.accountingHistory || [];
+                    return true;
+                } catch(e) {}
+            }
+        }
+        return false;
+    }
+
+    async function saveToCloud() {
+        if(!useCloudSync || !currentUser || !isOnline || syncInProgress || !db) return;
+        syncInProgress = true;
+        updateSyncStatus("syncing", "🔄 جاري المزامنة...");
+        try {
+            await db.ref(`users/${currentUser.uid}/data`).set({
+                customers: userData.customers,
+                workers: userData.workers,
+                accountingPersons: userData.accountingPersons,
+                currentPersonId: userData.currentPersonId,
+                nextCustId: userData.nextCustId,
+                nextProjId: userData.nextProjId,
+                nextRoomId: userData.nextRoomId,
+                currentWeekKey: userData.currentWeekKey,
+                workersArchives: userData.workersArchives,
+                accountingHistory: userData.accountingHistory,
+                lastModified: firebase.database.ServerValue.TIMESTAMP,
+                lastDeviceId: deviceId,
+                lastSync: new Date().toISOString()
+            });
+            updateSyncStatus("online", "☁️ متزامن مع السحابة");
+        } catch(e) {
+            console.error("خطأ في الحفظ:", e);
+            updateSyncStatus("online", "⚠️ تم الحفظ محلياً فقط");
+        }
+        syncInProgress = false;
+    }
+
+    async function loadFromCloud() {
+        if(!useCloudSync || !currentUser || !isOnline || !db) return false;
+        updateSyncStatus("syncing", "🔄 جاري التحميل...");
+        try {
+            const snapshot = await db.ref(`users/${currentUser.uid}/data`).get();
+            if(snapshot.exists()) {
+                const data = snapshot.val();
+                userData.customers = data.customers || [];
+                userData.workers = data.workers || [];
+                userData.accountingPersons = data.accountingPersons || { main: { name: "المدير الرئيسي", rows: [] } };
+                userData.currentPersonId = data.currentPersonId || "main";
+                userData.nextCustId = data.nextCustId || 1;
+                userData.nextProjId = data.nextProjId || 100;
+                userData.nextRoomId = data.nextRoomId || 1000;
+                userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
+                userData.workersArchives = data.workersArchives || [];
+                userData.accountingHistory = data.accountingHistory || [];
+                updateSyncStatus("online", "☁️ متزامن مع السحابة");
+                return true;
+            }
+        } catch(e) { console.error("خطأ في التحميل:", e); }
+        return false;
+    }
+
+    async function autoSave() {
+        saveToLocal();
+        if(useCloudSync && isOnline && currentUser && !currentUser.isLocalOnly) {
+            await saveToCloud();
+        }
+    }
+
+    function togglePassword(fieldId) {
+        let f = document.getElementById(fieldId);
+        f.type = f.type === "password" ? "text" : "password";
+    }
+
+    function loginLocalOnly() {
+        const localId = "local_user_" + deviceId;
+        currentUser = { uid: localId, email: "local@system.com", name: "المستخدم المحلي", isLocalOnly: true };
+        useCloudSync = false;
+        loadFromLocal();
+        if(userData.customers.length === 0) userData.currentWeekKey = getCurrentWeekKey();
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، مستخدم محلي`;
+        document.getElementById("syncModeDisplay").innerHTML = `💾 وضع محلي`;
+        updateSyncStatus("offline", "💾 وضع التشغيل المحلي");
+        renderAll();
+        initNavigationStack();
+    }
+
+    async function login() {
+        if(!auth) {
+            document.getElementById("loginError").innerText = "❌ Firebase غير مهيأ. يرجى استخدام الوضع المحلي";
+            return;
+        }
+        let email = document.getElementById("loginEmail").value.trim();
+        let password = document.getElementById("loginPassword").value;
+        let remember = document.getElementById("rememberDevice").checked;
+        let errorDiv = document.getElementById("loginError");
+        if(!email || !password) { errorDiv.innerText = "البريد الإلكتروني والرمز السري مطلوبان"; return; }
+        try {
+            const cred = await auth.signInWithEmailAndPassword(email, password);
+            currentUser = { uid: cred.user.uid, email: email, name: email.split('@')[0], isLocalOnly: false };
+            useCloudSync = true;
+            if(remember) {
+                localStorage.setItem('user_session_' + deviceId, JSON.stringify({
+                    uid: currentUser.uid, email: email, name: currentUser.name,
+                    timestamp: Date.now(), expires: Date.now() + (30 * 24 * 60 * 60 * 1000)
+                }));
+            }
+            await loadFromLocal();
+            await loadFromCloud();
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+            document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${currentUser.name}`;
+            document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
+            updateSyncStatus("online", "☁️ متزامن مع السحابة");
+            renderAll();
+            initNavigationStack();
+            errorDiv.innerText = "";
+        } catch(e) {
+            errorDiv.innerText = e.code === 'auth/user-not-found' ? "الحساب غير موجود" : "خطأ في تسجيل الدخول";
+        }
+    }
+
+    async function register() {
+        if(!auth) {
+            document.getElementById("regError").innerText = "❌ Firebase غير مهيأ";
+            return;
+        }
+        let email = document.getElementById("regEmail").value.trim();
+        let name = document.getElementById("regName").value.trim();
+        let password = document.getElementById("regPassword").value;
+        let remember = document.getElementById("regRememberDevice").checked;
+        let errorDiv = document.getElementById("regError");
+        if(!email || !name || !password) { errorDiv.innerText = "جميع الحقول مطلوبة"; return; }
+        if(password.length < 6) { errorDiv.innerText = "الرمز السري 6 أحرف على الأقل"; return; }
+        try {
+            const cred = await auth.createUserWithEmailAndPassword(email, password);
+            if(db) await db.ref(`users/${cred.user.uid}/profile`).set({ name, email, createdAt: new Date().toISOString() });
+            currentUser = { uid: cred.user.uid, email: email, name: name, isLocalOnly: false };
+            useCloudSync = true;
+            userData.currentWeekKey = getCurrentWeekKey();
+            if(remember) localStorage.setItem('user_session_' + deviceId, JSON.stringify({ uid: currentUser.uid, email: email, name: name, timestamp: Date.now(), expires: Date.now() + (30 * 24 * 60 * 60 * 1000) }));
+            await saveToCloud();
+            saveToLocal();
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+            document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${name}`;
+            document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
+            renderAll();
+            initNavigationStack();
+            alert("✅ تم إنشاء الحساب بنجاح!");
+        } catch(e) { errorDiv.innerText = e.code === 'auth/email-already-in-use' ? "البريد مستخدم" : e.message; }
+    }
+
+    async function logout() {
+        await autoSave();
+        currentUser = null; useCloudSync = false;
+        document.getElementById("mainApp").style.display = "none";
+        document.getElementById("loginScreen").style.display = "flex";
+    }
+
+    function showRegister() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("registerScreen").style.display = "flex"; }
+    function hideRegister() { document.getElementById("registerScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; }
+
+    // ==================== العمال (مع إضافة في الأعلى) ====================
+    function calculateWorkerTotal(w){ let days=dayKeys.reduce((s,k)=>s+(w.days[k]||0),0); return (days*(w.price||0))-(w.expense||0); }
+    function updateWorkersTotal() { document.getElementById("workersTotal").innerText = userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0).toFixed(2); }
+
+    function renderWorkersTable(){
+        let tbody=document.getElementById("workersTableBody"); if(!tbody) return;
+        let search=document.getElementById("searchInput")?.value.toLowerCase()||'';
+        let filtered=userData.workers.filter(w=>w.name.toLowerCase().includes(search));
+        tbody.innerHTML = filtered.map((w,idx)=> {
+            let daysHtml = '';
+            dayKeys.forEach((d, i) => { daysHtml += `<td data-label="${dayNames[i]}"><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days[d]?'checked':''}></td>`; });
+            return `<tr data-worker-id="${w.id}">
+                <td data-label="#">${idx+1}</td>
+                <td data-label="الاسم"><input class="editable name-input" value="${escapeHtml(w.name)}" data-field="name" data-id="${w.id}"></td>
+                ${daysHtml}
+                <td data-label="المصروف"><input class="editable" value="${w.expense||''}" data-field="expense" data-id="${w.id}" step="0.01"></td>
+                <td data-label="السعر"><input class="editable" value="${w.price||''}" data-field="price" data-id="${w.id}" step="0.01"></td>
+                <td data-label="المجموع" class="total-cell">${calculateWorkerTotal(w).toFixed(2)}</td>
+                <td data-label=""><button class="delete-btn" data-id="${w.id}">✖</button></td>
+             </tr>`;
+        }).join('');
+        attachWorkerEvents(); updateWorkersTotal();
+    }
+
+    function attachWorkerEvents(){
+        document.querySelectorAll('.attendance-check').forEach(cb=>{ cb.onchange=()=>{ let w=userData.workers.find(w=>w.id==parseInt(cb.dataset.id)); if(w){ w.days[cb.dataset.day]=cb.checked?1:0; renderWorkersTable(); autoSave(); } }; });
+        document.querySelectorAll('.editable').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ let val = inp.value; w[inp.dataset.field]= (inp.dataset.field==='name') ? val : (val===''?0:parseFloat(val)||0); renderWorkersTable(); autoSave(); } }; });
+        document.querySelectorAll('.delete-btn').forEach(btn=>{ btn.onclick=()=>{ userData.workers=userData.workers.filter(w=>w.id!=parseInt(btn.dataset.id)); renderWorkersTable(); autoSave(); }; });
+    }
+
+    // إضافة عامل في الأعلى
+    function addNewWorker(){
+        let newId = userData.workers.length ? Math.max(...userData.workers.map(w=>w.id)) + 1 : 1;
+        const newWorker = { id:newId, name:'عامل جديد', price:0, expense:0, days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} };
+        userData.workers.unshift(newWorker); // إضافة في الأعلى
+        renderWorkersTable();
+        autoSave();
+        // تمرير إلى الأعلى
+        document.querySelector('.workers-table-wrapper')?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function filterWorkers(){ renderWorkersTable(); }
+    function toggleArchivePanel(){ document.getElementById('archivePanel').classList.toggle('show'); loadWorkersArchivesList(); }
+    function loadWorkersArchivesList(){ let div=document.getElementById('archiveList'); if(!div)return; if(userData.workersArchives.length===0){ div.innerHTML='<div class="empty-message">📭 لا توجد سجلات</div>'; return; }
+        div.innerHTML=userData.workersArchives.map(a=>`<div class="archive-item" data-week="${a.weekKey}"><div>📅 ${a.weekKey}</div><button class="delete-archive-btn" data-week="${a.weekKey}">🗑</button></div>`).join('');
+        document.querySelectorAll('.archive-item').forEach(item=>{ item.onclick=(e)=>{ if(!e.target.classList.contains('delete-archive-btn')) loadWorkersArchiveWeek(item.dataset.week); }; });
+        document.querySelectorAll('.delete-archive-btn').forEach(btn=>{ btn.onclick=(e)=>{ e.stopPropagation(); userData.workersArchives=userData.workersArchives.filter(a=>a.weekKey!==btn.dataset.week); loadWorkersArchivesList(); autoSave(); }; });
+    }
+    function loadWorkersArchiveWeek(weekKey){ let a=userData.workersArchives.find(a=>a.weekKey===weekKey); if(a){ userData.workers=[...a.workers]; renderWorkersTable(); autoSave(); alert(`تم تحميل أسبوع ${weekKey}`); } }
+
+    // ==================== المحاسبة (مع إضافة في الأعلى) ====================
+    function renderPersonSelect() { let select = document.getElementById("personSelect"); if(!select) return; let options = ''; for(let id in userData.accountingPersons) { options += `<option value="${id}">${escapeHtml(userData.accountingPersons[id].name)}</option>`; } select.innerHTML = options; select.value = userData.currentPersonId; }
+    function switchPerson() { userData.currentPersonId = document.getElementById("personSelect").value; renderAccountingTable(); autoSave(); }
+    function addNewPerson() { let name = prompt("اسم الشخص الجديد:"); if(name) { let newId = 'person_' + Date.now(); userData.accountingPersons[newId] = { name: name, rows: [] }; renderPersonSelect(); userData.currentPersonId = newId; renderAccountingTable(); autoSave(); } }
+
+    function renderAccountingTable() {
+        let tbody = document.getElementById("accountingBody"); if(!tbody) return;
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) { person = { name: 'غير معروف', rows: [] }; userData.accountingPersons[userData.currentPersonId]=person; }
+        let rows = person.rows || [];
+        tbody.innerHTML = rows.map((r,i)=>`<tr data-row-index="${i}">
+            <td><input type="number" class="acc-expense" data-i="${i}" placeholder="0" value="${r.expense||''}" step="0.01" style="width:100%;"></td>
+            <td><input type="number" class="acc-revenue" data-i="${i}" placeholder="0" value="${r.revenue||''}" step="0.01" style="width:100%;"></td>
+            <td><input type="text" class="acc-note" data-i="${i}" placeholder="ملاحظة" value="${r.revenueNote||''}" style="width:100%;"></td>
+            <td><button class="delete-btn" data-i="${i}">✖</button></td>
+        </tr>`).join('');
+        attachAccountingEvents(); updateAccountingSummary();
+    }
+
+    function attachAccountingEvents() {
+        let person = userData.accountingPersons[userData.currentPersonId]; if(!person) return;
+        document.querySelectorAll('.acc-expense').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].expense=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
+        document.querySelectorAll('.acc-revenue').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].revenue=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
+        document.querySelectorAll('.acc-note').forEach(inp=>{ inp.onchange=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].revenueNote=inp.value; autoSave(); }; });
+        document.querySelectorAll('#accountingBody .delete-btn').forEach(btn=>{ btn.onclick=()=>{ let i=parseInt(btn.dataset.i); person.rows.splice(i,1); renderAccountingTable(); autoSave(); }; });
+    }
+
+    // إضافة صف في الأعلى
+    function addAccountingRow() {
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) return;
+        if(!person.rows) person.rows = [];
+        person.rows.unshift({expense:null, revenue:null, revenueNote:''}); // إضافة في الأعلى
+        renderAccountingTable();
+        autoSave();
+    }
+
+    function updateAccountingSummary() {
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) return;
+        let rows = person.rows || [];
+        let totalRevenue = rows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
+        let totalExpense = rows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
+        let net = totalRevenue - totalExpense;
+        document.getElementById("totalRevenue").innerText = totalRevenue.toFixed(2);
+        document.getElementById("totalExpense").innerText = totalExpense.toFixed(2);
+        let profitEl = document.getElementById("netProfit");
+        profitEl.innerText = net.toFixed(2);
+        profitEl.className = 'profit ' + (net>=0?'positive':'negative');
+    }
+
+    function archiveAndClearAccounting() {
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) return;
+        let rows = person.rows || [];
+        if(rows.length === 0){ alert("لا توجد بيانات"); return; }
+        if(confirm("سيتم حفظ البيانات ثم مسح الجدول؟")){
+            let totalExpense = rows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
+            let totalRevenue = rows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
+            let date = new Date().toLocaleDateString('ar-EG');
+            let time = new Date().toLocaleTimeString('ar-EG');
+            let historyRecord = { id: Date.now(), personName: person.name, date, time, rows: JSON.parse(JSON.stringify(rows)), summary: { totalExpense, totalRevenue, net: totalRevenue - totalExpense } };
+            if(!userData.accountingHistory) userData.accountingHistory = [];
+            userData.accountingHistory.unshift(historyRecord);
+            person.rows = [];
+            renderAccountingTable();
+            autoSave();
+            alert("تم الحفظ والمسح");
+        }
+    }
+
+    function showAccountingHistory() {
+        if(!userData.accountingHistory || userData.accountingHistory.length === 0){ alert("لا توجد سجلات"); return; }
+        let modal = document.createElement('div'); modal.className = 'modal';
+        let content = document.createElement('div'); content.className = 'modal-content';
+        content.innerHTML = '<h3>📋 سجل المحاسبة السابقة</h3>';
+        userData.accountingHistory.forEach(record => {
+            let div = document.createElement('div'); div.className = 'record-item';
+            div.innerHTML = `<div><strong>📅 ${record.date} - ${record.time}</strong> | 👤 ${record.personName}</div><div>💰 إيرادات: ${record.summary.totalRevenue.toFixed(2)} | 📉 مصاريف: ${record.summary.totalExpense.toFixed(2)} | صافي: ${record.summary.net.toFixed(2)}</div><div>📝 ${record.rows.length} سجل</div><button class="btn-outline" onclick="viewRecordDetails(${record.id})">🔍 عرض</button>`;
+            content.appendChild(div);
+        });
+        let closeBtn = document.createElement('button'); closeBtn.innerText = 'إغلاق'; closeBtn.className = 'btn-secondary'; closeBtn.onclick = () => modal.remove();
+        content.appendChild(closeBtn); modal.appendChild(content); document.body.appendChild(modal);
+    }
+
+    window.viewRecordDetails = function(recordId) {
+        let record = userData.accountingHistory.find(r => r.id === recordId);
+        if(!record) return;
+        let details = `📋 تفاصيل السجل\n${record.date}\n\n`;
+        record.rows.forEach((r, i) => { details += `${i+1}. مصاريف: ${(r.expense||0).toFixed(2)} | إيرادات: ${(r.revenue||0).toFixed(2)} | ملاحظة: ${r.revenueNote||'-'}\n`; });
+        details += `\n📊 الإجمالي: إيرادات=${record.summary.totalRevenue.toFixed(2)} | مصاريف=${record.summary.totalExpense.toFixed(2)} | صافي=${record.summary.net.toFixed(2)}`;
+        alert(details);
+    };
+
+    // ==================== العملاء والمشاريع ====================
+    function renderCustomersScreen() {
+        const grid = document.getElementById("customersGrid"); if(!grid) return;
+        if(userData.customers.length === 0){ grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء</div>'; return; }
+        let html='';
+        userData.customers.forEach(c=>{
+            let total=0;
+            c.projects?.forEach(p=>{ total+=p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0; });
+            html+=`<div class="customer-folder" data-id="${c.id}"><div class="folder-icon">📂</div><div class="customer-info"><div class="customer-name">${escapeHtml(c.name)}</div><div class="customer-stats">📁 ${c.projects?.length||0} مشروع | 💰 ${total.toFixed(2)} دينار</div></div></div>`;
+        });
+        grid.innerHTML=html;
+        document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>openCustomerProjects(parseInt(el.dataset.id))));
+    }
+
+    function openCustomerProjects(custId){
+        currentCustomerId=custId;
+        let cust=userData.customers.find(c=>c.id===custId);
+        document.getElementById("currentCustomerNameSpan").innerText=cust.name;
+        let grid=document.getElementById("projectsGrid");
+        if(cust.projects?.length){
+            grid.innerHTML=cust.projects.map(p=>`<div class="project-card" data-id="${p.id}"><div class="project-info"><div class="project-name">🏢 ${escapeHtml(p.name)}</div><div class="project-total">💰 ${(p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2)} دينار</div></div></div>`).join('');
+            document.querySelectorAll('.project-card').forEach(el=>el.addEventListener('click',()=>openProjectDetail(custId,parseInt(el.dataset.id))));
+        } else grid.innerHTML='<div class="empty-message">📭 لا توجد مشاريع</div>';
+        showProjectScreen('projects');
+        updateHistoryState('projects', custId);
+    }
+
+    function openProjectDetail(custId,projId){
+        currentCustomerId=custId; currentProjectId=projId;
+        let cust=userData.customers.find(c=>c.id===custId);
+        let proj=cust.projects.find(p=>p.id===projId);
+        document.getElementById("detailCustomerName").innerText=cust.name;
+        document.getElementById("detailProjectName").innerText=proj.name;
+        document.getElementById("navCustomerName").innerText=cust.name;
+        document.getElementById("navProjectName").innerText=proj.name;
+        document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50;
+        renderPaymentsTable(proj);
+        renderRoomsTable(proj);
+        updateProjectTotal(proj);
+        showProjectScreen('detail');
+        updateHistoryState('detail', custId, projId);
+    }
+
+    function renderPaymentsTable(proj){
+        let tbody = document.getElementById("paymentsBody"); if(!tbody) return;
+        if(!proj.payments) proj.payments = [];
+        if(proj.payments.length === 0){ tbody.innerHTML='<tr><td colspan="4">لا توجد دفعات</td></tr>'; document.getElementById("totalPayments").innerText="0.00"; return; }
+        tbody.innerHTML = proj.payments.map((p,idx)=>`<tr><td>${p.date}</td><td>${p.amount.toFixed(2)}</td><td>${escapeHtml(p.note||'')}</td><td><button class="delete-btn" data-payment-idx="${idx}">✖</button></td></tr>`).join('');
+        let total = proj.payments.reduce((s,p)=>s+p.amount,0);
+        document.getElementById("totalPayments").innerHTML = total.toFixed(2);
+        document.querySelectorAll('#paymentsBody .delete-btn').forEach(btn=>{ btn.onclick=()=>{ let idx=parseInt(btn.dataset.paymentIdx); proj.payments.splice(idx,1); renderPaymentsTable(proj); autoSave(); }; });
+    }
+
+    function addPayment(){
+        let cust=userData.customers.find(c=>c.id===currentCustomerId);
+        let proj=cust?.projects.find(p=>p.id===currentProjectId);
+        if(!proj) return;
+        let amount = prompt("المبلغ (دينار):");
+        if(!amount) return;
+        let note = prompt("ملاحظة:", "");
+        let date = new Date().toLocaleDateString('ar-EG');
+        if(!proj.payments) proj.payments = [];
+        proj.payments.push({ date, amount: parseFloat(amount)||0, note });
+        renderPaymentsTable(proj);
+        autoSave();
+        alert("تم إضافة الدفعة");
+    }
+
+    function renderRoomsTable(proj){
+        let tbody=document.getElementById("roomsTableBody"); if(!tbody) return;
+        if(!proj.rooms) proj.rooms=[];
+        if(proj.rooms.length===0){ tbody.innerHTML='<tr><td colspan="7">➕ أضف غرفة</td></tr>'; return; }
+        let price=proj.globalPricePerMeter||50;
+        tbody.innerHTML=proj.rooms.map((r,idx)=>{
+            let meters = (r.lengthVal && r.widthVal) ? (r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)) : 0;
+            r.totalCost = meters * price;
+            return `<tr data-room-id="${r.id}"><td>${idx+1}</td>
+                <td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||''}"></td>
+                <td><input type="number" class="room-width" step="0.01" value="${r.widthVal||''}"></td>
+                <td><select class="room-mode"><option value="area" ${r.calcMode==='area'?'selected':''}>مساحة</option><option value="perimeter" ${r.calcMode==='perimeter'?'selected':''}>محيط</option></select></td>
+                <td><span class="calc-val">${meters.toFixed(2)}</span></td>
+                <td><span class="room-total">${r.totalCost.toFixed(2)}</span></td>
+                <td><button class="delete-room-btn" data-id="${r.id}">✖</button></td>
+            </tr>`;
+        }).join('');
+        attachRoomEvents(proj);
+    }
+
+    function attachRoomEvents(proj){
+        document.querySelectorAll('.room-length, .room-width, .room-mode').forEach(el=>{ el.onchange=()=>{ syncRoomsFromDOM(proj); updateProjectTotal(proj); autoSave(); }; });
+        document.querySelectorAll('.delete-room-btn').forEach(btn=>{ btn.onclick=()=>{ proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); autoSave(); }; });
+    }
+
+    function syncRoomsFromDOM(proj){
+        document.querySelectorAll('#roomsTableBody tr[data-room-id]').forEach(row=>{
+            let id=parseInt(row.dataset.roomId);
+            let room=proj.rooms.find(r=>r.id===id);
+            if(room){
+                let len = parseFloat(row.querySelector('.room-length')?.value);
+                let wid = parseFloat(row.querySelector('.room-width')?.value);
+                room.lengthVal = isNaN(len) ? 0 : len;
+                room.widthVal = isNaN(wid) ? 0 : wid;
+                room.calcMode = row.querySelector('.room-mode')?.value;
+            }
+        });
+    }
+
+    function updateProjectTotal(proj){
+        let price=parseFloat(document.getElementById("globalPricePerMeter").value)||0;
+        proj.globalPricePerMeter=price;
+        proj.rooms.forEach(r=>{
+            let m = (r.lengthVal && r.widthVal) ? (r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)) : 0;
+            r.totalCost=m*price;
+        });
+        document.getElementById("projectGrandTotal").innerHTML=proj.rooms.reduce((s,r)=>s+r.totalCost,0).toFixed(2);
+    }
+
+    function addNewCustomer(){ let name=prompt("اسم العميل:"); if(name){ userData.customers.push({id:userData.nextCustId++, name, projects:[]}); renderCustomersScreen(); autoSave(); } }
+    function addProject(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust){ let name=prompt("اسم المشروع:"); if(name){ cust.projects.push({id:userData.nextProjId++, name, rooms:[], globalPricePerMeter:50, payments:[]}); openCustomerProjects(currentCustomerId); autoSave(); } } }
+    function addRoom(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ proj.rooms.push({id:userData.nextRoomId++, lengthVal:null, widthVal:null, calcMode:"area", totalCost:0}); openProjectDetail(currentCustomerId,currentProjectId); autoSave(); } }
+    function deleteProject(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust){ cust.projects=cust.projects.filter(p=>p.id!==currentProjectId); openCustomerProjects(currentCustomerId); autoSave(); } }
+    function saveProject(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ syncRoomsFromDOM(proj); updateProjectTotal(proj); autoSave(); alert("تم الحفظ"); } }
+
+    function showProjectScreen(screen){
+        document.getElementById("customersScreen").style.display=screen==='customers'?'block':'none';
+        document.getElementById("projectsScreen").style.display=screen==='projects'?'block':'none';
+        document.getElementById("projectDetailScreen").style.display=screen==='detail'?'block':'none';
+        if(screen==='customers') { renderCustomersScreen(); updateHistoryState('customers'); }
+    }
+
+    function showMainTab(tab){
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        if(tab==='projects'){
+            document.getElementById('projectsTab').classList.add('active');
+            document.querySelector('.tabs .tab-btn:first-child').classList.add('active');
+            showProjectScreen('customers');
+        } else if(tab==='workers'){
+            document.getElementById('workersTab').classList.add('active');
+            document.querySelector('.tabs .tab-btn:nth-child(2)').classList.add('active');
+            renderWorkersTable();
+        } else{
+            document.getElementById('accountingTab').classList.add('active');
+            document.querySelector('.tabs .tab-btn:nth-child(3)').classList.add('active');
+            renderAccountingTable();
+        }
+    }
+
+    // ==================== نظام التنقل ====================
+    function initNavigationStack() {
+        navigationStack = ['customers'];
+        history.pushState({screen: 'customers'}, '', '#customers');
+        window.addEventListener('popstate', function(event) { handleBackButton(); });
+    }
+
+    function handleBackButton() {
+        if (navigationStack.length > 1) {
+            navigationStack.pop();
+            const previousScreen = navigationStack[navigationStack.length - 1];
+            switch(previousScreen) {
+                case 'customers': showProjectScreen('customers'); showBackNotice('تم الرجوع إلى العملاء'); break;
+                case 'projects': if(currentCustomerId) openCustomerProjects(currentCustomerId); showBackNotice('تم الرجوع إلى المشاريع'); break;
+                case 'detail': if(currentCustomerId && currentProjectId) openProjectDetail(currentCustomerId, currentProjectId); showBackNotice('تم الرجوع إلى التفاصيل'); break;
+                default: break;
+            }
+        } else {
+            if(confirm('⚠️ هل تريد الخروج من التطبيق؟')) window.close();
+        }
+        event.preventDefault();
+        return false;
+    }
+
+    function updateHistoryState(screen, custId = null, projId = null) {
+        let stateKey = screen;
+        if(custId && projId) stateKey = `project_${custId}_${projId}`;
+        else if(custId) stateKey = `projects_${custId}`;
+        if(navigationStack[navigationStack.length - 1] !== stateKey) {
+            navigationStack.push(stateKey);
+            history.pushState({screen: stateKey}, '', `#${stateKey}`);
+        }
+    }
+
+    function showBackNotice(message) {
+        const notice = document.getElementById('backNotice');
+        notice.textContent = message;
+        notice.classList.add('show');
+        setTimeout(() => notice.classList.remove('show'), 1500);
+    }
+
+    function renderAll(){ renderCustomersScreen(); renderWorkersTable(); renderPersonSelect(); renderAccountingTable(); loadWorkersArchivesList(); }
+
+    // مستمعي الأحداث
+    window.addEventListener('online', async () => { isOnline = true; if(useCloudSync && currentUser && !currentUser.isLocalOnly) await loadFromCloud(); });
+    window.addEventListener('offline', () => { isOnline = false; updateSyncStatus("offline", "📴 غير متصل"); });
+
+    document.getElementById("addCustomerBtn")?.addEventListener("click",addNewCustomer);
+    document.getElementById("addProjectFromProjects")?.addEventListener("click",addProject);
+    document.getElementById("addRoomInProject")?.addEventListener("click",addRoom);
+    document.getElementById("saveProjectData")?.addEventListener("click",saveProject);
+    document.getElementById("deleteProjectBtn")?.addEventListener("click",deleteProject);
+    document.getElementById("addPaymentBtn")?.addEventListener("click",addPayment);
+    document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{ if(currentProjectId){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust) updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId)); } });
+
+    // بدء التطبيق
+    (async function init() {
+        document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("mainApp").style.display = "none";
+    })();
+
+    console.log("✅ النظام جاهز للاستخدام");
+</script>
+</body>
+</html>
