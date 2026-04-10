@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>نظام إدارة المشاريع - متكامل مع التحقق</title>
+    <title>نظام إدارة المشاريع</title>
 
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -139,7 +139,8 @@
         button:active { opacity: 0.7; }
 
         .verification-badge { background: #f59e0b; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.6rem; margin-right: 8px; }
-        .resend-btn { background: transparent; border: 1px solid #3b82f6; color: #3b82f6; padding: 2px 8px; border-radius: 16px; font-size: 0.6rem; cursor: pointer; margin-right: 8px; }
+        .resend-btn { background: #3b82f6; border: none; padding: 6px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; margin-top: 8px; width: 100%; }
+        .resend-btn:hover { background: #2563eb; }
     </style>
 </head>
 <body>
@@ -168,6 +169,12 @@
             <input type="checkbox" id="rememberDevice" checked>
             <label for="rememberDevice">تذكر هذا الجهاز (البقاء متصلاً)</label>
         </div>
+
+        <!-- زر إعادة إرسال رابط التفعيل -->
+        <button onclick="window.resendVerificationEmail()" class="resend-btn" style="background:#3b82f6;">
+            📧 إعادة إرسال رابط التفعيل
+        </button>
+
         <button onclick="window.login()" class="btn-primary" style="width:100%;margin-top:8px;">دخول</button>
         <button onclick="window.showRegister()" class="btn-outline" style="width:100%;margin-top:8px;">إنشاء حساب جديد</button>
         <button onclick="window.loginLocalOnly()" class="btn-outline" style="width:100%;margin-top:8px;background:#f0fdf4;">📱 تشغيل محلي (بدون سحابة)</button>
@@ -207,7 +214,10 @@
         </div>
         <div id="syncStatus" class="sync-status online">💾 وضع التشغيل المحلي</div>
         <div id="verificationWarning" style="display:none; background:#fef3c7; padding:8px; border-radius:12px; margin-bottom:10px; text-align:center; font-size:0.7rem;">
-            ⚠️ بريدك الإلكتروني غير مفعل. <button onclick="window.resendVerificationEmail()" class="resend-btn">إعادة إرسال رابط التفعيل</button>
+            ⚠️ بريدك الإلكتروني غير مفعل.
+            <button onclick="window.resendVerificationFromWarning()" class="resend-btn" style="background:#f59e0b; display:inline-block; width:auto; margin-top:5px;">
+                إعادة إرسال رابط التفعيل
+            </button>
         </div>
         <div class="tabs">
             <button class="tab-btn active" onclick="window.showMainTab('projects')">📂 العملاء</button>
@@ -286,7 +296,6 @@
         const successDiv = document.getElementById("firebaseSuccess");
         if(successDiv) successDiv.style.display = "block";
 
-        // تعيين persistence تلقائيًا
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch(e) {
         console.warn("⚠️ Firebase init failed:", e);
@@ -302,7 +311,6 @@
     const dayKeys = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
     const dayNames = ['سبت', 'أحد', 'إثن', 'ثلاث', 'أربع', 'خميس', 'جمعة'];
 
-    // دوال مساعدة
     function getDeviceId() {
         let deviceId = localStorage.getItem('device_id');
         if(!deviceId) {
@@ -333,7 +341,6 @@
         if(el) { el.textContent = message; el.className = `sync-status ${status}`; }
     }
 
-    // حفظ واسترجاع البيانات
     function saveToLocal() {
         if(currentUser && !currentUser.isLocalOnly) {
             localStorage.setItem(`data_${currentUser.uid}`, JSON.stringify({
@@ -426,7 +433,6 @@
                 lastSync: new Date().toISOString()
             });
 
-            // تسجيل الجهاز
             await db.ref(`users/${currentUser.uid}/devices/${deviceId}`).set({
                 lastLogin: Date.now(),
                 userAgent: navigator.userAgent,
@@ -472,7 +478,47 @@
         }
     }
 
-    // دوال المصادقة مع التحقق من البريد
+    // ==================== دوال إعادة إرسال التفعيل ====================
+
+    window.resendVerificationEmail = async function() {
+        const email = document.getElementById("loginEmail").value.trim();
+
+        if(!email) {
+            document.getElementById("loginError").innerText = "❌ الرجاء إدخال بريدك الإلكتروني أولاً";
+            return;
+        }
+
+        try {
+            // نرسل رابط إعادة تعيين كلمة المرور (وهو أيضاً يرسل رابط التفعيل)
+            await auth.sendPasswordResetEmail(email);
+            document.getElementById("loginError").innerHTML = "✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني.<br>📧 يرجى التحقق من صندوق الوارد أو البريد العشوائي (Spam)";
+            document.getElementById("loginError").style.color = "#065f46";
+            setTimeout(() => {
+                document.getElementById("loginError").innerText = "";
+                document.getElementById("loginError").style.color = "red";
+            }, 5000);
+        } catch(e) {
+            if(e.code === 'auth/user-not-found') {
+                document.getElementById("loginError").innerText = "❌ لا يوجد حساب مرتبط بهذا البريد الإلكتروني";
+            } else {
+                document.getElementById("loginError").innerText = "❌ خطأ: " + e.message;
+            }
+        }
+    }
+
+    window.resendVerificationFromWarning = async function() {
+        if(auth && auth.currentUser) {
+            try {
+                await auth.currentUser.sendEmailVerification();
+                alert("✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني");
+            } catch(e) {
+                alert("❌ خطأ: " + e.message);
+            }
+        } else {
+            alert("❌ الرجاء تسجيل الدخول أولاً");
+        }
+    }
+
     window.togglePassword = function(fieldId) {
         let f = document.getElementById(fieldId);
         f.type = f.type === "password" ? "text" : "password";
@@ -505,7 +551,6 @@
         let errorDiv = document.getElementById("loginError");
         if(!email || !password) { errorDiv.innerText = "البريد الإلكتروني والرمز السري مطلوبان"; return; }
         try {
-            // تعيين persistence حسب اختيار المستخدم
             await auth.setPersistence(
                 remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION
             );
@@ -550,18 +595,17 @@
         let name = document.getElementById("regName").value.trim();
         let password = document.getElementById("regPassword").value;
         let errorDiv = document.getElementById("regError");
+
         if(!email || !name || !password) { errorDiv.innerText = "جميع الحقول مطلوبة"; return; }
         if(password.length < 6) { errorDiv.innerText = "الرمز السري 6 أحرف على الأقل"; return; }
+
         try {
             const cred = await auth.createUserWithEmailAndPassword(email, password);
-
-            // تحديث اسم المستخدم
             await cred.user.updateProfile({ displayName: name });
 
             // إرسال رابط التفعيل
             await cred.user.sendEmailVerification();
 
-            // حفظ بيانات المستخدم في قاعدة البيانات
             if(db) await db.ref(`users/${cred.user.uid}/profile`).set({
                 name, email,
                 createdAt: new Date().toISOString(),
@@ -570,24 +614,15 @@
 
             alert("✅ تم إنشاء الحساب بنجاح!\n📧 تم إرسال رابط التفعيل إلى بريدك الإلكتروني.\n🔍 يرجى تفعيل حسابك ثم تسجيل الدخول.");
 
-            // تسجيل الخروج لحين التفعيل
             await auth.signOut();
             window.hideRegister();
 
-            // مسح الحقول
             document.getElementById("regEmail").value = "";
             document.getElementById("regName").value = "";
             document.getElementById("regPassword").value = "";
 
         } catch(e) {
             errorDiv.innerText = e.code === 'auth/email-already-in-use' ? "البريد مستخدم بالفعل" : e.message;
-        }
-    }
-
-    window.resendVerificationEmail = async function() {
-        if(auth && auth.currentUser) {
-            await auth.currentUser.sendEmailVerification();
-            alert("📧 تم إرسال رابط التفعيل مرة أخرى إلى بريدك الإلكتروني");
         }
     }
 
@@ -603,7 +638,7 @@
     window.showRegister = function() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("registerScreen").style.display = "flex"; }
     window.hideRegister = function() { document.getElementById("registerScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; }
 
-    // دوال العمال (نفس الكود السابق)
+    // ==================== دوال العمال ====================
     function calculateWorkerTotal(w){ let days=dayKeys.reduce((s,k)=>s+(w.days[k]||0),0); return (days*(w.price||0))-(w.expense||0); }
     function updateWorkersTotal() {
         const totalEl = document.getElementById("workersTotal");
@@ -661,7 +696,7 @@
         if(a){ userData.workers=[...a.workers]; window.renderWorkersTable(); autoSave(); alert(`تم تحميل أسبوع ${weekKey}`); }
     }
 
-    // دوال المحاسبة (مختصرة للطول)
+    // ==================== دوال المحاسبة ====================
     window.renderPersonSelect = function() {
         let select = document.getElementById("personSelect"); if(!select) return;
         let options = '';
@@ -765,7 +800,7 @@
         alert(details);
     };
 
-    // دوال العملاء والمشاريع
+    // ==================== دوال العملاء والمشاريع ====================
     window.renderCustomersScreen = function() {
         const grid = document.getElementById("customersGrid"); if(!grid) return;
         if(userData.customers.length === 0){ grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء</div>'; return; }
@@ -846,7 +881,7 @@
                 <td><span class="calc-val">${meters.toFixed(2)}</span></td>
                 <td><span class="room-total">${r.totalCost.toFixed(2)}</span></td>
                 <td><button class="delete-room-btn" data-id="${r.id}">✖</button></td>
-             </tr>`;
+              </tr>`;
         }).join('');
         attachRoomEvents(proj);
     }
@@ -1036,13 +1071,12 @@
                     window.initNavigationStack();
                 } else if(user && !user.emailVerified) {
                     document.getElementById("verificationWarning").style.display = "block";
-                    await auth.signOut();
                 }
             });
         }
     })();
 
-    console.log("✅ النظام جاهز للاستخدام مع التحقق من البريد الإلكتروني وتذكر الجهاز");
+    console.log("✅ النظام جاهز للاستخدام مع إعادة إرسال رابط التفعيل");
 </script>
 </body>
 </html>
