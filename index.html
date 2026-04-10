@@ -111,20 +111,15 @@
         .profit.negative { color: #ef4444; font-weight: bold; }
         .empty-message { text-align: center; padding: 20px; background: white; border-radius: 20px; color: #64748b; font-size: 0.75rem; }
 
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto; padding: 20px; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .login-card { background: white; padding: 20px; border-radius: 24px; width: 90%; max-width: 340px; text-align: center; }
         .login-card input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 12px; font-size: 14px; }
         .error-msg { color: red; font-size: 0.7rem; margin-top: 6px; }
-        .success-msg { color: #065f46; font-size: 0.7rem; margin-top: 6px; }
         .password-field { position: relative; width: 100%; }
         .password-field input { width: 100%; padding: 12px; padding-left: 45px; }
         .toggle-password { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; background: none; border: none; font-size: 1.2rem; }
         .remember-me { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin: 10px 0; font-size: 0.75rem; }
         .remember-me input { width: auto; margin: 0; }
-        .link-btn { background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 0.7rem; text-decoration: underline; margin-top: 8px; }
-        .divider { display: flex; align-items: center; text-align: center; margin: 12px 0; }
-        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
-        .divider span { padding: 0 10px; color: #64748b; font-size: 0.7rem; }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; }
         .modal-content { background: white; border-radius: 20px; padding: 16px; width: 90%; max-width: 500px; max-height: 80%; overflow-y: auto; }
@@ -143,13 +138,13 @@
         button { transition: opacity 0.2s; }
         button:active { opacity: 0.7; }
 
-        .verification-warning { background: #fef3c7; padding: 8px; border-radius: 12px; margin-bottom: 10px; text-align: center; font-size: 0.7rem; }
-        .resend-small-btn { background: #f59e0b; border: none; padding: 4px 12px; border-radius: 20px; color: white; cursor: pointer; margin-top: 5px; font-size: 0.65rem; }
+        .verification-badge { background: #f59e0b; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.6rem; margin-right: 8px; }
+        .resend-btn { background: #3b82f6; border: none; padding: 6px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; margin-top: 8px; width: 100%; }
+        .resend-btn:hover { background: #2563eb; }
     </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول الرئيسية -->
 <div id="loginScreen" class="login-overlay">
     <div class="login-card">
         <h2>📊 نظام إدارة المشاريع</h2>
@@ -165,7 +160,6 @@
             <p>البيانات محفوظة في السحابة الخاصة بك</p>
         </div>
 
-        <!-- نموذج تسجيل الدخول -->
         <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
         <div class="password-field">
             <input type="password" id="loginPassword" placeholder="الرمز السري">
@@ -176,27 +170,22 @@
             <label for="rememberDevice">تذكر هذا الجهاز (البقاء متصلاً)</label>
         </div>
 
+        <!-- زر إعادة إرسال رابط التفعيل -->
+        <button onclick="window.resendVerificationEmail()" class="resend-btn" style="background:#3b82f6;">
+            📧 إعادة إرسال رابط التفعيل
+        </button>
+
         <button onclick="window.login()" class="btn-primary" style="width:100%;margin-top:8px;">دخول</button>
-
-        <!-- زر نسيت كلمة المرور -->
-        <button onclick="window.showResetPassword()" class="link-btn" style="width:100%;">🔑 نسيت كلمة المرور؟</button>
-
-        <div class="divider"><span>أو</span></div>
-
-        <button onclick="window.showRegister()" class="btn-outline" style="width:100%;">📝 إنشاء حساب جديد</button>
+        <button onclick="window.showRegister()" class="btn-outline" style="width:100%;margin-top:8px;">إنشاء حساب جديد</button>
         <button onclick="window.loginLocalOnly()" class="btn-outline" style="width:100%;margin-top:8px;background:#f0fdf4;">📱 تشغيل محلي (بدون سحابة)</button>
-
         <div id="loginError" class="error-msg"></div>
-        <div id="loginSuccess" class="success-msg"></div>
     </div>
 </div>
 
-<!-- شاشة إنشاء حساب جديد -->
 <div id="registerScreen" class="login-overlay" style="display:none;">
     <div class="login-card">
         <h2>📝 حساب جديد</h2>
         <p style="font-size:12px; color:#666; margin-bottom:8px;">سيتم إرسال رابط تفعيل إلى بريدك الإلكتروني</p>
-
         <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
         <input type="text" id="regName" placeholder="الاسم الكامل">
         <div class="password-field">
@@ -207,34 +196,9 @@
             <input type="checkbox" id="regRememberDevice" checked>
             <label for="regRememberDevice">تذكر هذا الجهاز</label>
         </div>
-
         <button onclick="window.register()" class="btn-primary" style="width:100%;margin-top:8px;">تسجيل</button>
-
-        <!-- زر إعادة إرسال رابط التفعيل (بعد إنشاء الحساب) -->
-        <button onclick="window.resendVerificationFromRegister()" class="btn-warning" style="width:100%;margin-top:8px;">
-            📧 لم يصلني رابط التفعيل؟ إعادة إرسال
-        </button>
-
-        <button onclick="window.hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">🔙 رجوع إلى تسجيل الدخول</button>
-
+        <button onclick="window.hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">رجوع</button>
         <div id="regError" class="error-msg"></div>
-        <div id="regSuccess" class="success-msg"></div>
-    </div>
-</div>
-
-<!-- شاشة إعادة تعيين كلمة المرور -->
-<div id="resetPasswordScreen" class="login-overlay" style="display:none;">
-    <div class="login-card">
-        <h2>🔑 إعادة تعيين كلمة المرور</h2>
-        <p style="font-size:12px; color:#666; margin-bottom:8px;">أدخل بريدك الإلكتروني لإرسال رابط إعادة التعيين</p>
-
-        <input type="email" id="resetEmail" placeholder="البريد الإلكتروني">
-
-        <button onclick="window.sendPasswordReset()" class="btn-primary" style="width:100%;margin-top:8px;">إرسال رابط إعادة التعيين</button>
-        <button onclick="window.hideResetPassword()" class="btn-outline" style="width:100%;margin-top:8px;">🔙 رجوع</button>
-
-        <div id="resetError" class="error-msg"></div>
-        <div id="resetSuccess" class="success-msg"></div>
     </div>
 </div>
 
@@ -249,9 +213,11 @@
             </div>
         </div>
         <div id="syncStatus" class="sync-status online">💾 وضع التشغيل المحلي</div>
-        <div id="verificationWarning" class="verification-warning" style="display:none;">
-            ⚠️ بريدك الإلكتروني غير مفعل. يرجى تفعيل حسابك عبر الرابط المرسل إلى بريدك.
-            <button onclick="window.resendVerificationFromWarning()" class="resend-small-btn">📧 إعادة إرسال رابط التفعيل</button>
+        <div id="verificationWarning" style="display:none; background:#fef3c7; padding:8px; border-radius:12px; margin-bottom:10px; text-align:center; font-size:0.7rem;">
+            ⚠️ بريدك الإلكتروني غير مفعل.
+            <button onclick="window.resendVerificationFromWarning()" class="resend-btn" style="background:#f59e0b; display:inline-block; width:auto; margin-top:5px;">
+                إعادة إرسال رابط التفعيل
+            </button>
         </div>
         <div class="tabs">
             <button class="tab-btn active" onclick="window.showMainTab('projects')">📂 العملاء</button>
@@ -512,7 +478,46 @@
         }
     }
 
-    // ==================== دوال المصادقة ====================
+    // ==================== دوال إعادة إرسال التفعيل ====================
+
+    window.resendVerificationEmail = async function() {
+        const email = document.getElementById("loginEmail").value.trim();
+
+        if(!email) {
+            document.getElementById("loginError").innerText = "❌ الرجاء إدخال بريدك الإلكتروني أولاً";
+            return;
+        }
+
+        try {
+            // نرسل رابط إعادة تعيين كلمة المرور (وهو أيضاً يرسل رابط التفعيل)
+            await auth.sendPasswordResetEmail(email);
+            document.getElementById("loginError").innerHTML = "✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني.<br>📧 يرجى التحقق من صندوق الوارد أو البريد العشوائي (Spam)";
+            document.getElementById("loginError").style.color = "#065f46";
+            setTimeout(() => {
+                document.getElementById("loginError").innerText = "";
+                document.getElementById("loginError").style.color = "red";
+            }, 5000);
+        } catch(e) {
+            if(e.code === 'auth/user-not-found') {
+                document.getElementById("loginError").innerText = "❌ لا يوجد حساب مرتبط بهذا البريد الإلكتروني";
+            } else {
+                document.getElementById("loginError").innerText = "❌ خطأ: " + e.message;
+            }
+        }
+    }
+
+    window.resendVerificationFromWarning = async function() {
+        if(auth && auth.currentUser) {
+            try {
+                await auth.currentUser.sendEmailVerification();
+                alert("✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني");
+            } catch(e) {
+                alert("❌ خطأ: " + e.message);
+            }
+        } else {
+            alert("❌ الرجاء تسجيل الدخول أولاً");
+        }
+    }
 
     window.togglePassword = function(fieldId) {
         let f = document.getElementById(fieldId);
@@ -544,10 +549,6 @@
         let password = document.getElementById("loginPassword").value;
         let remember = document.getElementById("rememberDevice").checked;
         let errorDiv = document.getElementById("loginError");
-        let successDiv = document.getElementById("loginSuccess");
-        errorDiv.innerText = "";
-        successDiv.innerText = "";
-
         if(!email || !password) { errorDiv.innerText = "البريد الإلكتروني والرمز السري مطلوبان"; return; }
         try {
             await auth.setPersistence(
@@ -556,6 +557,7 @@
 
             const cred = await auth.signInWithEmailAndPassword(email, password);
 
+            // التحقق من تفعيل البريد الإلكتروني
             if (!cred.user.emailVerified) {
                 errorDiv.innerText = "⚠️ يرجى تفعيل حسابك عبر الرابط المرسل إلى بريدك الإلكتروني";
                 document.getElementById("verificationWarning").style.display = "block";
@@ -577,7 +579,7 @@
             updateSyncStatus("online", "☁️ متزامن مع السحابة");
             window.renderAll();
             window.initNavigationStack();
-
+            errorDiv.innerText = "";
         } catch(e) {
             errorDiv.innerText = e.code === 'auth/user-not-found' ? "الحساب غير موجود" :
                                  e.code === 'auth/wrong-password' ? "كلمة المرور غير صحيحة" : e.message;
@@ -593,9 +595,6 @@
         let name = document.getElementById("regName").value.trim();
         let password = document.getElementById("regPassword").value;
         let errorDiv = document.getElementById("regError");
-        let successDiv = document.getElementById("regSuccess");
-        errorDiv.innerText = "";
-        successDiv.innerText = "";
 
         if(!email || !name || !password) { errorDiv.innerText = "جميع الحقول مطلوبة"; return; }
         if(password.length < 6) { errorDiv.innerText = "الرمز السري 6 أحرف على الأقل"; return; }
@@ -604,6 +603,7 @@
             const cred = await auth.createUserWithEmailAndPassword(email, password);
             await cred.user.updateProfile({ displayName: name });
 
+            // إرسال رابط التفعيل
             await cred.user.sendEmailVerification();
 
             if(db) await db.ref(`users/${cred.user.uid}/profile`).set({
@@ -612,104 +612,17 @@
                 devices: { [deviceId]: { firstLogin: Date.now(), userAgent: navigator.userAgent } }
             });
 
-            successDiv.innerText = "✅ تم إنشاء الحساب! تم إرسال رابط التفعيل إلى بريدك.";
+            alert("✅ تم إنشاء الحساب بنجاح!\n📧 تم إرسال رابط التفعيل إلى بريدك الإلكتروني.\n🔍 يرجى تفعيل حسابك ثم تسجيل الدخول.");
 
             await auth.signOut();
+            window.hideRegister();
 
-            // مسح الحقول
             document.getElementById("regEmail").value = "";
             document.getElementById("regName").value = "";
             document.getElementById("regPassword").value = "";
 
-            setTimeout(() => {
-                window.hideRegister();
-                document.getElementById("loginSuccess").innerText = "✅ تم إنشاء الحساب! يرجى تفعيل حسابك عبر البريد ثم تسجيل الدخول.";
-                setTimeout(() => {
-                    document.getElementById("loginSuccess").innerText = "";
-                }, 5000);
-            }, 2000);
-
         } catch(e) {
             errorDiv.innerText = e.code === 'auth/email-already-in-use' ? "البريد مستخدم بالفعل" : e.message;
-        }
-    }
-
-    // إعادة إرسال رابط التفعيل من شاشة التسجيل
-    window.resendVerificationFromRegister = async function() {
-        const email = document.getElementById("regEmail").value.trim();
-        let errorDiv = document.getElementById("regError");
-        let successDiv = document.getElementById("regSuccess");
-
-        if(!email) {
-            errorDiv.innerText = "❌ الرجاء إدخال بريدك الإلكتروني أولاً";
-            return;
-        }
-
-        try {
-            await auth.sendPasswordResetEmail(email);
-            successDiv.innerText = "✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد أو البريد العشوائي (Spam)";
-            errorDiv.innerText = "";
-        } catch(e) {
-            if(e.code === 'auth/user-not-found') {
-                errorDiv.innerText = "❌ لا يوجد حساب مرتبط بهذا البريد الإلكتروني";
-            } else {
-                errorDiv.innerText = "❌ خطأ: " + e.message;
-            }
-            successDiv.innerText = "";
-        }
-    }
-
-    // إعادة تعيين كلمة المرور
-    window.showResetPassword = function() {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("resetPasswordScreen").style.display = "flex";
-        document.getElementById("resetEmail").value = "";
-        document.getElementById("resetError").innerText = "";
-        document.getElementById("resetSuccess").innerText = "";
-    }
-
-    window.hideResetPassword = function() {
-        document.getElementById("resetPasswordScreen").style.display = "none";
-        document.getElementById("loginScreen").style.display = "flex";
-    }
-
-    window.sendPasswordReset = async function() {
-        const email = document.getElementById("resetEmail").value.trim();
-        let errorDiv = document.getElementById("resetError");
-        let successDiv = document.getElementById("resetSuccess");
-        errorDiv.innerText = "";
-        successDiv.innerText = "";
-
-        if(!email) {
-            errorDiv.innerText = "❌ الرجاء إدخال بريدك الإلكتروني";
-            return;
-        }
-
-        try {
-            await auth.sendPasswordResetEmail(email);
-            successDiv.innerText = "✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني";
-            setTimeout(() => {
-                window.hideResetPassword();
-            }, 3000);
-        } catch(e) {
-            if(e.code === 'auth/user-not-found') {
-                errorDiv.innerText = "❌ لا يوجد حساب مرتبط بهذا البريد الإلكتروني";
-            } else {
-                errorDiv.innerText = "❌ خطأ: " + e.message;
-            }
-        }
-    }
-
-    window.resendVerificationFromWarning = async function() {
-        if(auth && auth.currentUser) {
-            try {
-                await auth.currentUser.sendEmailVerification();
-                alert("✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني");
-            } catch(e) {
-                alert("❌ خطأ: " + e.message);
-            }
-        } else {
-            alert("❌ الرجاء تسجيل الدخول أولاً");
         }
     }
 
@@ -720,20 +633,10 @@
         document.getElementById("loginScreen").style.display = "flex";
         document.getElementById("loginEmail").value = "";
         document.getElementById("loginPassword").value = "";
-        document.getElementById("loginError").innerText = "";
     }
 
-    window.showRegister = function() {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("registerScreen").style.display = "flex";
-        document.getElementById("regError").innerText = "";
-        document.getElementById("regSuccess").innerText = "";
-    }
-
-    window.hideRegister = function() {
-        document.getElementById("registerScreen").style.display = "none";
-        document.getElementById("loginScreen").style.display = "flex";
-    }
+    window.showRegister = function() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("registerScreen").style.display = "flex"; }
+    window.hideRegister = function() { document.getElementById("registerScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; }
 
     // ==================== دوال العمال ====================
     function calculateWorkerTotal(w){ let days=dayKeys.reduce((s,k)=>s+(w.days[k]||0),0); return (days*(w.price||0))-(w.expense||0); }
@@ -1173,7 +1076,7 @@
         }
     })();
 
-    console.log("✅ النظام جاهز للاستخدام - واجهة جديدة مع إعادة تعيين كلمة المرور");
+    console.log("✅ النظام جاهز للاستخدام مع إعادة إرسال رابط التفعيل");
 </script>
 </body>
 </html>
