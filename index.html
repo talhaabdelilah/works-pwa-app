@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>نظام إدارة المشاريع</title>
+    <title>نظام إدارة المشاريع - متكامل مع التحقق</title>
 
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -20,7 +20,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Cairo', 'Tahoma', sans-serif; }
         body { background: #eef2f5; padding: 8px; min-height: 100vh; }
-        .app-container { max-width: 100%; margin: 0 auto; }
+        .app-container { max-width: 800px; margin: 0 auto; }
         .main-header { background: #1e293b; color: white; padding: 10px 14px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; position: sticky; top: 0; z-index: 100; }
         .main-header h1 { font-size: 1rem; }
         .user-info { font-size: 0.7rem; background: #334155; padding: 4px 10px; border-radius: 30px; }
@@ -32,7 +32,7 @@
         .btn-warning { background: #f59e0b; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
         .btn-info { background: #8b5cf6; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
         .tabs { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 6px; border-radius: 40px; position: sticky; top: 60px; z-index: 99; }
-        .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
+        .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: all 0.2s; }
         .tab-btn.active { background: #3b82f6; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -42,7 +42,8 @@
         .sync-status.syncing { background: #fef3c7; color: #92400e; }
 
         .customers-grid, .projects-grid { display: flex; flex-direction: column; gap: 8px; }
-        .customer-folder, .project-card { background: white; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-right: 3px solid #3b82f6; }
+        .customer-folder, .project-card { background: white; border-radius: 14px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-right: 3px solid #3b82f6; transition: transform 0.1s, box-shadow 0.2s; }
+        .customer-folder:active, .project-card:active { transform: scale(0.99); }
         .project-card { border-right-color: #f59e0b; }
         .folder-icon { font-size: 1.6rem; }
         .customer-info, .project-info { flex: 1; }
@@ -133,6 +134,12 @@
 
         .install-prompt { background: #e0e7ff; border-radius: 12px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; }
         .install-prompt button { background: #4f46e5; border: none; padding: 4px 12px; border-radius: 20px; color: white; cursor: pointer; }
+
+        button { transition: opacity 0.2s; }
+        button:active { opacity: 0.7; }
+
+        .verification-badge { background: #f59e0b; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.6rem; margin-right: 8px; }
+        .resend-btn { background: transparent; border: 1px solid #3b82f6; color: #3b82f6; padding: 2px 8px; border-radius: 16px; font-size: 0.6rem; cursor: pointer; margin-right: 8px; }
     </style>
 </head>
 <body>
@@ -155,15 +162,15 @@
         <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
         <div class="password-field">
             <input type="password" id="loginPassword" placeholder="الرمز السري">
-            <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">👁️</button>
+            <button type="button" class="toggle-password" onclick="window.togglePassword('loginPassword')">👁️</button>
         </div>
         <div class="remember-me">
             <input type="checkbox" id="rememberDevice" checked>
-            <label for="rememberDevice">تذكر هذا الجهاز</label>
+            <label for="rememberDevice">تذكر هذا الجهاز (البقاء متصلاً)</label>
         </div>
-        <button onclick="login()" class="btn-primary" style="width:100%;margin-top:8px;">دخول</button>
-        <button onclick="showRegister()" class="btn-outline" style="width:100%;margin-top:8px;">إنشاء حساب جديد</button>
-        <button onclick="loginLocalOnly()" class="btn-outline" style="width:100%;margin-top:8px;background:#f0fdf4;">📱 تشغيل محلي (بدون سحابة)</button>
+        <button onclick="window.login()" class="btn-primary" style="width:100%;margin-top:8px;">دخول</button>
+        <button onclick="window.showRegister()" class="btn-outline" style="width:100%;margin-top:8px;">إنشاء حساب جديد</button>
+        <button onclick="window.loginLocalOnly()" class="btn-outline" style="width:100%;margin-top:8px;background:#f0fdf4;">📱 تشغيل محلي (بدون سحابة)</button>
         <div id="loginError" class="error-msg"></div>
     </div>
 </div>
@@ -171,18 +178,19 @@
 <div id="registerScreen" class="login-overlay" style="display:none;">
     <div class="login-card">
         <h2>📝 حساب جديد</h2>
+        <p style="font-size:12px; color:#666; margin-bottom:8px;">سيتم إرسال رابط تفعيل إلى بريدك الإلكتروني</p>
         <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
         <input type="text" id="regName" placeholder="الاسم الكامل">
         <div class="password-field">
             <input type="password" id="regPassword" placeholder="الرمز السري (6 أحرف على الأقل)">
-            <button type="button" class="toggle-password" onclick="togglePassword('regPassword')">👁️</button>
+            <button type="button" class="toggle-password" onclick="window.togglePassword('regPassword')">👁️</button>
         </div>
         <div class="remember-me">
             <input type="checkbox" id="regRememberDevice" checked>
             <label for="regRememberDevice">تذكر هذا الجهاز</label>
         </div>
-        <button onclick="register()" class="btn-primary" style="width:100%;margin-top:8px;">تسجيل</button>
-        <button onclick="hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">رجوع</button>
+        <button onclick="window.register()" class="btn-primary" style="width:100%;margin-top:8px;">تسجيل</button>
+        <button onclick="window.hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">رجوع</button>
         <div id="regError" class="error-msg"></div>
     </div>
 </div>
@@ -194,34 +202,36 @@
             <div style="display:flex; gap:8px; align-items:center;">
                 <span class="user-info" id="userNameDisplay"></span>
                 <span class="user-info" id="syncModeDisplay" style="background:#475569;"></span>
-                <button class="logout-btn" onclick="logout()">🚪 خروج</button>
+                <button class="logout-btn" onclick="window.logout()">🚪 خروج</button>
             </div>
         </div>
         <div id="syncStatus" class="sync-status online">💾 وضع التشغيل المحلي</div>
+        <div id="verificationWarning" style="display:none; background:#fef3c7; padding:8px; border-radius:12px; margin-bottom:10px; text-align:center; font-size:0.7rem;">
+            ⚠️ بريدك الإلكتروني غير مفعل. <button onclick="window.resendVerificationEmail()" class="resend-btn">إعادة إرسال رابط التفعيل</button>
+        </div>
         <div class="tabs">
-            <button class="tab-btn active" onclick="showMainTab('projects')">📂 العملاء</button>
-            <button class="tab-btn" onclick="showMainTab('workers')">👥 العمال</button>
-            <button class="tab-btn" onclick="showMainTab('accounting')">💰 المحاسبة</button>
+            <button class="tab-btn active" onclick="window.showMainTab('projects')">📂 العملاء</button>
+            <button class="tab-btn" onclick="window.showMainTab('workers')">👥 العمال</button>
+            <button class="tab-btn" onclick="window.showMainTab('accounting')">💰 المحاسبة</button>
         </div>
 
         <div id="projectsTab" class="tab-content active">
             <div id="customersScreen"><div style="margin-bottom:10px;"><button id="addCustomerBtn" class="btn-primary" style="width:100%;">➕ عميل جديد</button></div><div id="customersGrid" class="customers-grid"></div></div>
-            <div id="projectsScreen" style="display:none;"><div class="breadcrumb"><span>📂 <span id="currentCustomerNameSpan"></span></span><button id="addProjectFromProjects" class="btn-secondary">➕ مشروع جديد</button></div><div id="projectsGrid" class="projects-grid"></div></div>
-            <div id="projectDetailScreen" style="display:none;"><div class="breadcrumb"><span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span></div><div class="project-detail-card"><div class="info-bar"><div class="info-row"><div class="info-item"><span class="info-label">👤 العميل</span><span class="info-value" id="detailCustomerName"></span></div><div class="info-item"><span class="info-label">🏗️ المشروع</span><span class="info-value" id="detailProjectName"></span></div></div><div class="price-per-meter-box"><span>💰 سعر المتر:</span><input type="number" id="globalPricePerMeter" step="0.01" value="50"></div><div class="info-row"><div class="info-item"><span class="info-label">💵 إجمالي المشروع</span><span class="info-value grand-total" id="projectGrandTotal">0.00</span><span> دينار</span></div></div></div><div class="payments-section"><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;"><h4>💰 الدفعات المستلمة</h4><button id="addPaymentBtn" class="btn-secondary">➕ إضافة دفعة</button></div><div class="table-wrapper"><table class="payments-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="paymentsBody"></tbody></table></div><div><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span> دينار</div></div><button id="addRoomInProject" class="btn-primary btn-add-room">➕ إضافة غرفة</button><div class="table-wrapper"><table class="rooms-table"><thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></tr></thead><tbody id="roomsTableBody"></tbody></table></div><div class="action-buttons" style="display:flex; gap:8px; margin-top:12px;"><button id="saveProjectData" class="btn-secondary">💾 حفظ</button><button id="deleteProjectBtn" class="btn-danger">🗑️ حذف</button></div></div></div>
+            <div id="projectsScreen" style="display:none;"><div class="breadcrumb"><span>📂 <span id="currentCustomerNameSpan"></span></span><button id="addProjectFromProjects" class="btn-secondary">➕ مشروع جديد</button><button onclick="window.showProjectScreen('customers')" class="btn-outline">🔙 رجوع</button></div><div id="projectsGrid" class="projects-grid"></div></div>
+            <div id="projectDetailScreen" style="display:none;"><div class="breadcrumb"><span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span><button onclick="window.openCustomerProjects(currentCustomerId)" class="btn-outline">🔙 رجوع</button></div><div class="project-detail-card"><div class="info-bar"><div class="info-row"><div class="info-item"><span class="info-label">👤 العميل</span><span class="info-value" id="detailCustomerName"></span></div><div class="info-item"><span class="info-label">🏗️ المشروع</span><span class="info-value" id="detailProjectName"></span></div></div><div class="price-per-meter-box"><span>💰 سعر المتر:</span><input type="number" id="globalPricePerMeter" step="0.01" value="50"></div><div class="info-row"><div class="info-item"><span class="info-label">💵 إجمالي المشروع</span><span class="info-value grand-total" id="projectGrandTotal">0.00</span><span> دينار</span></div></div></div><div class="payments-section"><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;"><h4>💰 الدفعات المستلمة</h4><button id="addPaymentBtn" class="btn-secondary">➕ إضافة دفعة</button></div><div class="table-wrapper"><table class="payments-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="paymentsBody"></tbody></table></div><div><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span> دينار</div><div><strong>المتبقي:</strong> <span id="remainingAmount">0.00</span> دينار</div></div><button id="addRoomInProject" class="btn-primary btn-add-room">➕ إضافة غرفة</button><div class="table-wrapper"><table class="rooms-table"><thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></thead><tbody id="roomsTableBody"></tbody></table></div><div class="action-buttons" style="display:flex; gap:8px; margin-top:12px;"><button id="saveProjectData" class="btn-secondary">💾 حفظ</button><button id="deleteProjectBtn" class="btn-danger">🗑️ حذف المشروع</button></div></div></div>
         </div>
 
         <div id="workersTab" class="tab-content">
             <div class="toolbar">
-                <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 بحث" onkeyup="filterWorkers()"></div>
-                <div><button class="btn-primary" onclick="addNewWorker()">➕ إضافة عامل</button><button class="btn-warning" onclick="toggleArchivePanel()">📂 السجلات</button></div>
+                <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 بحث" onkeyup="window.filterWorkers()"></div>
+                <div><button class="btn-primary" onclick="window.addNewWorker()">➕ إضافة عامل</button><button class="btn-warning" onclick="window.toggleArchivePanel()">📂 السجلات</button></div>
             </div>
             <div id="archivePanel" class="archive-panel"><div id="archiveList" class="archive-list"></div></div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
                     <thead>
                         <tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المصروف</th><th>السعر</th><th>المجموع</th><th></th>
-                        </tr>
-                    </thead>
+                        </thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
             </div>
@@ -229,11 +239,11 @@
         </div>
 
         <div id="accountingTab" class="tab-content">
-            <div class="person-selector"><label>👤 الشخص:</label><select id="personSelect" onchange="switchPerson()"><option value="main">المدير الرئيسي</option></select><button class="btn-secondary" onclick="addNewPerson()">➕ شخص جديد</button></div>
-            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;"><button class="btn-primary" onclick="addAccountingRow()">➕ إضافة صف</button><button class="btn-danger" onclick="archiveAndClearAccounting()">📦 حذف وحفظ</button><button class="btn-info" onclick="showAccountingHistory()">📋 السجل</button></div>
+            <div class="person-selector"><label>👤 الشخص:</label><select id="personSelect" onchange="window.switchPerson()"><option value="main">المدير الرئيسي</option></select><button class="btn-secondary" onclick="window.addNewPerson()">➕ شخص جديد</button></div>
+            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;"><button class="btn-primary" onclick="window.addAccountingRow()">➕ إضافة صف</button><button class="btn-danger" onclick="window.archiveAndClearAccounting()">📦 حذف وحفظ</button><button class="btn-info" onclick="window.showAccountingHistory()">📋 السجل</button></div>
             <div class="table-wrapper">
                 <table class="accounting-table">
-                    <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr></thead>
+                    <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></thead>
                     <tbody id="accountingBody"></tbody>
                 </table>
             </div>
@@ -259,6 +269,13 @@
     let auth = null;
     let db = null;
     let firebaseReady = false;
+    let currentUser = null;
+    let isOnline = navigator.onLine;
+    let syncInProgress = false;
+    let navigationStack = [];
+    let useCloudSync = false;
+    let currentCustomerId = null;
+    let currentProjectId = null;
 
     try {
         firebase.initializeApp(firebaseConfig);
@@ -266,38 +283,26 @@
         db = firebase.database();
         firebaseReady = true;
         console.log("✅ Firebase initialized");
-        document.getElementById("firebaseSuccess").style.display = "block";
+        const successDiv = document.getElementById("firebaseSuccess");
+        if(successDiv) successDiv.style.display = "block";
+
+        // تعيين persistence تلقائيًا
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch(e) {
         console.warn("⚠️ Firebase init failed:", e);
     }
 
-    // ==================== PWA Installation ====================
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const installPrompt = document.getElementById('installPrompt');
-        if(installPrompt) installPrompt.style.display = 'flex';
-    });
+    // بيانات المستخدم
+    let userData = {
+        customers: [], workers: [], accountingPersons: { main: { name: "المدير الرئيسي", rows: [] } },
+        currentPersonId: "main", nextCustId: 1, nextProjId: 100, nextRoomId: 1000,
+        currentWeekKey: "", workersArchives: [], accountingHistory: []
+    };
 
-    document.getElementById('installBtn')?.addEventListener('click', async () => {
-        if(deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if(outcome === 'accepted') {
-                document.getElementById('installPrompt').style.display = 'none';
-            }
-            deferredPrompt = null;
-        }
-    });
+    const dayKeys = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+    const dayNames = ['سبت', 'أحد', 'إثن', 'ثلاث', 'أربع', 'خميس', 'جمعة'];
 
-    // ==================== المتغيرات العامة ====================
-    let currentUser = null;
-    let isOnline = navigator.onLine;
-    let syncInProgress = false;
-    let navigationStack = [];
-    let useCloudSync = false;
-
+    // دوال مساعدة
     function getDeviceId() {
         let deviceId = localStorage.getItem('device_id');
         if(!deviceId) {
@@ -306,18 +311,7 @@
         }
         return deviceId;
     }
-
     const deviceId = getDeviceId();
-
-    let userData = {
-        customers: [], workers: [], accountingPersons: { main: { name: "المدير الرئيسي", rows: [] } },
-        currentPersonId: "main", nextCustId: 1, nextProjId: 100, nextRoomId: 1000,
-        currentWeekKey: "", workersArchives: [], accountingHistory: []
-    };
-
-    let currentCustomerId = null, currentProjectId = null;
-    const dayKeys = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
-    const dayNames = ['سبت', 'أحد', 'إثن', 'ثلاث', 'أربع', 'خميس', 'جمعة'];
 
     function getCurrentWeekKey() {
         const today = new Date();
@@ -332,16 +326,30 @@
         return `${year}-W${weekNum.toString().padStart(2, '0')}`;
     }
 
+    function escapeHtml(s){ if(!s)return ''; return s.replace(/[&<>]/g,function(m){ return m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'; }); }
+
     function updateSyncStatus(status, message) {
         const el = document.getElementById("syncStatus");
         if(el) { el.textContent = message; el.className = `sync-status ${status}`; }
     }
 
-    function escapeHtml(s){ if(!s)return ''; return s.replace(/[&<>]/g,function(m){ return m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'; }); }
-
+    // حفظ واسترجاع البيانات
     function saveToLocal() {
-        if(currentUser) {
+        if(currentUser && !currentUser.isLocalOnly) {
             localStorage.setItem(`data_${currentUser.uid}`, JSON.stringify({
+                customers: userData.customers,
+                workers: userData.workers,
+                accountingPersons: userData.accountingPersons,
+                currentPersonId: userData.currentPersonId,
+                nextCustId: userData.nextCustId,
+                nextProjId: userData.nextProjId,
+                nextRoomId: userData.nextRoomId,
+                currentWeekKey: userData.currentWeekKey,
+                workersArchives: userData.workersArchives,
+                accountingHistory: userData.accountingHistory
+            }));
+        } else if(currentUser && currentUser.isLocalOnly) {
+            localStorage.setItem(`data_local_${currentUser.uid}`, JSON.stringify({
                 customers: userData.customers,
                 workers: userData.workers,
                 accountingPersons: userData.accountingPersons,
@@ -357,8 +365,26 @@
     }
 
     function loadFromLocal() {
-        if(currentUser) {
+        if(currentUser && !currentUser.isLocalOnly) {
             const saved = localStorage.getItem(`data_${currentUser.uid}`);
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    userData.customers = data.customers || [];
+                    userData.workers = data.workers || [];
+                    userData.accountingPersons = data.accountingPersons || { main: { name: "المدير الرئيسي", rows: [] } };
+                    userData.currentPersonId = data.currentPersonId || "main";
+                    userData.nextCustId = data.nextCustId || 1;
+                    userData.nextProjId = data.nextProjId || 100;
+                    userData.nextRoomId = data.nextRoomId || 1000;
+                    userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
+                    userData.workersArchives = data.workersArchives || [];
+                    userData.accountingHistory = data.accountingHistory || [];
+                    return true;
+                } catch(e) {}
+            }
+        } else if(currentUser && currentUser.isLocalOnly) {
+            const saved = localStorage.getItem(`data_local_${currentUser.uid}`);
             if(saved) {
                 try {
                     const data = JSON.parse(saved);
@@ -380,7 +406,7 @@
     }
 
     async function saveToCloud() {
-        if(!useCloudSync || !currentUser || !isOnline || syncInProgress || !db) return;
+        if(!useCloudSync || !currentUser || !isOnline || syncInProgress || !db || currentUser.isLocalOnly) return;
         syncInProgress = true;
         updateSyncStatus("syncing", "🔄 جاري المزامنة...");
         try {
@@ -399,6 +425,14 @@
                 lastDeviceId: deviceId,
                 lastSync: new Date().toISOString()
             });
+
+            // تسجيل الجهاز
+            await db.ref(`users/${currentUser.uid}/devices/${deviceId}`).set({
+                lastLogin: Date.now(),
+                userAgent: navigator.userAgent,
+                deviceName: navigator.platform || "Unknown"
+            });
+
             updateSyncStatus("online", "☁️ متزامن مع السحابة");
         } catch(e) {
             console.error("خطأ في الحفظ:", e);
@@ -408,7 +442,7 @@
     }
 
     async function loadFromCloud() {
-        if(!useCloudSync || !currentUser || !isOnline || !db) return false;
+        if(!useCloudSync || !currentUser || !isOnline || !db || currentUser.isLocalOnly) return false;
         updateSyncStatus("syncing", "🔄 جاري التحميل...");
         try {
             const snapshot = await db.ref(`users/${currentUser.uid}/data`).get();
@@ -438,12 +472,13 @@
         }
     }
 
-    function togglePassword(fieldId) {
+    // دوال المصادقة مع التحقق من البريد
+    window.togglePassword = function(fieldId) {
         let f = document.getElementById(fieldId);
         f.type = f.type === "password" ? "text" : "password";
     }
 
-    function loginLocalOnly() {
+    window.loginLocalOnly = function() {
         const localId = "local_user_" + deviceId;
         currentUser = { uid: localId, email: "local@system.com", name: "المستخدم المحلي", isLocalOnly: true };
         useCloudSync = false;
@@ -453,12 +488,13 @@
         document.getElementById("mainApp").style.display = "block";
         document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، مستخدم محلي`;
         document.getElementById("syncModeDisplay").innerHTML = `💾 وضع محلي`;
+        document.getElementById("verificationWarning").style.display = "none";
         updateSyncStatus("offline", "💾 وضع التشغيل المحلي");
-        renderAll();
-        initNavigationStack();
+        window.renderAll();
+        window.initNavigationStack();
     }
 
-    async function login() {
+    window.login = async function() {
         if(!auth) {
             document.getElementById("loginError").innerText = "❌ Firebase غير مهيأ. يرجى استخدام الوضع المحلي";
             return;
@@ -469,31 +505,43 @@
         let errorDiv = document.getElementById("loginError");
         if(!email || !password) { errorDiv.innerText = "البريد الإلكتروني والرمز السري مطلوبان"; return; }
         try {
+            // تعيين persistence حسب اختيار المستخدم
+            await auth.setPersistence(
+                remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION
+            );
+
             const cred = await auth.signInWithEmailAndPassword(email, password);
-            currentUser = { uid: cred.user.uid, email: email, name: email.split('@')[0], isLocalOnly: false };
-            useCloudSync = true;
-            if(remember) {
-                localStorage.setItem('user_session_' + deviceId, JSON.stringify({
-                    uid: currentUser.uid, email: email, name: currentUser.name,
-                    timestamp: Date.now(), expires: Date.now() + (30 * 24 * 60 * 60 * 1000)
-                }));
+
+            // التحقق من تفعيل البريد الإلكتروني
+            if (!cred.user.emailVerified) {
+                errorDiv.innerText = "⚠️ يرجى تفعيل حسابك عبر الرابط المرسل إلى بريدك الإلكتروني";
+                document.getElementById("verificationWarning").style.display = "block";
+                await auth.signOut();
+                return;
             }
+
+            currentUser = { uid: cred.user.uid, email: email, name: cred.user.displayName || email.split('@')[0], isLocalOnly: false };
+            useCloudSync = true;
+
             await loadFromLocal();
             await loadFromCloud();
+
             document.getElementById("loginScreen").style.display = "none";
             document.getElementById("mainApp").style.display = "block";
             document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${currentUser.name}`;
             document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
+            document.getElementById("verificationWarning").style.display = "none";
             updateSyncStatus("online", "☁️ متزامن مع السحابة");
-            renderAll();
-            initNavigationStack();
+            window.renderAll();
+            window.initNavigationStack();
             errorDiv.innerText = "";
         } catch(e) {
-            errorDiv.innerText = e.code === 'auth/user-not-found' ? "الحساب غير موجود" : "خطأ في تسجيل الدخول";
+            errorDiv.innerText = e.code === 'auth/user-not-found' ? "الحساب غير موجود" :
+                                 e.code === 'auth/wrong-password' ? "كلمة المرور غير صحيحة" : e.message;
         }
     }
 
-    async function register() {
+    window.register = async function() {
         if(!auth) {
             document.getElementById("regError").innerText = "❌ Firebase غير مهيأ";
             return;
@@ -501,44 +549,68 @@
         let email = document.getElementById("regEmail").value.trim();
         let name = document.getElementById("regName").value.trim();
         let password = document.getElementById("regPassword").value;
-        let remember = document.getElementById("regRememberDevice").checked;
         let errorDiv = document.getElementById("regError");
         if(!email || !name || !password) { errorDiv.innerText = "جميع الحقول مطلوبة"; return; }
         if(password.length < 6) { errorDiv.innerText = "الرمز السري 6 أحرف على الأقل"; return; }
         try {
             const cred = await auth.createUserWithEmailAndPassword(email, password);
-            if(db) await db.ref(`users/${cred.user.uid}/profile`).set({ name, email, createdAt: new Date().toISOString() });
-            currentUser = { uid: cred.user.uid, email: email, name: name, isLocalOnly: false };
-            useCloudSync = true;
-            userData.currentWeekKey = getCurrentWeekKey();
-            if(remember) localStorage.setItem('user_session_' + deviceId, JSON.stringify({ uid: currentUser.uid, email: email, name: name, timestamp: Date.now(), expires: Date.now() + (30 * 24 * 60 * 60 * 1000) }));
-            await saveToCloud();
-            saveToLocal();
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
-            document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${name}`;
-            document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
-            renderAll();
-            initNavigationStack();
-            alert("✅ تم إنشاء الحساب بنجاح!");
-        } catch(e) { errorDiv.innerText = e.code === 'auth/email-already-in-use' ? "البريد مستخدم" : e.message; }
+
+            // تحديث اسم المستخدم
+            await cred.user.updateProfile({ displayName: name });
+
+            // إرسال رابط التفعيل
+            await cred.user.sendEmailVerification();
+
+            // حفظ بيانات المستخدم في قاعدة البيانات
+            if(db) await db.ref(`users/${cred.user.uid}/profile`).set({
+                name, email,
+                createdAt: new Date().toISOString(),
+                devices: { [deviceId]: { firstLogin: Date.now(), userAgent: navigator.userAgent } }
+            });
+
+            alert("✅ تم إنشاء الحساب بنجاح!\n📧 تم إرسال رابط التفعيل إلى بريدك الإلكتروني.\n🔍 يرجى تفعيل حسابك ثم تسجيل الدخول.");
+
+            // تسجيل الخروج لحين التفعيل
+            await auth.signOut();
+            window.hideRegister();
+
+            // مسح الحقول
+            document.getElementById("regEmail").value = "";
+            document.getElementById("regName").value = "";
+            document.getElementById("regPassword").value = "";
+
+        } catch(e) {
+            errorDiv.innerText = e.code === 'auth/email-already-in-use' ? "البريد مستخدم بالفعل" : e.message;
+        }
     }
 
-    async function logout() {
+    window.resendVerificationEmail = async function() {
+        if(auth && auth.currentUser) {
+            await auth.currentUser.sendEmailVerification();
+            alert("📧 تم إرسال رابط التفعيل مرة أخرى إلى بريدك الإلكتروني");
+        }
+    }
+
+    window.logout = async function() {
         await autoSave();
         currentUser = null; useCloudSync = false;
         document.getElementById("mainApp").style.display = "none";
         document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginPassword").value = "";
     }
 
-    function showRegister() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("registerScreen").style.display = "flex"; }
-    function hideRegister() { document.getElementById("registerScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; }
+    window.showRegister = function() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("registerScreen").style.display = "flex"; }
+    window.hideRegister = function() { document.getElementById("registerScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; }
 
-    // ==================== العمال (مع إضافة في الأعلى) ====================
+    // دوال العمال (نفس الكود السابق)
     function calculateWorkerTotal(w){ let days=dayKeys.reduce((s,k)=>s+(w.days[k]||0),0); return (days*(w.price||0))-(w.expense||0); }
-    function updateWorkersTotal() { document.getElementById("workersTotal").innerText = userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0).toFixed(2); }
+    function updateWorkersTotal() {
+        const totalEl = document.getElementById("workersTotal");
+        if(totalEl) totalEl.innerText = userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0).toFixed(2);
+    }
 
-    function renderWorkersTable(){
+    window.renderWorkersTable = function(){
         let tbody=document.getElementById("workersTableBody"); if(!tbody) return;
         let search=document.getElementById("searchInput")?.value.toLowerCase()||'';
         let filtered=userData.workers.filter(w=>w.name.toLowerCase().includes(search));
@@ -553,43 +625,58 @@
                 <td data-label="السعر"><input class="editable" value="${w.price||''}" data-field="price" data-id="${w.id}" step="0.01"></td>
                 <td data-label="المجموع" class="total-cell">${calculateWorkerTotal(w).toFixed(2)}</td>
                 <td data-label=""><button class="delete-btn" data-id="${w.id}">✖</button></td>
-             </tr>`;
+              </tr>`;
         }).join('');
         attachWorkerEvents(); updateWorkersTotal();
     }
 
     function attachWorkerEvents(){
-        document.querySelectorAll('.attendance-check').forEach(cb=>{ cb.onchange=()=>{ let w=userData.workers.find(w=>w.id==parseInt(cb.dataset.id)); if(w){ w.days[cb.dataset.day]=cb.checked?1:0; renderWorkersTable(); autoSave(); } }; });
-        document.querySelectorAll('.editable').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ let val = inp.value; w[inp.dataset.field]= (inp.dataset.field==='name') ? val : (val===''?0:parseFloat(val)||0); renderWorkersTable(); autoSave(); } }; });
-        document.querySelectorAll('.delete-btn').forEach(btn=>{ btn.onclick=()=>{ userData.workers=userData.workers.filter(w=>w.id!=parseInt(btn.dataset.id)); renderWorkersTable(); autoSave(); }; });
+        document.querySelectorAll('.attendance-check').forEach(cb=>{ cb.onchange=()=>{ let w=userData.workers.find(w=>w.id==parseInt(cb.dataset.id)); if(w){ w.days[cb.dataset.day]=cb.checked?1:0; window.renderWorkersTable(); autoSave(); } }; });
+        document.querySelectorAll('.editable').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ let val = inp.value; w[inp.dataset.field]= (inp.dataset.field==='name') ? val : (val===''?0:parseFloat(val)||0); window.renderWorkersTable(); autoSave(); } }; });
+        document.querySelectorAll('.delete-btn').forEach(btn=>{ btn.onclick=()=>{ userData.workers=userData.workers.filter(w=>w.id!=parseInt(btn.dataset.id)); window.renderWorkersTable(); autoSave(); }; });
     }
 
-    // إضافة عامل في الأعلى
-    function addNewWorker(){
+    window.addNewWorker = function(){
         let newId = userData.workers.length ? Math.max(...userData.workers.map(w=>w.id)) + 1 : 1;
         const newWorker = { id:newId, name:'عامل جديد', price:0, expense:0, days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} };
-        userData.workers.unshift(newWorker); // إضافة في الأعلى
-        renderWorkersTable();
+        userData.workers.unshift(newWorker);
+        window.renderWorkersTable();
         autoSave();
-        // تمرير إلى الأعلى
         document.querySelector('.workers-table-wrapper')?.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function filterWorkers(){ renderWorkersTable(); }
-    function toggleArchivePanel(){ document.getElementById('archivePanel').classList.toggle('show'); loadWorkersArchivesList(); }
-    function loadWorkersArchivesList(){ let div=document.getElementById('archiveList'); if(!div)return; if(userData.workersArchives.length===0){ div.innerHTML='<div class="empty-message">📭 لا توجد سجلات</div>'; return; }
+    window.filterWorkers = function(){ window.renderWorkersTable(); }
+    window.toggleArchivePanel = function(){ document.getElementById('archivePanel').classList.toggle('show'); loadWorkersArchivesList(); }
+
+    function loadWorkersArchivesList(){
+        let div=document.getElementById('archiveList'); if(!div)return;
+        if(userData.workersArchives.length===0){ div.innerHTML='<div class="empty-message">📭 لا توجد سجلات</div>'; return; }
         div.innerHTML=userData.workersArchives.map(a=>`<div class="archive-item" data-week="${a.weekKey}"><div>📅 ${a.weekKey}</div><button class="delete-archive-btn" data-week="${a.weekKey}">🗑</button></div>`).join('');
         document.querySelectorAll('.archive-item').forEach(item=>{ item.onclick=(e)=>{ if(!e.target.classList.contains('delete-archive-btn')) loadWorkersArchiveWeek(item.dataset.week); }; });
         document.querySelectorAll('.delete-archive-btn').forEach(btn=>{ btn.onclick=(e)=>{ e.stopPropagation(); userData.workersArchives=userData.workersArchives.filter(a=>a.weekKey!==btn.dataset.week); loadWorkersArchivesList(); autoSave(); }; });
     }
-    function loadWorkersArchiveWeek(weekKey){ let a=userData.workersArchives.find(a=>a.weekKey===weekKey); if(a){ userData.workers=[...a.workers]; renderWorkersTable(); autoSave(); alert(`تم تحميل أسبوع ${weekKey}`); } }
 
-    // ==================== المحاسبة (مع إضافة في الأعلى) ====================
-    function renderPersonSelect() { let select = document.getElementById("personSelect"); if(!select) return; let options = ''; for(let id in userData.accountingPersons) { options += `<option value="${id}">${escapeHtml(userData.accountingPersons[id].name)}</option>`; } select.innerHTML = options; select.value = userData.currentPersonId; }
-    function switchPerson() { userData.currentPersonId = document.getElementById("personSelect").value; renderAccountingTable(); autoSave(); }
-    function addNewPerson() { let name = prompt("اسم الشخص الجديد:"); if(name) { let newId = 'person_' + Date.now(); userData.accountingPersons[newId] = { name: name, rows: [] }; renderPersonSelect(); userData.currentPersonId = newId; renderAccountingTable(); autoSave(); } }
+    function loadWorkersArchiveWeek(weekKey){
+        let a=userData.workersArchives.find(a=>a.weekKey===weekKey);
+        if(a){ userData.workers=[...a.workers]; window.renderWorkersTable(); autoSave(); alert(`تم تحميل أسبوع ${weekKey}`); }
+    }
 
-    function renderAccountingTable() {
+    // دوال المحاسبة (مختصرة للطول)
+    window.renderPersonSelect = function() {
+        let select = document.getElementById("personSelect"); if(!select) return;
+        let options = '';
+        for(let id in userData.accountingPersons) { options += `<option value="${id}">${escapeHtml(userData.accountingPersons[id].name)}</option>`; }
+        select.innerHTML = options; select.value = userData.currentPersonId;
+    }
+
+    window.switchPerson = function() { userData.currentPersonId = document.getElementById("personSelect").value; window.renderAccountingTable(); autoSave(); }
+
+    window.addNewPerson = function() {
+        let name = prompt("اسم الشخص الجديد:");
+        if(name) { let newId = 'person_' + Date.now(); userData.accountingPersons[newId] = { name: name, rows: [] }; window.renderPersonSelect(); userData.currentPersonId = newId; window.renderAccountingTable(); autoSave(); }
+    }
+
+    window.renderAccountingTable = function() {
         let tbody = document.getElementById("accountingBody"); if(!tbody) return;
         let person = userData.accountingPersons[userData.currentPersonId];
         if(!person) { person = { name: 'غير معروف', rows: [] }; userData.accountingPersons[userData.currentPersonId]=person; }
@@ -597,9 +684,9 @@
         tbody.innerHTML = rows.map((r,i)=>`<tr data-row-index="${i}">
             <td><input type="number" class="acc-expense" data-i="${i}" placeholder="0" value="${r.expense||''}" step="0.01" style="width:100%;"></td>
             <td><input type="number" class="acc-revenue" data-i="${i}" placeholder="0" value="${r.revenue||''}" step="0.01" style="width:100%;"></td>
-            <td><input type="text" class="acc-note" data-i="${i}" placeholder="ملاحظة" value="${r.revenueNote||''}" style="width:100%;"></td>
+            <td><input type="text" class="acc-note" data-i="${i}" placeholder="ملاحظة" value="${escapeHtml(r.revenueNote||'')}" style="width:100%;"></td>
             <td><button class="delete-btn" data-i="${i}">✖</button></td>
-        </tr>`).join('');
+          </tr>`).join('');
         attachAccountingEvents(); updateAccountingSummary();
     }
 
@@ -608,16 +695,15 @@
         document.querySelectorAll('.acc-expense').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].expense=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
         document.querySelectorAll('.acc-revenue').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].revenue=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
         document.querySelectorAll('.acc-note').forEach(inp=>{ inp.onchange=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].revenueNote=inp.value; autoSave(); }; });
-        document.querySelectorAll('#accountingBody .delete-btn').forEach(btn=>{ btn.onclick=()=>{ let i=parseInt(btn.dataset.i); person.rows.splice(i,1); renderAccountingTable(); autoSave(); }; });
+        document.querySelectorAll('#accountingBody .delete-btn').forEach(btn=>{ btn.onclick=()=>{ let i=parseInt(btn.dataset.i); person.rows.splice(i,1); window.renderAccountingTable(); autoSave(); }; });
     }
 
-    // إضافة صف في الأعلى
-    function addAccountingRow() {
+    window.addAccountingRow = function() {
         let person = userData.accountingPersons[userData.currentPersonId];
         if(!person) return;
         if(!person.rows) person.rows = [];
-        person.rows.unshift({expense:null, revenue:null, revenueNote:''}); // إضافة في الأعلى
-        renderAccountingTable();
+        person.rows.unshift({expense:null, revenue:null, revenueNote:''});
+        window.renderAccountingTable();
         autoSave();
     }
 
@@ -628,14 +714,15 @@
         let totalRevenue = rows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
         let totalExpense = rows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
         let net = totalRevenue - totalExpense;
-        document.getElementById("totalRevenue").innerText = totalRevenue.toFixed(2);
-        document.getElementById("totalExpense").innerText = totalExpense.toFixed(2);
-        let profitEl = document.getElementById("netProfit");
-        profitEl.innerText = net.toFixed(2);
-        profitEl.className = 'profit ' + (net>=0?'positive':'negative');
+        const revenueEl = document.getElementById("totalRevenue");
+        const expenseEl = document.getElementById("totalExpense");
+        const profitEl = document.getElementById("netProfit");
+        if(revenueEl) revenueEl.innerText = totalRevenue.toFixed(2);
+        if(expenseEl) expenseEl.innerText = totalExpense.toFixed(2);
+        if(profitEl) { profitEl.innerText = net.toFixed(2); profitEl.className = 'profit ' + (net>=0?'positive':'negative'); }
     }
 
-    function archiveAndClearAccounting() {
+    window.archiveAndClearAccounting = function() {
         let person = userData.accountingPersons[userData.currentPersonId];
         if(!person) return;
         let rows = person.rows || [];
@@ -649,20 +736,20 @@
             if(!userData.accountingHistory) userData.accountingHistory = [];
             userData.accountingHistory.unshift(historyRecord);
             person.rows = [];
-            renderAccountingTable();
+            window.renderAccountingTable();
             autoSave();
             alert("تم الحفظ والمسح");
         }
     }
 
-    function showAccountingHistory() {
+    window.showAccountingHistory = function() {
         if(!userData.accountingHistory || userData.accountingHistory.length === 0){ alert("لا توجد سجلات"); return; }
         let modal = document.createElement('div'); modal.className = 'modal';
         let content = document.createElement('div'); content.className = 'modal-content';
         content.innerHTML = '<h3>📋 سجل المحاسبة السابقة</h3>';
         userData.accountingHistory.forEach(record => {
             let div = document.createElement('div'); div.className = 'record-item';
-            div.innerHTML = `<div><strong>📅 ${record.date} - ${record.time}</strong> | 👤 ${record.personName}</div><div>💰 إيرادات: ${record.summary.totalRevenue.toFixed(2)} | 📉 مصاريف: ${record.summary.totalExpense.toFixed(2)} | صافي: ${record.summary.net.toFixed(2)}</div><div>📝 ${record.rows.length} سجل</div><button class="btn-outline" onclick="viewRecordDetails(${record.id})">🔍 عرض</button>`;
+            div.innerHTML = `<div><strong>📅 ${record.date} - ${record.time}</strong> | 👤 ${record.personName}</div><div>💰 إيرادات: ${record.summary.totalRevenue.toFixed(2)} | 📉 مصاريف: ${record.summary.totalExpense.toFixed(2)} | صافي: ${record.summary.net.toFixed(2)}</div><div>📝 ${record.rows.length} سجل</div><button class="btn-outline" onclick="window.viewRecordDetails(${record.id})">🔍 عرض</button>`;
             content.appendChild(div);
         });
         let closeBtn = document.createElement('button'); closeBtn.innerText = 'إغلاق'; closeBtn.className = 'btn-secondary'; closeBtn.onclick = () => modal.remove();
@@ -678,8 +765,8 @@
         alert(details);
     };
 
-    // ==================== العملاء والمشاريع ====================
-    function renderCustomersScreen() {
+    // دوال العملاء والمشاريع
+    window.renderCustomersScreen = function() {
         const grid = document.getElementById("customersGrid"); if(!grid) return;
         if(userData.customers.length === 0){ grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء</div>'; return; }
         let html='';
@@ -689,64 +776,62 @@
             html+=`<div class="customer-folder" data-id="${c.id}"><div class="folder-icon">📂</div><div class="customer-info"><div class="customer-name">${escapeHtml(c.name)}</div><div class="customer-stats">📁 ${c.projects?.length||0} مشروع | 💰 ${total.toFixed(2)} دينار</div></div></div>`;
         });
         grid.innerHTML=html;
-        document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>openCustomerProjects(parseInt(el.dataset.id))));
+        document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>window.openCustomerProjects(parseInt(el.dataset.id))));
     }
 
-    function openCustomerProjects(custId){
+    window.openCustomerProjects = function(custId){
         currentCustomerId=custId;
         let cust=userData.customers.find(c=>c.id===custId);
+        if(!cust) return;
         document.getElementById("currentCustomerNameSpan").innerText=cust.name;
         let grid=document.getElementById("projectsGrid");
         if(cust.projects?.length){
             grid.innerHTML=cust.projects.map(p=>`<div class="project-card" data-id="${p.id}"><div class="project-info"><div class="project-name">🏢 ${escapeHtml(p.name)}</div><div class="project-total">💰 ${(p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2)} دينار</div></div></div>`).join('');
-            document.querySelectorAll('.project-card').forEach(el=>el.addEventListener('click',()=>openProjectDetail(custId,parseInt(el.dataset.id))));
+            document.querySelectorAll('.project-card').forEach(el=>el.addEventListener('click',()=>window.openProjectDetail(custId,parseInt(el.dataset.id))));
         } else grid.innerHTML='<div class="empty-message">📭 لا توجد مشاريع</div>';
-        showProjectScreen('projects');
+        window.showProjectScreen('projects');
         updateHistoryState('projects', custId);
     }
 
-    function openProjectDetail(custId,projId){
+    window.openProjectDetail = function(custId,projId){
         currentCustomerId=custId; currentProjectId=projId;
         let cust=userData.customers.find(c=>c.id===custId);
+        if(!cust) return;
         let proj=cust.projects.find(p=>p.id===projId);
+        if(!proj) return;
         document.getElementById("detailCustomerName").innerText=cust.name;
         document.getElementById("detailProjectName").innerText=proj.name;
         document.getElementById("navCustomerName").innerText=cust.name;
         document.getElementById("navProjectName").innerText=proj.name;
-        document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50;
+        const priceInput = document.getElementById("globalPricePerMeter");
+        if(priceInput) priceInput.value=proj.globalPricePerMeter||50;
         renderPaymentsTable(proj);
-        renderRoomsTable(proj);
-        updateProjectTotal(proj);
-        showProjectScreen('detail');
+        window.renderRoomsTable(proj);
+        window.updateProjectTotal(proj);
+        window.showProjectScreen('detail');
         updateHistoryState('detail', custId, projId);
     }
 
     function renderPaymentsTable(proj){
         let tbody = document.getElementById("paymentsBody"); if(!tbody) return;
         if(!proj.payments) proj.payments = [];
-        if(proj.payments.length === 0){ tbody.innerHTML='<tr><td colspan="4">لا توجد دفعات</td></tr>'; document.getElementById("totalPayments").innerText="0.00"; return; }
+        if(proj.payments.length === 0){ tbody.innerHTML='<tr><td colspan="4">لا توجد دفعات</td></tr>';
+            document.getElementById("totalPayments").innerText="0.00";
+            const remaining = (proj.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0) - 0;
+            const remainingEl = document.getElementById("remainingAmount");
+            if(remainingEl) remainingEl.innerText = remaining.toFixed(2);
+            return;
+        }
         tbody.innerHTML = proj.payments.map((p,idx)=>`<tr><td>${p.date}</td><td>${p.amount.toFixed(2)}</td><td>${escapeHtml(p.note||'')}</td><td><button class="delete-btn" data-payment-idx="${idx}">✖</button></td></tr>`).join('');
         let total = proj.payments.reduce((s,p)=>s+p.amount,0);
         document.getElementById("totalPayments").innerHTML = total.toFixed(2);
+        const projectTotal = proj.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0;
+        const remainingEl = document.getElementById("remainingAmount");
+        if(remainingEl) remainingEl.innerText = (projectTotal - total).toFixed(2);
         document.querySelectorAll('#paymentsBody .delete-btn').forEach(btn=>{ btn.onclick=()=>{ let idx=parseInt(btn.dataset.paymentIdx); proj.payments.splice(idx,1); renderPaymentsTable(proj); autoSave(); }; });
     }
 
-    function addPayment(){
-        let cust=userData.customers.find(c=>c.id===currentCustomerId);
-        let proj=cust?.projects.find(p=>p.id===currentProjectId);
-        if(!proj) return;
-        let amount = prompt("المبلغ (دينار):");
-        if(!amount) return;
-        let note = prompt("ملاحظة:", "");
-        let date = new Date().toLocaleDateString('ar-EG');
-        if(!proj.payments) proj.payments = [];
-        proj.payments.push({ date, amount: parseFloat(amount)||0, note });
-        renderPaymentsTable(proj);
-        autoSave();
-        alert("تم إضافة الدفعة");
-    }
-
-    function renderRoomsTable(proj){
+    window.renderRoomsTable = function(proj){
         let tbody=document.getElementById("roomsTableBody"); if(!tbody) return;
         if(!proj.rooms) proj.rooms=[];
         if(proj.rooms.length===0){ tbody.innerHTML='<tr><td colspan="7">➕ أضف غرفة</td></tr>'; return; }
@@ -761,14 +846,14 @@
                 <td><span class="calc-val">${meters.toFixed(2)}</span></td>
                 <td><span class="room-total">${r.totalCost.toFixed(2)}</span></td>
                 <td><button class="delete-room-btn" data-id="${r.id}">✖</button></td>
-            </tr>`;
+             </tr>`;
         }).join('');
         attachRoomEvents(proj);
     }
 
     function attachRoomEvents(proj){
-        document.querySelectorAll('.room-length, .room-width, .room-mode').forEach(el=>{ el.onchange=()=>{ syncRoomsFromDOM(proj); updateProjectTotal(proj); autoSave(); }; });
-        document.querySelectorAll('.delete-room-btn').forEach(btn=>{ btn.onclick=()=>{ proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); autoSave(); }; });
+        document.querySelectorAll('.room-length, .room-width, .room-mode').forEach(el=>{ el.onchange=()=>{ syncRoomsFromDOM(proj); window.updateProjectTotal(proj); autoSave(); }; });
+        document.querySelectorAll('.delete-room-btn').forEach(btn=>{ btn.onclick=()=>{ proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); window.renderRoomsTable(proj); window.updateProjectTotal(proj); autoSave(); }; });
     }
 
     function syncRoomsFromDOM(proj){
@@ -785,68 +870,98 @@
         });
     }
 
-    function updateProjectTotal(proj){
+    window.updateProjectTotal = function(proj){
         let price=parseFloat(document.getElementById("globalPricePerMeter").value)||0;
         proj.globalPricePerMeter=price;
         proj.rooms.forEach(r=>{
             let m = (r.lengthVal && r.widthVal) ? (r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)) : 0;
             r.totalCost=m*price;
         });
-        document.getElementById("projectGrandTotal").innerHTML=proj.rooms.reduce((s,r)=>s+r.totalCost,0).toFixed(2);
+        const grandTotal = proj.rooms.reduce((s,r)=>s+r.totalCost,0).toFixed(2);
+        document.getElementById("projectGrandTotal").innerHTML=grandTotal;
+        const totalPayments = proj.payments?.reduce((s,p)=>s+p.amount,0)||0;
+        const remainingEl = document.getElementById("remainingAmount");
+        if(remainingEl) remainingEl.innerText = (parseFloat(grandTotal) - totalPayments).toFixed(2);
     }
 
-    function addNewCustomer(){ let name=prompt("اسم العميل:"); if(name){ userData.customers.push({id:userData.nextCustId++, name, projects:[]}); renderCustomersScreen(); autoSave(); } }
-    function addProject(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust){ let name=prompt("اسم المشروع:"); if(name){ cust.projects.push({id:userData.nextProjId++, name, rooms:[], globalPricePerMeter:50, payments:[]}); openCustomerProjects(currentCustomerId); autoSave(); } } }
-    function addRoom(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ proj.rooms.push({id:userData.nextRoomId++, lengthVal:null, widthVal:null, calcMode:"area", totalCost:0}); openProjectDetail(currentCustomerId,currentProjectId); autoSave(); } }
-    function deleteProject(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust){ cust.projects=cust.projects.filter(p=>p.id!==currentProjectId); openCustomerProjects(currentCustomerId); autoSave(); } }
-    function saveProject(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ syncRoomsFromDOM(proj); updateProjectTotal(proj); autoSave(); alert("تم الحفظ"); } }
-
-    function showProjectScreen(screen){
-        document.getElementById("customersScreen").style.display=screen==='customers'?'block':'none';
-        document.getElementById("projectsScreen").style.display=screen==='projects'?'block':'none';
-        document.getElementById("projectDetailScreen").style.display=screen==='detail'?'block':'none';
-        if(screen==='customers') { renderCustomersScreen(); updateHistoryState('customers'); }
+    window.addNewCustomer = function(){ let name=prompt("اسم العميل:"); if(name){ userData.customers.push({id:userData.nextCustId++, name, projects:[]}); window.renderCustomersScreen(); autoSave(); } }
+    window.addProject = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust){ let name=prompt("اسم المشروع:"); if(name){ cust.projects.push({id:userData.nextProjId++, name, rooms:[], globalPricePerMeter:50, payments:[]}); window.openCustomerProjects(currentCustomerId); autoSave(); } } }
+    window.addRoom = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ proj.rooms.push({id:userData.nextRoomId++, lengthVal:null, widthVal:null, calcMode:"area", totalCost:0}); window.openProjectDetail(currentCustomerId,currentProjectId); autoSave(); } }
+    window.deleteProject = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust && confirm("هل أنت متأكد من حذف المشروع؟")){ cust.projects=cust.projects.filter(p=>p.id!==currentProjectId); window.openCustomerProjects(currentCustomerId); autoSave(); } }
+    window.saveProject = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ syncRoomsFromDOM(proj); window.updateProjectTotal(proj); autoSave(); alert("تم الحفظ"); } }
+    window.addPayment = function(){
+        let cust=userData.customers.find(c=>c.id===currentCustomerId);
+        let proj=cust?.projects.find(p=>p.id===currentProjectId);
+        if(!proj) return;
+        let amount = prompt("المبلغ (دينار):");
+        if(!amount || isNaN(parseFloat(amount))) return;
+        let note = prompt("ملاحظة:", "");
+        let date = new Date().toLocaleDateString('ar-EG');
+        if(!proj.payments) proj.payments = [];
+        proj.payments.push({ date, amount: parseFloat(amount)||0, note });
+        renderPaymentsTable(proj);
+        window.updateProjectTotal(proj);
+        autoSave();
+        alert("تم إضافة الدفعة");
     }
 
-    function showMainTab(tab){
+    window.showProjectScreen = function(screen){
+        const customersScreen = document.getElementById("customersScreen");
+        const projectsScreen = document.getElementById("projectsScreen");
+        const detailScreen = document.getElementById("projectDetailScreen");
+        if(customersScreen) customersScreen.style.display=screen==='customers'?'block':'none';
+        if(projectsScreen) projectsScreen.style.display=screen==='projects'?'block':'none';
+        if(detailScreen) detailScreen.style.display=screen==='detail'?'block':'none';
+        if(screen==='customers') { window.renderCustomersScreen(); updateHistoryState('customers'); }
+    }
+
+    window.showMainTab = function(tab){
         document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
         if(tab==='projects'){
             document.getElementById('projectsTab').classList.add('active');
             document.querySelector('.tabs .tab-btn:first-child').classList.add('active');
-            showProjectScreen('customers');
+            window.showProjectScreen('customers');
         } else if(tab==='workers'){
             document.getElementById('workersTab').classList.add('active');
             document.querySelector('.tabs .tab-btn:nth-child(2)').classList.add('active');
-            renderWorkersTable();
+            window.renderWorkersTable();
         } else{
             document.getElementById('accountingTab').classList.add('active');
             document.querySelector('.tabs .tab-btn:nth-child(3)').classList.add('active');
-            renderAccountingTable();
+            window.renderAccountingTable();
         }
     }
 
-    // ==================== نظام التنقل ====================
-    function initNavigationStack() {
+    // نظام التنقل
+    window.initNavigationStack = function() {
         navigationStack = ['customers'];
         history.pushState({screen: 'customers'}, '', '#customers');
-        window.addEventListener('popstate', function(event) { handleBackButton(); });
+        window.addEventListener('popstate', function(event) { window.handleBackButton(); });
     }
 
-    function handleBackButton() {
+    window.handleBackButton = function() {
         if (navigationStack.length > 1) {
             navigationStack.pop();
             const previousScreen = navigationStack[navigationStack.length - 1];
-            switch(previousScreen) {
-                case 'customers': showProjectScreen('customers'); showBackNotice('تم الرجوع إلى العملاء'); break;
-                case 'projects': if(currentCustomerId) openCustomerProjects(currentCustomerId); showBackNotice('تم الرجوع إلى المشاريع'); break;
-                case 'detail': if(currentCustomerId && currentProjectId) openProjectDetail(currentCustomerId, currentProjectId); showBackNotice('تم الرجوع إلى التفاصيل'); break;
-                default: break;
+            if(previousScreen.startsWith('projects_')) {
+                const custId = parseInt(previousScreen.split('_')[1]);
+                if(custId) window.openCustomerProjects(custId);
+                window.showBackNotice('تم الرجوع إلى المشاريع');
+            } else if(previousScreen.startsWith('project_')) {
+                const parts = previousScreen.split('_');
+                if(parts.length >= 3) window.openProjectDetail(parseInt(parts[1]), parseInt(parts[2]));
+                window.showBackNotice('تم الرجوع إلى التفاصيل');
+            } else if(previousScreen === 'customers') {
+                window.showProjectScreen('customers');
+                window.showBackNotice('تم الرجوع إلى العملاء');
+            } else if(previousScreen === 'projects') {
+                if(currentCustomerId) window.openCustomerProjects(currentCustomerId);
+                window.showBackNotice('تم الرجوع إلى المشاريع');
             }
         } else {
             if(confirm('⚠️ هل تريد الخروج من التطبيق؟')) window.close();
         }
-        event.preventDefault();
         return false;
     }
 
@@ -860,34 +975,74 @@
         }
     }
 
-    function showBackNotice(message) {
+    window.showBackNotice = function(message) {
         const notice = document.getElementById('backNotice');
-        notice.textContent = message;
-        notice.classList.add('show');
-        setTimeout(() => notice.classList.remove('show'), 1500);
+        if(notice) {
+            notice.textContent = message;
+            notice.classList.add('show');
+            setTimeout(() => notice.classList.remove('show'), 1500);
+        }
     }
 
-    function renderAll(){ renderCustomersScreen(); renderWorkersTable(); renderPersonSelect(); renderAccountingTable(); loadWorkersArchivesList(); }
+    window.renderAll = function(){ window.renderCustomersScreen(); window.renderWorkersTable(); window.renderPersonSelect(); window.renderAccountingTable(); loadWorkersArchivesList(); }
 
     // مستمعي الأحداث
-    window.addEventListener('online', async () => { isOnline = true; if(useCloudSync && currentUser && !currentUser.isLocalOnly) await loadFromCloud(); });
+    window.addEventListener('online', async () => { isOnline = true; if(useCloudSync && currentUser && !currentUser.isLocalOnly) await loadFromCloud(); window.renderAll(); });
     window.addEventListener('offline', () => { isOnline = false; updateSyncStatus("offline", "📴 غير متصل"); });
 
-    document.getElementById("addCustomerBtn")?.addEventListener("click",addNewCustomer);
-    document.getElementById("addProjectFromProjects")?.addEventListener("click",addProject);
-    document.getElementById("addRoomInProject")?.addEventListener("click",addRoom);
-    document.getElementById("saveProjectData")?.addEventListener("click",saveProject);
-    document.getElementById("deleteProjectBtn")?.addEventListener("click",deleteProject);
-    document.getElementById("addPaymentBtn")?.addEventListener("click",addPayment);
-    document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{ if(currentProjectId){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust) updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId)); } });
+    // ربط الأحداث بعد تحميل الصفحة
+    document.addEventListener("DOMContentLoaded", () => {
+        const addCustomerBtn = document.getElementById("addCustomerBtn");
+        const addProjectBtn = document.getElementById("addProjectFromProjects");
+        const addRoomBtn = document.getElementById("addRoomInProject");
+        const saveProjectBtn = document.getElementById("saveProjectData");
+        const deleteProjectBtn = document.getElementById("deleteProjectBtn");
+        const addPaymentBtn = document.getElementById("addPaymentBtn");
+        const priceInput = document.getElementById("globalPricePerMeter");
 
-    // بدء التطبيق
+        if(addCustomerBtn) addCustomerBtn.addEventListener("click", window.addNewCustomer);
+        if(addProjectBtn) addProjectBtn.addEventListener("click", window.addProject);
+        if(addRoomBtn) addRoomBtn.addEventListener("click", window.addRoom);
+        if(saveProjectBtn) saveProjectBtn.addEventListener("click", window.saveProject);
+        if(deleteProjectBtn) deleteProjectBtn.addEventListener("click", window.deleteProject);
+        if(addPaymentBtn) addPaymentBtn.addEventListener("click", window.addPayment);
+        if(priceInput) priceInput.addEventListener("change", () => {
+            if(currentProjectId){
+                let cust=userData.customers.find(c=>c.id===currentCustomerId);
+                if(cust && cust.projects) window.updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId));
+            }
+        });
+    });
+
+    // التحقق من جلسة سابقة
     (async function init() {
         document.getElementById("loginScreen").style.display = "flex";
         document.getElementById("mainApp").style.display = "none";
+
+        if(auth) {
+            auth.onAuthStateChanged(async (user) => {
+                if(user && user.emailVerified) {
+                    currentUser = { uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0], isLocalOnly: false };
+                    useCloudSync = true;
+                    await loadFromLocal();
+                    await loadFromCloud();
+                    document.getElementById("loginScreen").style.display = "none";
+                    document.getElementById("mainApp").style.display = "block";
+                    document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${currentUser.name}`;
+                    document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
+                    document.getElementById("verificationWarning").style.display = "none";
+                    updateSyncStatus("online", "☁️ متزامن مع السحابة");
+                    window.renderAll();
+                    window.initNavigationStack();
+                } else if(user && !user.emailVerified) {
+                    document.getElementById("verificationWarning").style.display = "block";
+                    await auth.signOut();
+                }
+            });
+        }
     })();
 
-    console.log("✅ النظام جاهز للاستخدام");
+    console.log("✅ النظام جاهز للاستخدام مع التحقق من البريد الإلكتروني وتذكر الجهاز");
 </script>
 </body>
 </html>
