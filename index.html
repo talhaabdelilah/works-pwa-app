@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>نظام إدارة المشاريع - أرشيف العمال</title>
+    <title>نظام إدارة المشاريع</title>
 
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -20,7 +20,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Cairo', 'Tahoma', sans-serif; }
         body { background: #eef2f5; padding: 8px; min-height: 100vh; }
-        .app-container { max-width: 950px; margin: 0 auto; }
+        .app-container { max-width: 800px; margin: 0 auto; }
         .main-header { background: #1e293b; color: white; padding: 10px 14px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; position: sticky; top: 0; z-index: 100; }
         .main-header h1 { font-size: 1rem; }
         .user-info { font-size: 0.7rem; background: #334155; padding: 4px 10px; border-radius: 30px; }
@@ -29,9 +29,8 @@
         .btn-secondary { background: #3b82f6; border: none; padding: 5px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
         .btn-outline { background: white; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 30px; cursor: pointer; font-size: 0.65rem; }
         .btn-danger { background: #ef4444; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
-        .btn-warning { background: #f59e0b; border: none; padding: 5px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
-        .btn-info { background: #8b5cf6; border: none; padding: 5px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
-        .btn-success { background: #10b981; border: none; padding: 5px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
+        .btn-warning { background: #f59e0b; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
+        .btn-info { background: #8b5cf6; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
         .tabs { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 6px; border-radius: 40px; position: sticky; top: 60px; z-index: 99; }
         .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: all 0.2s; }
         .tab-btn.active { background: #3b82f6; color: white; }
@@ -86,60 +85,19 @@
         .name-input { width: 80px; }
         .total-cell { background: #e8f5e9; font-weight: bold; }
         .delete-btn { background: #e74c3c; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; }
-        .expense-input { width: 110px; direction: ltr; text-align: left; }
-        .expense-hint { font-size: 0.55rem; color: #888; margin-top: 2px; }
 
-        /* تنسيق الجوال مع إبقاء الجدول أفقي */
         @media (max-width: 700px) {
-            .workers-table-wrapper {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            .workers-table {
-                min-width: 780px;
-                font-size: 0.6rem;
-            }
-            .workers-table th,
-            .workers-table td {
-                padding: 6px 3px;
-                white-space: nowrap;
-            }
-            .workers-table th {
-                font-size: 0.55rem;
-            }
-            .editable {
-                width: 45px;
-                font-size: 0.6rem;
-                padding: 2px;
-            }
-            .name-input {
-                width: 70px;
-            }
-            .expense-input {
-                width: 95px;
-                font-size: 0.55rem;
-            }
-            .attendance-check {
-                width: 14px;
-                height: 14px;
-            }
-            .delete-btn {
-                padding: 2px 6px;
-                font-size: 0.55rem;
-            }
-            .expense-hint {
-                font-size: 0.5rem;
-            }
+            .workers-table thead { display: none; }
+            .workers-table, .workers-table tbody, .workers-table tr, .workers-table td { display: block; width: 100%; }
+            .workers-table tr { background: white; margin-bottom: 12px; border-radius: 16px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+            .workers-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 6px; border: none; border-bottom: 1px solid #f0f0f0; }
+            .workers-table td::before { content: attr(data-label); font-weight: bold; font-size: 0.65rem; color: #475569; margin-left: 10px; }
         }
 
         .archive-panel { background: #ecf0f1; border-radius: 12px; padding: 8px; margin-bottom: 10px; display: none; }
         .archive-panel.show { display: block; }
-        .archive-list { max-height: 250px; overflow-y: auto; }
-        .archive-item { background: white; padding: 10px; margin: 6px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-right: 3px solid #8b5cf6; transition: all 0.2s; }
-        .archive-item:hover { background: #f8fafc; transform: translateX(-2px); }
-        .archive-item .week-info { flex: 1; }
-        .archive-item .week-date { font-size: 0.55rem; color: #999; }
-        .archive-item .week-summary { font-size: 0.6rem; color: #666; }
+        .archive-list { max-height: 150px; overflow-y: auto; }
+        .archive-item { background: white; padding: 6px 10px; margin: 4px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
 
         .person-selector { background: white; padding: 10px; border-radius: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border: 1px solid #e2e8f0; }
         .person-selector select { flex: 1; padding: 8px 12px; border-radius: 30px; border: 1px solid #cbd5e1; background: white; font-size: 0.75rem; }
@@ -187,27 +145,11 @@
 
         .verification-warning { background: #fef3c7; padding: 8px; border-radius: 12px; margin-bottom: 10px; text-align: center; font-size: 0.7rem; }
         .resend-small-btn { background: #f59e0b; border: none; padding: 4px 12px; border-radius: 20px; color: white; cursor: pointer; margin-top: 5px; font-size: 0.65rem; }
-
-        /* صفحة اختيار المستخدم */
-        .users-select-screen { background: #1e293b; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .users-select-card { background: white; border-radius: 24px; padding: 24px; max-width: 400px; width: 100%; text-align: center; }
-        .users-select-card h2 { margin-bottom: 8px; color: #1e293b; }
-        .users-select-card p { font-size: 0.8rem; color: #64748b; margin-bottom: 20px; }
-        .users-list-select { display: flex; flex-direction: column; gap: 12px; }
-        .user-select-item { background: #f1f5f9; border-radius: 16px; padding: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; border: 2px solid transparent; }
-        .user-select-item:hover { background: #e2e8f0; transform: translateX(-5px); }
-        .user-select-item.selected { border-color: #10b981; background: #f0fdf4; }
-        .user-avatar { width: 48px; height: 48px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .user-select-info { flex: 1; text-align: right; }
-        .user-select-name { font-weight: bold; font-size: 1rem; }
-        .user-select-role { font-size: 0.7rem; color: #64748b; }
-        .user-select-actions { display: flex; gap: 8px; }
-        .add-user-btn { margin-top: 16px; width: 100%; }
     </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
+<!-- شاشة تسجيل الدخول الرئيسية -->
 <div id="loginScreen" class="login-overlay">
     <div class="login-card">
         <h2>📊 نظام إدارة المشاريع</h2>
@@ -223,6 +165,7 @@
             <p>البيانات محفوظة في السحابة الخاصة بك</p>
         </div>
 
+        <!-- نموذج تسجيل الدخول -->
         <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
         <div class="password-field">
             <input type="password" id="loginPassword" placeholder="الرمز السري">
@@ -234,6 +177,8 @@
         </div>
 
         <button onclick="window.login()" class="btn-primary" style="width:100%;margin-top:8px;">دخول</button>
+
+        <!-- زر نسيت كلمة المرور -->
         <button onclick="window.showResetPassword()" class="link-btn" style="width:100%;">🔑 نسيت كلمة المرور؟</button>
 
         <div class="divider"><span>أو</span></div>
@@ -264,8 +209,13 @@
         </div>
 
         <button onclick="window.register()" class="btn-primary" style="width:100%;margin-top:8px;">تسجيل</button>
-        <button onclick="window.resendVerificationFromRegister()" class="btn-warning" style="width:100%;margin-top:8px;">📧 لم يصلني رابط التفعيل؟</button>
-        <button onclick="window.hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">🔙 رجوع</button>
+
+        <!-- زر إعادة إرسال رابط التفعيل (بعد إنشاء الحساب) -->
+        <button onclick="window.resendVerificationFromRegister()" class="btn-warning" style="width:100%;margin-top:8px;">
+            📧 لم يصلني رابط التفعيل؟ إعادة إرسال
+        </button>
+
+        <button onclick="window.hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">🔙 رجوع إلى تسجيل الدخول</button>
 
         <div id="regError" class="error-msg"></div>
         <div id="regSuccess" class="success-msg"></div>
@@ -279,6 +229,7 @@
         <p style="font-size:12px; color:#666; margin-bottom:8px;">أدخل بريدك الإلكتروني لإرسال رابط إعادة التعيين</p>
 
         <input type="email" id="resetEmail" placeholder="البريد الإلكتروني">
+
         <button onclick="window.sendPasswordReset()" class="btn-primary" style="width:100%;margin-top:8px;">إرسال رابط إعادة التعيين</button>
         <button onclick="window.hideResetPassword()" class="btn-outline" style="width:100%;margin-top:8px;">🔙 رجوع</button>
 
@@ -287,28 +238,13 @@
     </div>
 </div>
 
-<!-- شاشة اختيار المستخدم (بعد تسجيل الدخول) -->
-<div id="usersSelectScreen" style="display:none;">
-    <div class="users-select-screen">
-        <div class="users-select-card">
-            <h2>👥 اختر المستخدم</h2>
-            <p>اختر الشخص الذي تريد العمل بحسابه</p>
-            <div id="usersListSelect" class="users-list-select"></div>
-            <button class="btn-primary add-user-btn" onclick="window.showAddUserModal()">➕ إضافة مستخدم جديد</button>
-            <button class="btn-outline" style="margin-top:12px; width:100%;" onclick="window.logout()">🚪 تسجيل خروج</button>
-        </div>
-    </div>
-</div>
-
-<!-- النظام الرئيسي -->
-<div id="mainSystem" style="display:none;">
+<div id="mainApp" style="display:none">
     <div class="app-container">
         <div class="main-header">
             <h1>📁 نظام إدارة المشاريع</h1>
             <div style="display:flex; gap:8px; align-items:center;">
-                <span class="user-info" id="systemUserName"></span>
-                <span class="user-info user-role" id="systemUserRole"></span>
-                <button class="logout-btn" onclick="window.backToUsersList()">🔙 تغيير المستخدم</button>
+                <span class="user-info" id="userNameDisplay"></span>
+                <span class="user-info" id="syncModeDisplay" style="background:#475569;"></span>
                 <button class="logout-btn" onclick="window.logout()">🚪 خروج</button>
             </div>
         </div>
@@ -326,26 +262,15 @@
         <div id="projectsTab" class="tab-content active">
             <div id="customersScreen"><div style="margin-bottom:10px;"><button id="addCustomerBtn" class="btn-primary" style="width:100%;">➕ عميل جديد</button></div><div id="customersGrid" class="customers-grid"></div></div>
             <div id="projectsScreen" style="display:none;"><div class="breadcrumb"><span>📂 <span id="currentCustomerNameSpan"></span></span><button id="addProjectFromProjects" class="btn-secondary">➕ مشروع جديد</button><button onclick="window.showProjectScreen('customers')" class="btn-outline">🔙 رجوع</button></div><div id="projectsGrid" class="projects-grid"></div></div>
-            <div id="projectDetailScreen" style="display:none;"><div class="breadcrumb"><span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span><button onclick="window.openCustomerProjects(window.currentCustomerId)" class="btn-outline">🔙 رجوع</button></div><div class="project-detail-card"><div class="info-bar"><div class="info-row"><div class="info-item"><span class="info-label">👤 العميل</span><span class="info-value" id="detailCustomerName"></span></div><div class="info-item"><span class="info-label">🏗️ المشروع</span><span class="info-value" id="detailProjectName"></span></div></div><div class="price-per-meter-box"><span>💰 سعر المتر:</span><input type="number" id="globalPricePerMeter" step="0.01" value="50"></div><div class="info-row"><div class="info-item"><span class="info-label">💵 إجمالي المشروع</span><span class="info-value grand-total" id="projectGrandTotal">0.00</span><span> دينار</span></div></div></div><div class="payments-section"><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;"><h4>💰 الدفعات المستلمة</h4><button id="addPaymentBtn" class="btn-secondary">➕ إضافة دفعة</button></div><div class="table-wrapper"><table class="payments-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="paymentsBody"></tbody></table></div><div><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span> دينار</div><div><strong>المتبقي:</strong> <span id="remainingAmount">0.00</span> دينار</div></div><button id="addRoomInProject" class="btn-primary btn-add-room">➕ إضافة غرفة</button><div class="table-wrapper"><table class="rooms-table"><thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></thead><tbody id="roomsTableBody"></tbody></table></div><div class="action-buttons" style="display:flex; gap:8px; margin-top:12px;"><button id="saveProjectData" class="btn-secondary">💾 حفظ</button><button id="deleteProjectBtn" class="btn-danger">🗑️ حذف المشروع</button></div></div></div>
+            <div id="projectDetailScreen" style="display:none;"><div class="breadcrumb"><span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span><button onclick="window.openCustomerProjects(currentCustomerId)" class="btn-outline">🔙 رجوع</button></div><div class="project-detail-card"><div class="info-bar"><div class="info-row"><div class="info-item"><span class="info-label">👤 العميل</span><span class="info-value" id="detailCustomerName"></span></div><div class="info-item"><span class="info-label">🏗️ المشروع</span><span class="info-value" id="detailProjectName"></span></div></div><div class="price-per-meter-box"><span>💰 سعر المتر:</span><input type="number" id="globalPricePerMeter" step="0.01" value="50"></div><div class="info-row"><div class="info-item"><span class="info-label">💵 إجمالي المشروع</span><span class="info-value grand-total" id="projectGrandTotal">0.00</span><span> دينار</span></div></div></div><div class="payments-section"><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;"><h4>💰 الدفعات المستلمة</h4><button id="addPaymentBtn" class="btn-secondary">➕ إضافة دفعة</button></div><div class="table-wrapper"><table class="payments-table"><thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead><tbody id="paymentsBody"></tbody></table></div><div><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span> دينار</div><div><strong>المتبقي:</strong> <span id="remainingAmount">0.00</span> دينار</div></div><button id="addRoomInProject" class="btn-primary btn-add-room">➕ إضافة غرفة</button><div class="table-wrapper"><table class="rooms-table"><thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></thead><tbody id="roomsTableBody"></tbody></table></div><div class="action-buttons" style="display:flex; gap:8px; margin-top:12px;"><button id="saveProjectData" class="btn-secondary">💾 حفظ</button><button id="deleteProjectBtn" class="btn-danger">🗑️ حذف المشروع</button></div></div></div>
         </div>
 
         <div id="workersTab" class="tab-content">
             <div class="toolbar">
                 <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 بحث" onkeyup="window.filterWorkers()"></div>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                    <button class="btn-primary" onclick="window.addNewWorker()">➕ إضافة عامل</button>
-                    <button class="btn-success" onclick="window.saveCurrentWeek()">📅 حفظ الأسبوع</button>
-                    <button class="btn-info" onclick="window.showCurrentWeekInfo()">ℹ️ معلومات</button>
-                    <button class="btn-secondary" onclick="window.toggleArchivePanel()">📂 السجلات</button>
-                </div>
+                <div><button class="btn-primary" onclick="window.addNewWorker()">➕ إضافة عامل</button><button class="btn-warning" onclick="window.toggleArchivePanel()">📂 السجلات</button></div>
             </div>
-            <div id="archivePanel" class="archive-panel">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <h4 style="font-size:0.75rem;">📋 أرشيف الأسابيع</h4>
-                    <button class="btn-outline" onclick="window.closeArchivePanel()" style="padding:2px 8px;">✖</button>
-                </div>
-                <div id="archiveList" class="archive-list"></div>
-            </div>
+            <div id="archivePanel" class="archive-panel"><div id="archiveList" class="archive-list"></div></div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
                     <thead>
@@ -354,29 +279,17 @@
                     <tbody id="workersTableBody"></tbody>
                 </table>
             </div>
-            <div class="summary" style="margin-top:12px; background:#e8f5e9;">
-                <div class="summary-item"><span>👥 إجمالي مستحقات العمال:</span><span id="workersTotal">0</span><span> دينار</span></div>
-            </div>
+            <div class="summary" style="margin-top:12px; background:#e8f5e9;"><div class="summary-item"><span>👥 إجمالي مستحقات العمال:</span><span id="workersTotal">0</span><span> دينار</span></div></div>
         </div>
 
         <div id="accountingTab" class="tab-content">
-            <div class="person-selector" id="accountingPersonSelector" style="display:none;">
-                <label>👤 الشخص:</label>
-                <select id="personSelect" onchange="window.switchPerson()">
-                    <option value="main">المدير الرئيسي</option>
-                </select>
-                <button class="btn-secondary" onclick="window.addNewPerson()">➕ شخص جديد</button>
-            </div>
-            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-                <button class="btn-primary" onclick="window.addAccountingRow()">➕ إضافة صف</button>
-                <button class="btn-danger" onclick="window.archiveAndClearAccounting()">📦 حذف وحفظ</button>
-                <button class="btn-info" onclick="window.showAccountingHistory()">📋 السجل</button>
-            </div>
+            <div class="person-selector"><label>👤 الشخص:</label><select id="personSelect" onchange="window.switchPerson()"><option value="main">المدير الرئيسي</option></select><button class="btn-secondary" onclick="window.addNewPerson()">➕ شخص جديد</button></div>
+            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;"><button class="btn-primary" onclick="window.addAccountingRow()">➕ إضافة صف</button><button class="btn-danger" onclick="window.archiveAndClearAccounting()">📦 حذف وحفظ</button><button class="btn-info" onclick="window.showAccountingHistory()">📋 السجل</button></div>
             <div class="table-wrapper">
                 <table class="accounting-table">
                     <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></thead>
                     <tbody id="accountingBody"></tbody>
-                追赶
+                </table>
             </div>
             <div class="summary"><div class="summary-item"><span>📈 مجموع الإيرادات:</span><span id="totalRevenue">0</span></div><div class="summary-item"><span>📉 مجموع المصاريف:</span><span id="totalExpense">0</span></div><div class="summary-item"><span>💰 صافي الربح:</span><span id="netProfit" class="profit">0</span></div></div>
         </div>
@@ -401,17 +314,12 @@
     let db = null;
     let firebaseReady = false;
     let currentUser = null;
-    let currentAccountingPerson = null; // المستخدم الحالي في المحاسبة
     let isOnline = navigator.onLine;
     let syncInProgress = false;
     let navigationStack = [];
     let useCloudSync = false;
     let currentCustomerId = null;
     let currentProjectId = null;
-    let weekCheckDone = false;
-
-    // قائمة المستخدمين (للمحاسبة)
-    let accountingUsersList = [];
 
     try {
         firebase.initializeApp(firebaseConfig);
@@ -421,21 +329,16 @@
         console.log("✅ Firebase initialized");
         const successDiv = document.getElementById("firebaseSuccess");
         if(successDiv) successDiv.style.display = "block";
-        setTimeout(() => {
-            if(successDiv) successDiv.style.opacity = "0";
-            setTimeout(() => {
-                if(successDiv) successDiv.style.display = "none";
-            }, 3000);
-        }, 5000);
+
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch(e) {
         console.warn("⚠️ Firebase init failed:", e);
     }
 
-    // بيانات المستخدم الأساسية (المشاريع والعمال)
+    // بيانات المستخدم
     let userData = {
-        customers: [], workers: [], accountingRows: [],
-        nextCustId: 1, nextProjId: 100, nextRoomId: 1000,
+        customers: [], workers: [], accountingPersons: { main: { name: "المدير الرئيسي", rows: [] } },
+        currentPersonId: "main", nextCustId: 1, nextProjId: 100, nextRoomId: 1000,
         currentWeekKey: "", workersArchives: [], accountingHistory: []
     };
 
@@ -472,412 +375,388 @@
         if(el) { el.textContent = message; el.className = `sync-status ${status}`; }
     }
 
-    // ==================== دالة تحويل النص إلى أرقام ====================
-    function parseExpenseString(value) {
-        if (!value || value === '') return 0;
-        let str = String(value).trim();
-        str = str.replace(/[,،\s]+/g, '+');
-        if (str.includes('+')) {
-            const numbers = str.split('+').filter(s => s.trim() !== '');
-            let total = 0;
-            for (let num of numbers) {
-                let parsed = parseFloat(num);
-                if (!isNaN(parsed)) {
-                    total += parsed;
-                }
-            }
-            return total;
-        }
-        let parsed = parseFloat(str);
-        return isNaN(parsed) ? 0 : parsed;
-    }
-
-    // ==================== دوال إدارة المستخدمين (المحاسبة) ====================
-
-    function loadAccountingUsersList() {
-        const saved = localStorage.getItem(`accounting_users_${currentUser?.uid || 'local'}`);
-        if(saved) {
-            accountingUsersList = JSON.parse(saved);
-        } else {
-            accountingUsersList = [
-                { id: 'main', name: 'المدير الرئيسي', type: 'admin' }
-            ];
-        }
-        if(!accountingUsersList.find(u => u.id === 'main')) {
-            accountingUsersList.unshift({ id: 'main', name: 'المدير الرئيسي', type: 'admin' });
-        }
-        saveAccountingUsersList();
-    }
-
-    function saveAccountingUsersList() {
-        localStorage.setItem(`accounting_users_${currentUser?.uid || 'local'}`, JSON.stringify(accountingUsersList));
-    }
-
-    function renderUsersSelectScreen() {
-        const container = document.getElementById("usersListSelect");
-        if(!container) return;
-
-        container.innerHTML = accountingUsersList.map(user => `
-            <div class="user-select-item" onclick="window.selectAccountingUser('${user.id}')">
-                <div class="user-avatar">${user.type === 'admin' ? '👑' : '👤'}</div>
-                <div class="user-select-info">
-                    <div class="user-select-name">${escapeHtml(user.name)}</div>
-                    <div class="user-select-role">${user.type === 'admin' ? 'مدير' : 'مستخدم عادي'}</div>
-                </div>
-                <div class="user-select-actions">
-                    <button class="btn-outline" style="padding:2px 8px;" onclick="event.stopPropagation();window.editAccountingUser('${user.id}')">✏️</button>
-                    ${user.id !== 'main' ? `<button class="btn-danger" style="padding:2px 8px;" onclick="event.stopPropagation();window.deleteAccountingUser('${user.id}')">🗑️</button>` : ''}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    window.selectAccountingUser = function(userId) {
-        const user = accountingUsersList.find(u => u.id === userId);
-        if(user) {
-            currentAccountingPerson = user;
-            loadAccountingDataForUser(userId);
-            document.getElementById("usersSelectScreen").style.display = "none";
-            document.getElementById("mainSystem").style.display = "block";
-            document.getElementById("systemUserName").innerHTML = `👋 ${escapeHtml(user.name)}`;
-            document.getElementById("systemUserRole").innerHTML = user.type === 'admin' ? '👑 مدير' : '👤 مستخدم';
-            window.renderAll();
-        }
-    }
-
-    window.showAddUserModal = function() {
-        const name = prompt("👤 أدخل اسم المستخدم الجديد:");
-        if(name && name.trim()) {
-            const newId = 'user_' + Date.now();
-            accountingUsersList.push({
-                id: newId,
-                name: name.trim(),
-                type: 'user'
-            });
-            saveAccountingUsersList();
-
-            // إنشاء بيانات افتراضية للمستخدم الجديد
-            localStorage.setItem(`accounting_data_${currentUser?.uid || 'local'}_${newId}`, JSON.stringify({
-                accountingRows: [],
-                accountingHistory: []
+    function saveToLocal() {
+        if(currentUser && !currentUser.isLocalOnly) {
+            localStorage.setItem(`data_${currentUser.uid}`, JSON.stringify({
+                customers: userData.customers,
+                workers: userData.workers,
+                accountingPersons: userData.accountingPersons,
+                currentPersonId: userData.currentPersonId,
+                nextCustId: userData.nextCustId,
+                nextProjId: userData.nextProjId,
+                nextRoomId: userData.nextRoomId,
+                currentWeekKey: userData.currentWeekKey,
+                workersArchives: userData.workersArchives,
+                accountingHistory: userData.accountingHistory
             }));
-
-            renderUsersSelectScreen();
-            alert(`✅ تم إضافة المستخدم "${name}"`);
-        }
-    }
-
-    window.editAccountingUser = function(userId) {
-        const user = accountingUsersList.find(u => u.id === userId);
-        if(user && userId !== 'main') {
-            const newName = prompt("✏️ تعديل الاسم:", user.name);
-            if(newName && newName.trim()) {
-                user.name = newName.trim();
-                saveAccountingUsersList();
-                renderUsersSelectScreen();
-                if(currentAccountingPerson?.id === userId) {
-                    document.getElementById("systemUserName").innerHTML = `👋 ${escapeHtml(user.name)}`;
-                }
-                alert("✅ تم تعديل الاسم");
-            }
-        }
-    }
-
-    window.deleteAccountingUser = function(userId) {
-        if(userId === 'main') {
-            alert("❌ لا يمكن حذف المستخدم الرئيسي");
-            return;
-        }
-        if(confirm(`⚠️ هل أنت متأكد من حذف المستخدم "${accountingUsersList.find(u=>u.id===userId)?.name}"؟`)) {
-            accountingUsersList = accountingUsersList.filter(u => u.id !== userId);
-            localStorage.removeItem(`accounting_data_${currentUser?.uid || 'local'}_${userId}`);
-            saveAccountingUsersList();
-            renderUsersSelectScreen();
-            if(currentAccountingPerson?.id === userId) {
-                // العودة إلى شاشة الاختيار
-                document.getElementById("mainSystem").style.display = "none";
-                document.getElementById("usersSelectScreen").style.display = "flex";
-                currentAccountingPerson = null;
-            }
-            alert("✅ تم حذف المستخدم");
-        }
-    }
-
-    function loadAccountingDataForUser(userId) {
-        const saved = localStorage.getItem(`accounting_data_${currentUser?.uid || 'local'}_${userId}`);
-        if(saved) {
-            const data = JSON.parse(saved);
-            userData.accountingRows = data.accountingRows || [];
-            userData.accountingHistory = data.accountingHistory || [];
-        } else {
-            userData.accountingRows = [];
-            userData.accountingHistory = [];
-        }
-    }
-
-    function saveAccountingDataForCurrentUser() {
-        if(currentAccountingPerson) {
-            localStorage.setItem(`accounting_data_${currentUser?.uid || 'local'}_${currentAccountingPerson.id}`, JSON.stringify({
-                accountingRows: userData.accountingRows,
+        } else if(currentUser && currentUser.isLocalOnly) {
+            localStorage.setItem(`data_local_${currentUser.uid}`, JSON.stringify({
+                customers: userData.customers,
+                workers: userData.workers,
+                accountingPersons: userData.accountingPersons,
+                currentPersonId: userData.currentPersonId,
+                nextCustId: userData.nextCustId,
+                nextProjId: userData.nextProjId,
+                nextRoomId: userData.nextRoomId,
+                currentWeekKey: userData.currentWeekKey,
+                workersArchives: userData.workersArchives,
                 accountingHistory: userData.accountingHistory
             }));
         }
     }
 
-    // ==================== دوال أرشفة العمال الأسبوعية ====================
+    function loadFromLocal() {
+        if(currentUser && !currentUser.isLocalOnly) {
+            const saved = localStorage.getItem(`data_${currentUser.uid}`);
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    userData.customers = data.customers || [];
+                    userData.workers = data.workers || [];
+                    userData.accountingPersons = data.accountingPersons || { main: { name: "المدير الرئيسي", rows: [] } };
+                    userData.currentPersonId = data.currentPersonId || "main";
+                    userData.nextCustId = data.nextCustId || 1;
+                    userData.nextProjId = data.nextProjId || 100;
+                    userData.nextRoomId = data.nextRoomId || 1000;
+                    userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
+                    userData.workersArchives = data.workersArchives || [];
+                    userData.accountingHistory = data.accountingHistory || [];
+                    return true;
+                } catch(e) {}
+            }
+        } else if(currentUser && currentUser.isLocalOnly) {
+            const saved = localStorage.getItem(`data_local_${currentUser.uid}`);
+            if(saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    userData.customers = data.customers || [];
+                    userData.workers = data.workers || [];
+                    userData.accountingPersons = data.accountingPersons || { main: { name: "المدير الرئيسي", rows: [] } };
+                    userData.currentPersonId = data.currentPersonId || "main";
+                    userData.nextCustId = data.nextCustId || 1;
+                    userData.nextProjId = data.nextProjId || 100;
+                    userData.nextRoomId = data.nextRoomId || 1000;
+                    userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
+                    userData.workersArchives = data.workersArchives || [];
+                    userData.accountingHistory = data.accountingHistory || [];
+                    return true;
+                } catch(e) {}
+            }
+        }
+        return false;
+    }
 
-    function checkForNewWeek() {
-        const currentWeek = getCurrentWeekKey();
-        const savedWeek = localStorage.getItem(`last_week_${currentUser?.uid || 'local'}_${currentAccountingPerson?.id || 'main'}`);
-
-        if(savedWeek && savedWeek !== currentWeek && userData.workers.length > 0) {
-            const weekTotal = userData.workers.reduce((sum, w) => sum + calculateWorkerTotal(w), 0);
-            const hasData = userData.workers.some(w => {
-                const hasAttendance = Object.values(w.days).some(day => day === 1);
-                const hasSalary = w.price > 0 || w.expense > 0;
-                return hasAttendance || hasSalary;
+    async function saveToCloud() {
+        if(!useCloudSync || !currentUser || !isOnline || syncInProgress || !db || currentUser.isLocalOnly) return;
+        syncInProgress = true;
+        updateSyncStatus("syncing", "🔄 جاري المزامنة...");
+        try {
+            await db.ref(`users/${currentUser.uid}/data`).set({
+                customers: userData.customers,
+                workers: userData.workers,
+                accountingPersons: userData.accountingPersons,
+                currentPersonId: userData.currentPersonId,
+                nextCustId: userData.nextCustId,
+                nextProjId: userData.nextProjId,
+                nextRoomId: userData.nextRoomId,
+                currentWeekKey: userData.currentWeekKey,
+                workersArchives: userData.workersArchives,
+                accountingHistory: userData.accountingHistory,
+                lastModified: firebase.database.ServerValue.TIMESTAMP,
+                lastDeviceId: deviceId,
+                lastSync: new Date().toISOString()
             });
 
-            if(hasData) {
-                const userChoice = confirm(
-                    `📅 تنبيه: أسبوع جديد!\n\n` +
-                    `الأسبوع الماضي: ${savedWeek}\n` +
-                    `الأسبوع الحالي: ${currentWeek}\n` +
-                    `إجمالي مستحقات الأسبوع الماضي: ${weekTotal.toFixed(2)} دينار\n\n` +
-                    `هل تريد حفظ بيانات الأسبوع الماضي قبل البدء بالأسبوع الجديد؟`
-                );
+            await db.ref(`users/${currentUser.uid}/devices/${deviceId}`).set({
+                lastLogin: Date.now(),
+                userAgent: navigator.userAgent,
+                deviceName: navigator.platform || "Unknown"
+            });
 
-                if(userChoice) {
-                    saveCurrentWeekAuto();
-                } else {
-                    userData.workers.forEach(worker => {
-                        worker.days = { sat: 0, sun: 0, mon: 0, tue: 0, wed: 0, thu: 0, fri: 0 };
-                        worker.expense = 0;
-                        worker.expenseRaw = '';
-                    });
-                    window.renderWorkersTable();
-                    autoSave();
-                }
-            }
+            updateSyncStatus("online", "☁️ متزامن مع السحابة");
+        } catch(e) {
+            console.error("خطأ في الحفظ:", e);
+            updateSyncStatus("online", "⚠️ تم الحفظ محلياً فقط");
         }
-
-        localStorage.setItem(`last_week_${currentUser?.uid || 'local'}_${currentAccountingPerson?.id || 'main'}`, currentWeek);
-        userData.currentWeekKey = currentWeek;
+        syncInProgress = false;
     }
 
-    function saveCurrentWeekAuto() {
-        if(userData.workers.length === 0) return;
-
-        const currentWeek = getCurrentWeekKey();
-        const weekTotal = userData.workers.reduce((sum, w) => sum + calculateWorkerTotal(w), 0);
-        const workerCount = userData.workers.length;
-        const attendanceDays = userData.workers.reduce((sum, w) => {
-            return sum + Object.values(w.days).filter(d => d === 1).length;
-        }, 0);
-
-        userData.workersArchives = userData.workersArchives.filter(a => a.weekKey !== currentWeek);
-
-        const archiveRecord = {
-            weekKey: currentWeek,
-            savedAt: new Date().toISOString(),
-            workers: JSON.parse(JSON.stringify(userData.workers)),
-            summary: {
-                workerCount: workerCount,
-                attendanceDays: attendanceDays,
-                weekTotal: weekTotal
+    async function loadFromCloud() {
+        if(!useCloudSync || !currentUser || !isOnline || !db || currentUser.isLocalOnly) return false;
+        updateSyncStatus("syncing", "🔄 جاري التحميل...");
+        try {
+            const snapshot = await db.ref(`users/${currentUser.uid}/data`).get();
+            if(snapshot.exists()) {
+                const data = snapshot.val();
+                userData.customers = data.customers || [];
+                userData.workers = data.workers || [];
+                userData.accountingPersons = data.accountingPersons || { main: { name: "المدير الرئيسي", rows: [] } };
+                userData.currentPersonId = data.currentPersonId || "main";
+                userData.nextCustId = data.nextCustId || 1;
+                userData.nextProjId = data.nextProjId || 100;
+                userData.nextRoomId = data.nextRoomId || 1000;
+                userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
+                userData.workersArchives = data.workersArchives || [];
+                userData.accountingHistory = data.accountingHistory || [];
+                updateSyncStatus("online", "☁️ متزامن مع السحابة");
+                return true;
             }
-        };
-
-        userData.workersArchives.unshift(archiveRecord);
-
-        userData.workers.forEach(worker => {
-            worker.days = { sat: 0, sun: 0, mon: 0, tue: 0, wed: 0, thu: 0, fri: 0 };
-            worker.expense = 0;
-            worker.expenseRaw = '';
-        });
-
-        userData.currentWeekKey = getCurrentWeekKey();
-        autoSave();
-        window.renderWorkersTable();
-        loadWorkersArchivesList();
+        } catch(e) { console.error("خطأ في التحميل:", e); }
+        return false;
     }
 
-    window.saveCurrentWeek = function() {
-        if(userData.workers.length === 0) {
-            alert("⚠️ لا يوجد عمال لحفظهم");
+    async function autoSave() {
+        saveToLocal();
+        if(useCloudSync && isOnline && currentUser && !currentUser.isLocalOnly) {
+            await saveToCloud();
+        }
+    }
+
+    // ==================== دوال المصادقة ====================
+
+    window.togglePassword = function(fieldId) {
+        let f = document.getElementById(fieldId);
+        f.type = f.type === "password" ? "text" : "password";
+    }
+
+    window.loginLocalOnly = function() {
+        const localId = "local_user_" + deviceId;
+        currentUser = { uid: localId, email: "local@system.com", name: "المستخدم المحلي", isLocalOnly: true };
+        useCloudSync = false;
+        loadFromLocal();
+        if(userData.customers.length === 0) userData.currentWeekKey = getCurrentWeekKey();
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، مستخدم محلي`;
+        document.getElementById("syncModeDisplay").innerHTML = `💾 وضع محلي`;
+        document.getElementById("verificationWarning").style.display = "none";
+        updateSyncStatus("offline", "💾 وضع التشغيل المحلي");
+        window.renderAll();
+        window.initNavigationStack();
+    }
+
+    window.login = async function() {
+        if(!auth) {
+            document.getElementById("loginError").innerText = "❌ Firebase غير مهيأ. يرجى استخدام الوضع المحلي";
+            return;
+        }
+        let email = document.getElementById("loginEmail").value.trim();
+        let password = document.getElementById("loginPassword").value;
+        let remember = document.getElementById("rememberDevice").checked;
+        let errorDiv = document.getElementById("loginError");
+        let successDiv = document.getElementById("loginSuccess");
+        errorDiv.innerText = "";
+        successDiv.innerText = "";
+
+        if(!email || !password) { errorDiv.innerText = "البريد الإلكتروني والرمز السري مطلوبان"; return; }
+        try {
+            await auth.setPersistence(
+                remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION
+            );
+
+            const cred = await auth.signInWithEmailAndPassword(email, password);
+
+            if (!cred.user.emailVerified) {
+                errorDiv.innerText = "⚠️ يرجى تفعيل حسابك عبر الرابط المرسل إلى بريدك الإلكتروني";
+                document.getElementById("verificationWarning").style.display = "block";
+                await auth.signOut();
+                return;
+            }
+
+            currentUser = { uid: cred.user.uid, email: email, name: cred.user.displayName || email.split('@')[0], isLocalOnly: false };
+            useCloudSync = true;
+
+            await loadFromLocal();
+            await loadFromCloud();
+
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("mainApp").style.display = "block";
+            document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${currentUser.name}`;
+            document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
+            document.getElementById("verificationWarning").style.display = "none";
+            updateSyncStatus("online", "☁️ متزامن مع السحابة");
+            window.renderAll();
+            window.initNavigationStack();
+
+        } catch(e) {
+            errorDiv.innerText = e.code === 'auth/user-not-found' ? "الحساب غير موجود" :
+                                 e.code === 'auth/wrong-password' ? "كلمة المرور غير صحيحة" : e.message;
+        }
+    }
+
+    window.register = async function() {
+        if(!auth) {
+            document.getElementById("regError").innerText = "❌ Firebase غير مهيأ";
+            return;
+        }
+        let email = document.getElementById("regEmail").value.trim();
+        let name = document.getElementById("regName").value.trim();
+        let password = document.getElementById("regPassword").value;
+        let errorDiv = document.getElementById("regError");
+        let successDiv = document.getElementById("regSuccess");
+        errorDiv.innerText = "";
+        successDiv.innerText = "";
+
+        if(!email || !name || !password) { errorDiv.innerText = "جميع الحقول مطلوبة"; return; }
+        if(password.length < 6) { errorDiv.innerText = "الرمز السري 6 أحرف على الأقل"; return; }
+
+        try {
+            const cred = await auth.createUserWithEmailAndPassword(email, password);
+            await cred.user.updateProfile({ displayName: name });
+
+            await cred.user.sendEmailVerification();
+
+            if(db) await db.ref(`users/${cred.user.uid}/profile`).set({
+                name, email,
+                createdAt: new Date().toISOString(),
+                devices: { [deviceId]: { firstLogin: Date.now(), userAgent: navigator.userAgent } }
+            });
+
+            successDiv.innerText = "✅ تم إنشاء الحساب! تم إرسال رابط التفعيل إلى بريدك.";
+
+            await auth.signOut();
+
+            // مسح الحقول
+            document.getElementById("regEmail").value = "";
+            document.getElementById("regName").value = "";
+            document.getElementById("regPassword").value = "";
+
+            setTimeout(() => {
+                window.hideRegister();
+                document.getElementById("loginSuccess").innerText = "✅ تم إنشاء الحساب! يرجى تفعيل حسابك عبر البريد ثم تسجيل الدخول.";
+                setTimeout(() => {
+                    document.getElementById("loginSuccess").innerText = "";
+                }, 5000);
+            }, 2000);
+
+        } catch(e) {
+            errorDiv.innerText = e.code === 'auth/email-already-in-use' ? "البريد مستخدم بالفعل" : e.message;
+        }
+    }
+
+    // إعادة إرسال رابط التفعيل من شاشة التسجيل
+    window.resendVerificationFromRegister = async function() {
+        const email = document.getElementById("regEmail").value.trim();
+        let errorDiv = document.getElementById("regError");
+        let successDiv = document.getElementById("regSuccess");
+
+        if(!email) {
+            errorDiv.innerText = "❌ الرجاء إدخال بريدك الإلكتروني أولاً";
             return;
         }
 
-        const currentWeek = getCurrentWeekKey();
-        const hasData = userData.workers.some(w => {
-            const hasAttendance = Object.values(w.days).some(day => day === 1);
-            const hasSalary = w.price > 0 || w.expense > 0;
-            return hasAttendance || hasSalary;
-        });
-
-        if(!hasData) {
-            if(!confirm("⚠️ لا توجد بيانات للأسبوع الحالي. هل تريد المتابعة؟")) {
-                return;
+        try {
+            await auth.sendPasswordResetEmail(email);
+            successDiv.innerText = "✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد أو البريد العشوائي (Spam)";
+            errorDiv.innerText = "";
+        } catch(e) {
+            if(e.code === 'auth/user-not-found') {
+                errorDiv.innerText = "❌ لا يوجد حساب مرتبط بهذا البريد الإلكتروني";
+            } else {
+                errorDiv.innerText = "❌ خطأ: " + e.message;
             }
-        }
-
-        const existingArchive = userData.workersArchives.find(a => a.weekKey === currentWeek);
-        if(existingArchive) {
-            if(!confirm(`⚠️ أسبوع ${currentWeek} موجود بالفعل. هل تريد استبداله؟`)) {
-                return;
-            }
-            userData.workersArchives = userData.workersArchives.filter(a => a.weekKey !== currentWeek);
-        }
-
-        const weekTotal = userData.workers.reduce((sum, w) => sum + calculateWorkerTotal(w), 0);
-        const workerCount = userData.workers.length;
-        const attendanceDays = userData.workers.reduce((sum, w) => {
-            return sum + Object.values(w.days).filter(d => d === 1).length;
-        }, 0);
-
-        const archiveRecord = {
-            weekKey: currentWeek,
-            savedAt: new Date().toISOString(),
-            workers: JSON.parse(JSON.stringify(userData.workers)),
-            summary: {
-                workerCount: workerCount,
-                attendanceDays: attendanceDays,
-                weekTotal: weekTotal
-            }
-        };
-
-        userData.workersArchives.unshift(archiveRecord);
-
-        userData.workers.forEach(worker => {
-            worker.days = { sat: 0, sun: 0, mon: 0, tue: 0, wed: 0, thu: 0, fri: 0 };
-            worker.expense = 0;
-            worker.expenseRaw = '';
-        });
-
-        userData.currentWeekKey = getCurrentWeekKey();
-        autoSave();
-        window.renderWorkersTable();
-        loadWorkersArchivesList();
-
-        alert(`✅ تم حفظ أسبوع ${currentWeek}\n📊 الإجمالي: ${weekTotal.toFixed(2)} دينار`);
-
-        document.getElementById('archivePanel').classList.add('show');
-    }
-
-    window.showCurrentWeekInfo = function() {
-        const currentWeek = getCurrentWeekKey();
-        const total = userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0).toFixed(2);
-        const workerCount = userData.workers.length;
-        const attendanceDays = userData.workers.reduce((sum, w) => {
-            return sum + Object.values(w.days).filter(d => d === 1).length;
-        }, 0);
-        alert(`📅 الأسبوع الحالي: ${currentWeek}\n👥 العمال: ${workerCount}\n📅 أيام الحضور: ${attendanceDays}\n💰 الإجمالي: ${total} دينار`);
-    }
-
-    function loadWorkersArchiveWeek(weekKey){
-        let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
-        if(archive){
-            if(userData.workers.length > 0 && confirm(`⚠️ سيتم استبدال البيانات الحالية بأسبوع ${weekKey}\nهل تريد حفظ الأسبوع الحالي أولاً؟`)) {
-                window.saveCurrentWeek();
-            }
-            userData.workers = JSON.parse(JSON.stringify(archive.workers));
-            window.renderWorkersTable();
-            autoSave();
-            alert(`📅 تم تحميل أسبوع ${weekKey}`);
+            successDiv.innerText = "";
         }
     }
 
-    function loadWorkersArchivesList(){
-        let div=document.getElementById('archiveList'); if(!div)return;
-        if(userData.workersArchives.length===0){
-            div.innerHTML='<div class="empty-message">📭 لا توجد سجلات أسبوعية</div>';
+    // إعادة تعيين كلمة المرور
+    window.showResetPassword = function() {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("resetPasswordScreen").style.display = "flex";
+        document.getElementById("resetEmail").value = "";
+        document.getElementById("resetError").innerText = "";
+        document.getElementById("resetSuccess").innerText = "";
+    }
+
+    window.hideResetPassword = function() {
+        document.getElementById("resetPasswordScreen").style.display = "none";
+        document.getElementById("loginScreen").style.display = "flex";
+    }
+
+    window.sendPasswordReset = async function() {
+        const email = document.getElementById("resetEmail").value.trim();
+        let errorDiv = document.getElementById("resetError");
+        let successDiv = document.getElementById("resetSuccess");
+        errorDiv.innerText = "";
+        successDiv.innerText = "";
+
+        if(!email) {
+            errorDiv.innerText = "❌ الرجاء إدخال بريدك الإلكتروني";
             return;
         }
-        const sortedArchives = [...userData.workersArchives].sort((a,b) => new Date(b.savedAt) - new Date(a.savedAt));
-        div.innerHTML = sortedArchives.map(archive => `
-            <div class="archive-item" data-week="${archive.weekKey}">
-                <div class="week-info" style="flex:1">
-                    <div><strong>📅 ${archive.weekKey}</strong></div>
-                    <div class="week-summary">💰 ${archive.summary.weekTotal.toFixed(2)} دينار | 👥 ${archive.summary.workerCount} عامل | 📅 ${archive.summary.attendanceDays} يوم</div>
-                    <div class="week-date">📌 ${new Date(archive.savedAt).toLocaleDateString('ar-EG')}</div>
-                </div>
-                <div>
-                    <button class="btn-info load-week-btn" data-week="${archive.weekKey}">📂 تحميل</button>
-                    <button class="btn-danger delete-archive-btn" data-week="${archive.weekKey}">🗑️</button>
-                </div>
-            </div>
-        `).join('');
-        document.querySelectorAll('.load-week-btn').forEach(btn => {
-            btn.onclick = (e) => { e.stopPropagation(); loadWorkersArchiveWeek(btn.dataset.week); };
-        });
-        document.querySelectorAll('.delete-archive-btn').forEach(btn => {
-            btn.onclick = (e) => {
-                e.stopPropagation();
-                if(confirm(`⚠️ هل أنت متأكد من حذف أسبوع ${btn.dataset.week}؟`)) {
-                    userData.workersArchives = userData.workersArchives.filter(a => a.weekKey !== btn.dataset.week);
-                    loadWorkersArchivesList();
-                    autoSave();
-                }
-            };
-        });
+
+        try {
+            await auth.sendPasswordResetEmail(email);
+            successDiv.innerText = "✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني";
+            setTimeout(() => {
+                window.hideResetPassword();
+            }, 3000);
+        } catch(e) {
+            if(e.code === 'auth/user-not-found') {
+                errorDiv.innerText = "❌ لا يوجد حساب مرتبط بهذا البريد الإلكتروني";
+            } else {
+                errorDiv.innerText = "❌ خطأ: " + e.message;
+            }
+        }
     }
 
-    window.toggleArchivePanel = function(){
-        const panel = document.getElementById('archivePanel');
-        panel.classList.toggle('show');
-        if(panel.classList.contains('show')) loadWorkersArchivesList();
+    window.resendVerificationFromWarning = async function() {
+        if(auth && auth.currentUser) {
+            try {
+                await auth.currentUser.sendEmailVerification();
+                alert("✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني");
+            } catch(e) {
+                alert("❌ خطأ: " + e.message);
+            }
+        } else {
+            alert("❌ الرجاء تسجيل الدخول أولاً");
+        }
     }
-    window.closeArchivePanel = function(){ document.getElementById('archivePanel').classList.remove('show'); }
+
+    window.logout = async function() {
+        await autoSave();
+        currentUser = null; useCloudSync = false;
+        document.getElementById("mainApp").style.display = "none";
+        document.getElementById("loginScreen").style.display = "flex";
+        document.getElementById("loginEmail").value = "";
+        document.getElementById("loginPassword").value = "";
+        document.getElementById("loginError").innerText = "";
+    }
+
+    window.showRegister = function() {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("registerScreen").style.display = "flex";
+        document.getElementById("regError").innerText = "";
+        document.getElementById("regSuccess").innerText = "";
+    }
+
+    window.hideRegister = function() {
+        document.getElementById("registerScreen").style.display = "none";
+        document.getElementById("loginScreen").style.display = "flex";
+    }
 
     // ==================== دوال العمال ====================
-    function calculateWorkerTotal(w){
-        let days = dayKeys.reduce((s,k)=>s+(w.days[k]||0),0);
-        return (days*(w.price||0))-(w.expense||0);
-    }
+    function calculateWorkerTotal(w){ let days=dayKeys.reduce((s,k)=>s+(w.days[k]||0),0); return (days*(w.price||0))-(w.expense||0); }
     function updateWorkersTotal() {
         const totalEl = document.getElementById("workersTotal");
         if(totalEl) totalEl.innerText = userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0).toFixed(2);
-    }
-
-    function handleExpenseInput(input, workerId) {
-        const worker = userData.workers.find(w => w.id === workerId);
-        if(!worker) return;
-        const rawValue = input.value;
-        const total = parseExpenseString(rawValue);
-        worker.expenseRaw = rawValue;
-        worker.expense = total;
-        const hintDiv = input.parentElement.querySelector('.expense-hint');
-        if(hintDiv) hintDiv.innerHTML = `💰 الإجمالي: ${total.toFixed(2)} دينار`;
-        const totalCell = document.getElementById(`worker_total_${worker.id}`);
-        if(totalCell) totalCell.innerText = calculateWorkerTotal(worker).toFixed(2);
-        autoSave();
-        updateWorkersTotal();
     }
 
     window.renderWorkersTable = function(){
         let tbody=document.getElementById("workersTableBody"); if(!tbody) return;
         let search=document.getElementById("searchInput")?.value.toLowerCase()||'';
         let filtered=userData.workers.filter(w=>w.name.toLowerCase().includes(search));
-        if(filtered.length === 0) {
-            tbody.innerHTML='<tr><td colspan="13" class="empty-message">📭 لا يوجد عمال</td></tr>';
-            updateWorkersTotal();
-            return;
-        }
         tbody.innerHTML = filtered.map((w,idx)=> {
             let daysHtml = '';
             dayKeys.forEach((d, i) => { daysHtml += `<td data-label="${dayNames[i]}"><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days[d]?'checked':''}></td>`; });
-            let expenseDisplay = (w.expenseRaw !== undefined && w.expenseRaw !== '') ? w.expenseRaw : (w.expense || '');
             return `<tr data-worker-id="${w.id}">
                 <td data-label="#">${idx+1}</td>
                 <td data-label="الاسم"><input class="editable name-input" value="${escapeHtml(w.name)}" data-field="name" data-id="${w.id}"></td>
                 ${daysHtml}
-                <td data-label="المصروف">
-                    <input type="text" class="editable expense-input" value="${escapeHtml(expenseDisplay)}" data-field="expense" data-id="${w.id}" placeholder="مثال: 30+40+50" style="direction:ltr;text-align:left;width:110px;">
-                    <div class="expense-hint">💰 الإجمالي: ${(w.expense||0).toFixed(2)} دينار</div>
-                </td>
-                <td data-label="السعر"><input class="editable" value="${w.price||0}" data-field="price" data-id="${w.id}" step="0.01"></td>
-                <td data-label="المجموع" class="total-cell" id="worker_total_${w.id}">${calculateWorkerTotal(w).toFixed(2)}</td>
-                <td data-label=""><button class="delete-worker-btn" data-id="${w.id}">✖</button></td>
+                <td data-label="المصروف"><input class="editable" value="${w.expense||''}" data-field="expense" data-id="${w.id}" step="0.01"></td>
+                <td data-label="السعر"><input class="editable" value="${w.price||''}" data-field="price" data-id="${w.id}" step="0.01"></td>
+                <td data-label="المجموع" class="total-cell">${calculateWorkerTotal(w).toFixed(2)}</td>
+                <td data-label=""><button class="delete-btn" data-id="${w.id}">✖</button></td>
               </tr>`;
         }).join('');
         attachWorkerEvents(); updateWorkersTotal();
@@ -885,52 +764,85 @@
 
     function attachWorkerEvents(){
         document.querySelectorAll('.attendance-check').forEach(cb=>{ cb.onchange=()=>{ let w=userData.workers.find(w=>w.id==parseInt(cb.dataset.id)); if(w){ w.days[cb.dataset.day]=cb.checked?1:0; window.renderWorkersTable(); autoSave(); } }; });
-        document.querySelectorAll('.name-input').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ w.name = inp.value; autoSave(); } }; });
-        document.querySelectorAll('.editable[data-field="price"]').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ w.price = parseFloat(inp.value) || 0; const totalCell = document.getElementById(`worker_total_${w.id}`); if(totalCell) totalCell.innerText = calculateWorkerTotal(w).toFixed(2); updateWorkersTotal(); autoSave(); } }; });
-        document.querySelectorAll('.expense-input').forEach(inp=>{ inp.onblur=()=>{ handleExpenseInput(inp, parseInt(inp.dataset.id)); }; inp.onkeypress=(e)=>{ if(e.key === 'Enter') { e.preventDefault(); handleExpenseInput(inp, parseInt(inp.dataset.id)); } }; });
-        document.querySelectorAll('.delete-worker-btn').forEach(btn=>{ btn.onclick=()=>{ if(confirm("⚠️ هل أنت متأكد من حذف هذا العامل؟")) { userData.workers = userData.workers.filter(w=>w.id != parseInt(btn.dataset.id)); window.renderWorkersTable(); autoSave(); } }; });
+        document.querySelectorAll('.editable').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ let val = inp.value; w[inp.dataset.field]= (inp.dataset.field==='name') ? val : (val===''?0:parseFloat(val)||0); window.renderWorkersTable(); autoSave(); } }; });
+        document.querySelectorAll('.delete-btn').forEach(btn=>{ btn.onclick=()=>{ userData.workers=userData.workers.filter(w=>w.id!=parseInt(btn.dataset.id)); window.renderWorkersTable(); autoSave(); }; });
     }
 
     window.addNewWorker = function(){
         let newId = userData.workers.length ? Math.max(...userData.workers.map(w=>w.id)) + 1 : 1;
-        const newWorker = { id:newId, name:'عامل جديد', price:0, expense:0, expenseRaw:'', days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} };
-        userData.workers.push(newWorker);
+        const newWorker = { id:newId, name:'عامل جديد', price:0, expense:0, days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} };
+        userData.workers.unshift(newWorker);
         window.renderWorkersTable();
         autoSave();
         document.querySelector('.workers-table-wrapper')?.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
     window.filterWorkers = function(){ window.renderWorkersTable(); }
+    window.toggleArchivePanel = function(){ document.getElementById('archivePanel').classList.toggle('show'); loadWorkersArchivesList(); }
+
+    function loadWorkersArchivesList(){
+        let div=document.getElementById('archiveList'); if(!div)return;
+        if(userData.workersArchives.length===0){ div.innerHTML='<div class="empty-message">📭 لا توجد سجلات</div>'; return; }
+        div.innerHTML=userData.workersArchives.map(a=>`<div class="archive-item" data-week="${a.weekKey}"><div>📅 ${a.weekKey}</div><button class="delete-archive-btn" data-week="${a.weekKey}">🗑</button></div>`).join('');
+        document.querySelectorAll('.archive-item').forEach(item=>{ item.onclick=(e)=>{ if(!e.target.classList.contains('delete-archive-btn')) loadWorkersArchiveWeek(item.dataset.week); }; });
+        document.querySelectorAll('.delete-archive-btn').forEach(btn=>{ btn.onclick=(e)=>{ e.stopPropagation(); userData.workersArchives=userData.workersArchives.filter(a=>a.weekKey!==btn.dataset.week); loadWorkersArchivesList(); autoSave(); }; });
+    }
+
+    function loadWorkersArchiveWeek(weekKey){
+        let a=userData.workersArchives.find(a=>a.weekKey===weekKey);
+        if(a){ userData.workers=[...a.workers]; window.renderWorkersTable(); autoSave(); alert(`تم تحميل أسبوع ${weekKey}`); }
+    }
 
     // ==================== دوال المحاسبة ====================
+    window.renderPersonSelect = function() {
+        let select = document.getElementById("personSelect"); if(!select) return;
+        let options = '';
+        for(let id in userData.accountingPersons) { options += `<option value="${id}">${escapeHtml(userData.accountingPersons[id].name)}</option>`; }
+        select.innerHTML = options; select.value = userData.currentPersonId;
+    }
+
+    window.switchPerson = function() { userData.currentPersonId = document.getElementById("personSelect").value; window.renderAccountingTable(); autoSave(); }
+
+    window.addNewPerson = function() {
+        let name = prompt("اسم الشخص الجديد:");
+        if(name) { let newId = 'person_' + Date.now(); userData.accountingPersons[newId] = { name: name, rows: [] }; window.renderPersonSelect(); userData.currentPersonId = newId; window.renderAccountingTable(); autoSave(); }
+    }
 
     window.renderAccountingTable = function() {
         let tbody = document.getElementById("accountingBody"); if(!tbody) return;
-        let rows = userData.accountingRows || [];
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) { person = { name: 'غير معروف', rows: [] }; userData.accountingPersons[userData.currentPersonId]=person; }
+        let rows = person.rows || [];
         tbody.innerHTML = rows.map((r,i)=>`<tr data-row-index="${i}">
             <td><input type="number" class="acc-expense" data-i="${i}" placeholder="0" value="${r.expense||''}" step="0.01" style="width:100%;"></td>
             <td><input type="number" class="acc-revenue" data-i="${i}" placeholder="0" value="${r.revenue||''}" step="0.01" style="width:100%;"></td>
-            <td><input type="text" class="acc-note" data-i="${i}" placeholder="ملاحظة" value="${escapeHtml(r.note||'')}" style="width:100%;"></td>
-            <td><button class="delete-acc-btn" data-i="${i}">✖</button></td>
-          </table>`).join('');
+            <td><input type="text" class="acc-note" data-i="${i}" placeholder="ملاحظة" value="${escapeHtml(r.revenueNote||'')}" style="width:100%;"></td>
+            <td><button class="delete-btn" data-i="${i}">✖</button></td>
+          </tr>`).join('');
         attachAccountingEvents(); updateAccountingSummary();
     }
 
     function attachAccountingEvents() {
-        document.querySelectorAll('.acc-expense').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); userData.accountingRows[i].expense=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
-        document.querySelectorAll('.acc-revenue').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); userData.accountingRows[i].revenue=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
-        document.querySelectorAll('.acc-note').forEach(inp=>{ inp.onchange=()=>{ let i=parseInt(inp.dataset.i); userData.accountingRows[i].note=inp.value; autoSave(); }; });
-        document.querySelectorAll('.delete-acc-btn').forEach(btn=>{ btn.onclick=()=>{ let i=parseInt(btn.dataset.i); userData.accountingRows.splice(i,1); window.renderAccountingTable(); autoSave(); }; });
+        let person = userData.accountingPersons[userData.currentPersonId]; if(!person) return;
+        document.querySelectorAll('.acc-expense').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].expense=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
+        document.querySelectorAll('.acc-revenue').forEach(inp=>{ inp.oninput=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].revenue=parseFloat(inp.value)||0; updateAccountingSummary(); autoSave(); }; });
+        document.querySelectorAll('.acc-note').forEach(inp=>{ inp.onchange=()=>{ let i=parseInt(inp.dataset.i); person.rows[i].revenueNote=inp.value; autoSave(); }; });
+        document.querySelectorAll('#accountingBody .delete-btn').forEach(btn=>{ btn.onclick=()=>{ let i=parseInt(btn.dataset.i); person.rows.splice(i,1); window.renderAccountingTable(); autoSave(); }; });
     }
 
     window.addAccountingRow = function() {
-        if(!userData.accountingRows) userData.accountingRows = [];
-        userData.accountingRows.unshift({expense:null, revenue:null, note:''});
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) return;
+        if(!person.rows) person.rows = [];
+        person.rows.unshift({expense:null, revenue:null, revenueNote:''});
         window.renderAccountingTable();
         autoSave();
     }
 
     function updateAccountingSummary() {
-        let rows = userData.accountingRows || [];
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) return;
+        let rows = person.rows || [];
         let totalRevenue = rows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
         let totalExpense = rows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
         let net = totalRevenue - totalExpense;
@@ -943,17 +855,19 @@
     }
 
     window.archiveAndClearAccounting = function() {
-        let rows = userData.accountingRows || [];
+        let person = userData.accountingPersons[userData.currentPersonId];
+        if(!person) return;
+        let rows = person.rows || [];
         if(rows.length === 0){ alert("لا توجد بيانات"); return; }
         if(confirm("سيتم حفظ البيانات ثم مسح الجدول؟")){
             let totalExpense = rows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
             let totalRevenue = rows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
             let date = new Date().toLocaleDateString('ar-EG');
             let time = new Date().toLocaleTimeString('ar-EG');
-            let historyRecord = { id: Date.now(), date, time, rows: JSON.parse(JSON.stringify(rows)), summary: { totalExpense, totalRevenue, net: totalRevenue - totalExpense } };
+            let historyRecord = { id: Date.now(), personName: person.name, date, time, rows: JSON.parse(JSON.stringify(rows)), summary: { totalExpense, totalRevenue, net: totalRevenue - totalExpense } };
             if(!userData.accountingHistory) userData.accountingHistory = [];
             userData.accountingHistory.unshift(historyRecord);
-            userData.accountingRows = [];
+            person.rows = [];
             window.renderAccountingTable();
             autoSave();
             alert("تم الحفظ والمسح");
@@ -967,11 +881,20 @@
         content.innerHTML = '<h3>📋 سجل المحاسبة السابقة</h3>';
         userData.accountingHistory.forEach(record => {
             let div = document.createElement('div'); div.className = 'record-item';
-            div.innerHTML = `<div><strong>📅 ${record.date} - ${record.time}</strong></div><div>💰 إيرادات: ${record.summary.totalRevenue.toFixed(2)} | 📉 مصاريف: ${record.summary.totalExpense.toFixed(2)} | صافي: ${record.summary.net.toFixed(2)}</div><div>📝 ${record.rows.length} سجل</div>`;
+            div.innerHTML = `<div><strong>📅 ${record.date} - ${record.time}</strong> | 👤 ${record.personName}</div><div>💰 إيرادات: ${record.summary.totalRevenue.toFixed(2)} | 📉 مصاريف: ${record.summary.totalExpense.toFixed(2)} | صافي: ${record.summary.net.toFixed(2)}</div><div>📝 ${record.rows.length} سجل</div><button class="btn-outline" onclick="window.viewRecordDetails(${record.id})">🔍 عرض</button>`;
             content.appendChild(div);
         });
         let closeBtn = document.createElement('button'); closeBtn.innerText = 'إغلاق'; closeBtn.className = 'btn-secondary'; closeBtn.onclick = () => modal.remove();
         content.appendChild(closeBtn); modal.appendChild(content); document.body.appendChild(modal);
+    }
+
+    window.viewRecordDetails = function(recordId) {
+        let record = userData.accountingHistory.find(r => r.id === recordId);
+        if(!record) return;
+        let details = `📋 تفاصيل السجل\n${record.date}\n\n`;
+        record.rows.forEach((r, i) => { details += `${i+1}. مصاريف: ${(r.expense||0).toFixed(2)} | إيرادات: ${(r.revenue||0).toFixed(2)} | ملاحظة: ${r.revenueNote||'-'}\n`; });
+        details += `\n📊 الإجمالي: إيرادات=${record.summary.totalRevenue.toFixed(2)} | مصاريف=${record.summary.totalExpense.toFixed(2)} | صافي=${record.summary.net.toFixed(2)}`;
+        alert(details);
     };
 
     // ==================== دوال العملاء والمشاريع ====================
@@ -1024,20 +947,20 @@
     function renderPaymentsTable(proj){
         let tbody = document.getElementById("paymentsBody"); if(!tbody) return;
         if(!proj.payments) proj.payments = [];
-        if(proj.payments.length === 0){ tbody.innerHTML='<tr><td colspan="4">لا توجد دفعات</td><tr>';
+        if(proj.payments.length === 0){ tbody.innerHTML='<tr><td colspan="4">لا توجد دفعات</td></tr>';
             document.getElementById("totalPayments").innerText="0.00";
             const remaining = (proj.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0) - 0;
             const remainingEl = document.getElementById("remainingAmount");
             if(remainingEl) remainingEl.innerText = remaining.toFixed(2);
             return;
         }
-        tbody.innerHTML = proj.payments.map((p,idx)=>`<tr><td>${p.date}</td><td>${p.amount.toFixed(2)}</td><td>${escapeHtml(p.note||'')}</td><td><button class="delete-payment-btn" data-idx="${idx}">✖</button></td></tr>`).join('');
+        tbody.innerHTML = proj.payments.map((p,idx)=>`<tr><td>${p.date}</td><td>${p.amount.toFixed(2)}</td><td>${escapeHtml(p.note||'')}</td><td><button class="delete-btn" data-payment-idx="${idx}">✖</button></td></tr>`).join('');
         let total = proj.payments.reduce((s,p)=>s+p.amount,0);
         document.getElementById("totalPayments").innerHTML = total.toFixed(2);
         const projectTotal = proj.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0;
         const remainingEl = document.getElementById("remainingAmount");
         if(remainingEl) remainingEl.innerText = (projectTotal - total).toFixed(2);
-        document.querySelectorAll('.delete-payment-btn').forEach(btn=>{ btn.onclick=()=>{ let idx=parseInt(btn.dataset.idx); proj.payments.splice(idx,1); renderPaymentsTable(proj); autoSave(); }; });
+        document.querySelectorAll('#paymentsBody .delete-btn').forEach(btn=>{ btn.onclick=()=>{ let idx=parseInt(btn.dataset.paymentIdx); proj.payments.splice(idx,1); renderPaymentsTable(proj); autoSave(); }; });
     }
 
     window.renderRoomsTable = function(proj){
@@ -1046,22 +969,22 @@
         if(proj.rooms.length===0){ tbody.innerHTML='<tr><td colspan="7">➕ أضف غرفة</td></tr>'; return; }
         let price=proj.globalPricePerMeter||50;
         tbody.innerHTML=proj.rooms.map((r,idx)=>{
-            let meters = (r.lengthVal && r.widthVal) ? (r.lengthVal*r.widthVal) : 0;
+            let meters = (r.lengthVal && r.widthVal) ? (r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)) : 0;
             r.totalCost = meters * price;
             return `<tr data-room-id="${r.id}"><td>${idx+1}</td>
                 <td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||''}"></td>
                 <td><input type="number" class="room-width" step="0.01" value="${r.widthVal||''}"></td>
-                <td><select class="room-mode"><option value="area" ${r.calcMode==='area'?'selected':''}>مساحة</option></select></td>
-                <td class="calc-val">${meters.toFixed(2)}</td>
-                <td class="room-total">${r.totalCost.toFixed(2)}</td>
+                <td><select class="room-mode"><option value="area" ${r.calcMode==='area'?'selected':''}>مساحة</option><option value="perimeter" ${r.calcMode==='perimeter'?'selected':''}>محيط</option></select></td>
+                <td><span class="calc-val">${meters.toFixed(2)}</span></td>
+                <td><span class="room-total">${r.totalCost.toFixed(2)}</span></td>
                 <td><button class="delete-room-btn" data-id="${r.id}">✖</button></td>
-               </tr>`;
+              </tr>`;
         }).join('');
         attachRoomEvents(proj);
     }
 
     function attachRoomEvents(proj){
-        document.querySelectorAll('.room-length, .room-width').forEach(el=>{ el.onchange=()=>{ syncRoomsFromDOM(proj); window.updateProjectTotal(proj); autoSave(); }; });
+        document.querySelectorAll('.room-length, .room-width, .room-mode').forEach(el=>{ el.onchange=()=>{ syncRoomsFromDOM(proj); window.updateProjectTotal(proj); autoSave(); }; });
         document.querySelectorAll('.delete-room-btn').forEach(btn=>{ btn.onclick=()=>{ proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); window.renderRoomsTable(proj); window.updateProjectTotal(proj); autoSave(); }; });
     }
 
@@ -1074,6 +997,7 @@
                 let wid = parseFloat(row.querySelector('.room-width')?.value);
                 room.lengthVal = isNaN(len) ? 0 : len;
                 room.widthVal = isNaN(wid) ? 0 : wid;
+                room.calcMode = row.querySelector('.room-mode')?.value;
             }
         });
     }
@@ -1082,7 +1006,7 @@
         let price=parseFloat(document.getElementById("globalPricePerMeter").value)||0;
         proj.globalPricePerMeter=price;
         proj.rooms.forEach(r=>{
-            let m = r.lengthVal * r.widthVal;
+            let m = (r.lengthVal && r.widthVal) ? (r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)) : 0;
             r.totalCost=m*price;
         });
         const grandTotal = proj.rooms.reduce((s,r)=>s+r.totalCost,0).toFixed(2);
@@ -1124,19 +1048,19 @@
     }
 
     window.showMainTab = function(tab){
-        document.querySelectorAll('#mainSystem .tab-content').forEach(t=>t.classList.remove('active'));
-        document.querySelectorAll('#mainSystem .tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
         if(tab==='projects'){
             document.getElementById('projectsTab').classList.add('active');
-            document.querySelector('#mainSystem .tab-btn:first-child').classList.add('active');
+            document.querySelector('.tabs .tab-btn:first-child').classList.add('active');
             window.showProjectScreen('customers');
         } else if(tab==='workers'){
             document.getElementById('workersTab').classList.add('active');
-            document.querySelector('#mainSystem .tab-btn:nth-child(2)').classList.add('active');
+            document.querySelector('.tabs .tab-btn:nth-child(2)').classList.add('active');
             window.renderWorkersTable();
         } else{
             document.getElementById('accountingTab').classList.add('active');
-            document.querySelector('#mainSystem .tab-btn:nth-child(3)').classList.add('active');
+            document.querySelector('.tabs .tab-btn:nth-child(3)').classList.add('active');
             window.renderAccountingTable();
         }
     }
@@ -1192,285 +1116,11 @@
         }
     }
 
-    window.renderAll = function(){
-        window.renderCustomersScreen();
-        window.renderWorkersTable();
-        window.renderAccountingTable();
-        loadWorkersArchivesList();
-        if(currentUser && !weekCheckDone && currentAccountingPerson) {
-            weekCheckDone = true;
-            setTimeout(() => checkForNewWeek(), 500);
-        }
-    }
+    window.renderAll = function(){ window.renderCustomersScreen(); window.renderWorkersTable(); window.renderPersonSelect(); window.renderAccountingTable(); loadWorkersArchivesList(); }
 
-    // ==================== دوال التخزين والمزامنة ====================
-
-    function saveToLocal() {
-        if(currentUser && !currentUser.isLocalOnly) {
-            localStorage.setItem(`data_${currentUser.uid}_${currentAccountingPerson?.id || 'main'}`, JSON.stringify({
-                customers: userData.customers,
-                workers: userData.workers,
-                nextCustId: userData.nextCustId,
-                nextProjId: userData.nextProjId,
-                nextRoomId: userData.nextRoomId,
-                currentWeekKey: userData.currentWeekKey,
-                workersArchives: userData.workersArchives
-            }));
-        } else if(currentUser && currentUser.isLocalOnly) {
-            localStorage.setItem(`data_local_${currentUser.uid}_${currentAccountingPerson?.id || 'main'}`, JSON.stringify({
-                customers: userData.customers,
-                workers: userData.workers,
-                nextCustId: userData.nextCustId,
-                nextProjId: userData.nextProjId,
-                nextRoomId: userData.nextRoomId,
-                currentWeekKey: userData.currentWeekKey,
-                workersArchives: userData.workersArchives
-            }));
-        }
-        saveAccountingDataForCurrentUser();
-    }
-
-    function loadFromLocal() {
-        if(currentUser && !currentUser.isLocalOnly) {
-            const saved = localStorage.getItem(`data_${currentUser.uid}_${currentAccountingPerson?.id || 'main'}`);
-            if(saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    userData.customers = data.customers || [];
-                    userData.workers = data.workers || [];
-                    userData.nextCustId = data.nextCustId || 1;
-                    userData.nextProjId = data.nextProjId || 100;
-                    userData.nextRoomId = data.nextRoomId || 1000;
-                    userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
-                    userData.workersArchives = data.workersArchives || [];
-                    return true;
-                } catch(e) {}
-            }
-        } else if(currentUser && currentUser.isLocalOnly) {
-            const saved = localStorage.getItem(`data_local_${currentUser.uid}_${currentAccountingPerson?.id || 'main'}`);
-            if(saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    userData.customers = data.customers || [];
-                    userData.workers = data.workers || [];
-                    userData.nextCustId = data.nextCustId || 1;
-                    userData.nextProjId = data.nextProjId || 100;
-                    userData.nextRoomId = data.nextRoomId || 1000;
-                    userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
-                    userData.workersArchives = data.workersArchives || [];
-                    return true;
-                } catch(e) {}
-            }
-        }
-        return false;
-    }
-
-    async function saveToCloud() {
-        if(!useCloudSync || !currentUser || !isOnline || syncInProgress || !db || currentUser.isLocalOnly) return;
-        syncInProgress = true;
-        updateSyncStatus("syncing", "🔄 جاري المزامنة...");
-        try {
-            await db.ref(`users/${currentUser.uid}/data_${currentAccountingPerson?.id || 'main'}`).set({
-                customers: userData.customers,
-                workers: userData.workers,
-                nextCustId: userData.nextCustId,
-                nextProjId: userData.nextProjId,
-                nextRoomId: userData.nextRoomId,
-                currentWeekKey: userData.currentWeekKey,
-                workersArchives: userData.workersArchives,
-                lastModified: firebase.database.ServerValue.TIMESTAMP
-            });
-            updateSyncStatus("online", "☁️ متزامن مع السحابة");
-        } catch(e) {
-            console.error("خطأ في الحفظ:", e);
-            updateSyncStatus("online", "⚠️ تم الحفظ محلياً فقط");
-        }
-        syncInProgress = false;
-    }
-
-    async function loadFromCloud() {
-        if(!useCloudSync || !currentUser || !isOnline || !db || currentUser.isLocalOnly) return false;
-        updateSyncStatus("syncing", "🔄 جاري التحميل...");
-        try {
-            const snapshot = await db.ref(`users/${currentUser.uid}/data_${currentAccountingPerson?.id || 'main'}`).get();
-            if(snapshot.exists()) {
-                const data = snapshot.val();
-                userData.customers = data.customers || [];
-                userData.workers = data.workers || [];
-                userData.nextCustId = data.nextCustId || 1;
-                userData.nextProjId = data.nextProjId || 100;
-                userData.nextRoomId = data.nextRoomId || 1000;
-                userData.currentWeekKey = data.currentWeekKey || getCurrentWeekKey();
-                userData.workersArchives = data.workersArchives || [];
-                updateSyncStatus("online", "☁️ متزامن مع السحابة");
-                return true;
-            }
-        } catch(e) { console.error("خطأ في التحميل:", e); }
-        return false;
-    }
-
-    async function autoSave() {
-        saveToLocal();
-        if(useCloudSync && isOnline && currentUser && !currentUser.isLocalOnly) {
-            await saveToCloud();
-        }
-    }
-
-    // ==================== دوال المصادقة ====================
-
-    window.togglePassword = function(fieldId) {
-        let f = document.getElementById(fieldId);
-        f.type = f.type === "password" ? "text" : "password";
-    }
-
-    window.loginLocalOnly = function() {
-        const localId = "local_user_" + deviceId;
-        currentUser = { uid: localId, email: "local@system.com", name: "المستخدم المحلي", isLocalOnly: true };
-        useCloudSync = false;
-        loadAccountingUsersList();
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("usersSelectScreen").style.display = "flex";
-        renderUsersSelectScreen();
-    }
-
-    window.login = async function() {
-        if(!auth) {
-            document.getElementById("loginError").innerText = "❌ Firebase غير مهيأ. يرجى استخدام الوضع المحلي";
-            return;
-        }
-        let email = document.getElementById("loginEmail").value.trim();
-        let password = document.getElementById("loginPassword").value;
-        let remember = document.getElementById("rememberDevice").checked;
-        let errorDiv = document.getElementById("loginError");
-
-        if(!email || !password) { errorDiv.innerText = "البريد الإلكتروني والرمز السري مطلوبان"; return; }
-        try {
-            await auth.setPersistence(
-                remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION
-            );
-            const cred = await auth.signInWithEmailAndPassword(email, password);
-            if (!cred.user.emailVerified) {
-                errorDiv.innerText = "⚠️ يرجى تفعيل حسابك عبر الرابط المرسل إلى بريدك الإلكتروني";
-                return;
-            }
-            currentUser = { uid: cred.user.uid, email: email, name: cred.user.displayName || email.split('@')[0], isLocalOnly: false };
-            useCloudSync = true;
-            loadAccountingUsersList();
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("usersSelectScreen").style.display = "flex";
-            renderUsersSelectScreen();
-        } catch(e) {
-            errorDiv.innerText = e.code === 'auth/user-not-found' ? "الحساب غير موجود" :
-                                 e.code === 'auth/wrong-password' ? "كلمة المرور غير صحيحة" : e.message;
-        }
-    }
-
-    window.backToUsersList = function() {
-        if(currentAccountingPerson) {
-            saveToLocal();
-        }
-        document.getElementById("mainSystem").style.display = "none";
-        document.getElementById("usersSelectScreen").style.display = "flex";
-        renderUsersSelectScreen();
-        currentAccountingPerson = null;
-        weekCheckDone = false;
-    }
-
-    window.register = async function() {
-        if(!auth) {
-            document.getElementById("regError").innerText = "❌ Firebase غير مهيأ";
-            return;
-        }
-        let email = document.getElementById("regEmail").value.trim();
-        let name = document.getElementById("regName").value.trim();
-        let password = document.getElementById("regPassword").value;
-        let errorDiv = document.getElementById("regError");
-        let successDiv = document.getElementById("regSuccess");
-
-        if(!email || !name || !password) { errorDiv.innerText = "جميع الحقول مطلوبة"; return; }
-        if(password.length < 6) { errorDiv.innerText = "الرمز السري 6 أحرف على الأقل"; return; }
-
-        try {
-            const cred = await auth.createUserWithEmailAndPassword(email, password);
-            await cred.user.updateProfile({ displayName: name });
-            await cred.user.sendEmailVerification();
-            successDiv.innerText = "✅ تم إنشاء الحساب! تم إرسال رابط التفعيل إلى بريدك.";
-            await auth.signOut();
-            setTimeout(() => {
-                window.hideRegister();
-            }, 2000);
-        } catch(e) {
-            errorDiv.innerText = e.code === 'auth/email-already-in-use' ? "البريد مستخدم بالفعل" : e.message;
-        }
-    }
-
-    window.resendVerificationFromRegister = async function() {
-        const email = document.getElementById("regEmail").value.trim();
-        if(!email) { document.getElementById("regError").innerText = "❌ الرجاء إدخال بريدك الإلكتروني أولاً"; return; }
-        try {
-            await auth.sendPasswordResetEmail(email);
-            document.getElementById("regSuccess").innerText = "✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني";
-        } catch(e) {
-            document.getElementById("regError").innerText = "❌ خطأ: " + e.message;
-        }
-    }
-
-    window.showResetPassword = function() {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("resetPasswordScreen").style.display = "flex";
-    }
-
-    window.hideResetPassword = function() {
-        document.getElementById("resetPasswordScreen").style.display = "none";
-        document.getElementById("loginScreen").style.display = "flex";
-    }
-
-    window.sendPasswordReset = async function() {
-        const email = document.getElementById("resetEmail").value.trim();
-        if(!email) { document.getElementById("resetError").innerText = "❌ الرجاء إدخال بريدك الإلكتروني"; return; }
-        try {
-            await auth.sendPasswordResetEmail(email);
-            document.getElementById("resetSuccess").innerText = "✅ تم إرسال رابط إعادة تعيين كلمة المرور";
-            setTimeout(() => { window.hideResetPassword(); }, 3000);
-        } catch(e) {
-            document.getElementById("resetError").innerText = "❌ خطأ: " + e.message;
-        }
-    }
-
-    window.resendVerificationFromWarning = async function() {
-        if(auth && auth.currentUser) {
-            try {
-                await auth.currentUser.sendEmailVerification();
-                alert("✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني");
-            } catch(e) { alert("❌ خطأ: " + e.message); }
-        } else { alert("❌ الرجاء تسجيل الدخول أولاً"); }
-    }
-
-    window.logout = async function() {
-        if(currentAccountingPerson) {
-            saveToLocal();
-        }
-        currentUser = null;
-        currentAccountingPerson = null;
-        useCloudSync = false;
-        weekCheckDone = false;
-        document.getElementById("mainSystem").style.display = "none";
-        document.getElementById("usersSelectScreen").style.display = "none";
-        document.getElementById("loginScreen").style.display = "flex";
-        document.getElementById("loginEmail").value = "";
-        document.getElementById("loginPassword").value = "";
-        document.getElementById("loginError").innerText = "";
-    }
-
-    window.showRegister = function() {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("registerScreen").style.display = "flex";
-    }
-
-    window.hideRegister = function() {
-        document.getElementById("registerScreen").style.display = "none";
-        document.getElementById("loginScreen").style.display = "flex";
-    }
+    // مستمعي الأحداث
+    window.addEventListener('online', async () => { isOnline = true; if(useCloudSync && currentUser && !currentUser.isLocalOnly) await loadFromCloud(); window.renderAll(); });
+    window.addEventListener('offline', () => { isOnline = false; updateSyncStatus("offline", "📴 غير متصل"); });
 
     // ربط الأحداث بعد تحميل الصفحة
     document.addEventListener("DOMContentLoaded", () => {
@@ -1499,24 +1149,31 @@
     // التحقق من جلسة سابقة
     (async function init() {
         document.getElementById("loginScreen").style.display = "flex";
-        document.getElementById("mainSystem").style.display = "none";
-        document.getElementById("usersSelectScreen").style.display = "none";
+        document.getElementById("mainApp").style.display = "none";
 
         if(auth) {
             auth.onAuthStateChanged(async (user) => {
                 if(user && user.emailVerified) {
                     currentUser = { uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0], isLocalOnly: false };
                     useCloudSync = true;
-                    loadAccountingUsersList();
+                    await loadFromLocal();
+                    await loadFromCloud();
                     document.getElementById("loginScreen").style.display = "none";
-                    document.getElementById("usersSelectScreen").style.display = "flex";
-                    renderUsersSelectScreen();
+                    document.getElementById("mainApp").style.display = "block";
+                    document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${currentUser.name}`;
+                    document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
+                    document.getElementById("verificationWarning").style.display = "none";
+                    updateSyncStatus("online", "☁️ متزامن مع السحابة");
+                    window.renderAll();
+                    window.initNavigationStack();
+                } else if(user && !user.emailVerified) {
+                    document.getElementById("verificationWarning").style.display = "block";
                 }
             });
         }
     })();
 
-    console.log("✅ النظام جاهز - مع صفحة اختيار المستخدم بعد تسجيل الدخول");
+    console.log("✅ النظام جاهز للاستخدام - واجهة جديدة مع إعادة تعيين كلمة المرور");
 </script>
 </body>
 </html>
