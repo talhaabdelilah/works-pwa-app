@@ -23,10 +23,12 @@
         .app-container { max-width: 800px; margin: 0 auto; }
 
         /* Header */
-        .main-header { background: #1e293b; color: white; padding: 10px 14px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; position: sticky; top: 0; z-index: 100; }
-        .main-header h1 { font-size: 1rem; }
-        .user-info { font-size: 0.7rem; background: #334155; padding: 4px 10px; border-radius: 30px; }
-        .logout-btn { background: #ef4444; border: none; padding: 5px 12px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
+        .main-header { background: #1e293b; color: white; padding: 6px 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; position: sticky; top: 0; z-index: 100; }
+        .main-header h1 { font-size: 0.9rem; }
+        .header-buttons { display: flex; gap: 6px; align-items: center; }
+        .calc-btn { background: #f59e0b; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
+        .user-info { font-size: 0.65rem; background: #334155; padding: 3px 8px; border-radius: 20px; }
+        .logout-btn { background: #ef4444; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
 
         /* Buttons */
         .btn-primary { background: #10b981; border: none; padding: 6px 14px; border-radius: 30px; color: white; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
@@ -35,37 +37,38 @@
         .btn-danger { background: #ef4444; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
         .btn-warning { background: #f59e0b; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
         .btn-info { background: #8b5cf6; border: none; padding: 4px 10px; border-radius: 30px; color: white; font-size: 0.65rem; cursor: pointer; }
+        .btn-dark { background: #334155; border: none; padding: 8px 16px; border-radius: 30px; color: white; font-size: 1rem; cursor: pointer; font-weight: bold; }
 
         /* Week Navigation */
-        .week-navigation { background: white; border-radius: 16px; padding: 8px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .week-navigation { background: white; border-radius: 16px; padding: 6px 10px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .week-nav-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .week-nav-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 6px 12px; border-radius: 25px; color: white; font-size: 0.7rem; cursor: pointer; }
+        .week-nav-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 5px 10px; border-radius: 25px; color: white; font-size: 0.65rem; cursor: pointer; }
         .current-week-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .week-display { font-size: 0.7rem; font-weight: bold; color: #1e293b; background: #f1f5f9; padding: 6px 12px; border-radius: 25px; text-align: center; }
+        .week-display { font-size: 0.65rem; font-weight: bold; color: #1e293b; background: #f1f5f9; padding: 5px 10px; border-radius: 25px; text-align: center; }
 
         /* Tabs */
-        .tabs { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 6px; border-radius: 40px; position: sticky; top: 60px; z-index: 99; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 12px; background: #f1f5f9; padding: 6px; border-radius: 40px; position: sticky; top: 50px; z-index: 99; }
         .tab-btn { flex: 1; padding: 8px 6px; background: transparent; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: all 0.2s; }
         .tab-btn.active { background: #3b82f6; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         /* Sync Status */
-        .sync-status { font-size: 0.6rem; text-align: center; padding: 4px; border-radius: 20px; margin-bottom: 8px; }
+        .sync-status { font-size: 0.55rem; text-align: center; padding: 3px; border-radius: 20px; margin-bottom: 6px; }
         .sync-status.online { background: #d1fae5; color: #065f46; }
         .sync-status.offline { background: #fee2e2; color: #b91c1c; }
 
         /* Workers Stats */
         .workers-stats { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-        .stat-card { flex: 1; background: white; padding: 6px 8px; border-radius: 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .stat-card .icon { font-size: 1rem; }
-        .stat-card .label { font-size: 0.55rem; color: #64748b; }
-        .stat-card .value { font-size: 0.9rem; font-weight: bold; color: #1e293b; }
+        .stat-card { flex: 1; background: white; padding: 5px 6px; border-radius: 14px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-card .icon { font-size: 0.9rem; }
+        .stat-card .label { font-size: 0.5rem; color: #64748b; }
+        .stat-card .value { font-size: 0.8rem; font-weight: bold; color: #1e293b; }
 
         /* Toolbar */
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
         .search-box { flex: 2; }
-        .search-box input { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 25px; font-size: 0.7rem; }
+        .search-box input { width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 25px; font-size: 0.65rem; }
         .btn-group { display: flex; gap: 6px; }
 
         /* Archive Panel */
@@ -74,7 +77,7 @@
         .archive-list { max-height: 120px; overflow-y: auto; }
         .archive-item { background: #f8fafc; padding: 6px 10px; margin: 4px 0; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
 
-        /* ========== جدول العمال المضغوط ========== */
+        /* ========== جدول العمال ========== */
         .workers-table-wrapper {
             background: white;
             border-radius: 16px;
@@ -123,8 +126,12 @@
             background: #fff;
         }
         .name-input {
-            width: 52px;
+            width: 60px;
             font-size: 0.48rem;
+            cursor: pointer;
+            background: #f0fdf4;
+            font-weight: bold;
+            color: #065f46;
         }
         .total-cell {
             background: #d1fae5;
@@ -143,8 +150,17 @@
             font-size: 0.45rem;
             font-weight: bold;
         }
+        .worker-name-clickable {
+            cursor: pointer;
+            color: #3b82f6;
+            font-weight: bold;
+            background: #eff6ff;
+            padding: 2px 4px;
+            border-radius: 8px;
+            display: inline-block;
+        }
         .workers-table th:nth-child(1) { width: 24px; }
-        .workers-table th:nth-child(2) { width: 54px; }
+        .workers-table th:nth-child(2) { width: 65px; }
         .workers-table th:nth-child(3) { width: 22px; }
         .workers-table th:nth-child(4) { width: 22px; }
         .workers-table th:nth-child(5) { width: 22px; }
@@ -163,7 +179,7 @@
             .workers-table { font-size: 0.48rem; }
             .workers-table th { font-size: 0.45rem; padding: 4px 1px; }
             .editable { width: 38px; font-size: 0.45rem; }
-            .name-input { width: 48px; }
+            .name-input { width: 55px; }
             .attendance-check { width: 12px; height: 12px; }
         }
 
@@ -183,15 +199,250 @@
         .rooms-table input { width: 70px; padding: 4px; border-radius: 6px; border: 1px solid #cbd5e1; text-align: center; }
 
         /* المحاسبة */
-        .person-selector { background: white; padding: 10px; border-radius: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border: 1px solid #e2e8f0; }
-        .person-selector select { flex: 1; padding: 8px; border-radius: 30px; border: 1px solid #cbd5e1; }
-        .accounting-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-        .accounting-table th, .accounting-table td { border: 1px solid #ddd; padding: 8px 6px; text-align: center; }
-        .summary { background: #f8fafc; padding: 12px; border-radius: 16px; margin-top: 12px; }
-        .summary-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.75rem; }
-        .profit.positive { color: #10b981; font-weight: bold; }
-        .profit.negative { color: #ef4444; font-weight: bold; }
+        .accounting-summary {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .summary-item {
+            text-align: center;
+            flex: 1;
+            min-width: 90px;
+        }
+        .summary-item .label { font-size: 0.6rem; opacity: 0.8; }
+        .summary-item .value { font-size: 1rem; font-weight: bold; }
+        .profit.positive { color: #10b981; }
+        .profit.negative { color: #f87171; }
+
+        .accounting-table-wrapper {
+            background: white;
+            border-radius: 16px;
+            overflow-x: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .accounting-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.7rem;
+        }
+        .accounting-table th {
+            background: #1e293b;
+            color: white;
+            padding: 8px 6px;
+            font-size: 0.65rem;
+        }
+        .accounting-table td {
+            padding: 6px 4px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .accounting-table input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            text-align: center;
+        }
+        .delete-acc-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.55rem;
+        }
+        .person-selector {
+            background: white;
+            padding: 8px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            border: 1px solid #e2e8f0;
+        }
+        .person-selector select { flex: 1; padding: 6px; border-radius: 30px; border: 1px solid #cbd5e1; font-size: 0.7rem; }
+
         .empty-message { text-align: center; padding: 20px; background: white; border-radius: 20px; color: #64748b; font-size: 0.75rem; }
+
+        /* حاسبة داخلية */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .calculator {
+            background: #1e293b;
+            border-radius: 32px;
+            padding: 20px;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .calculator-screen {
+            background: #0f172a;
+            color: white;
+            font-size: 2rem;
+            text-align: left;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            direction: ltr;
+            font-family: monospace;
+            word-wrap: break-word;
+            min-height: 70px;
+        }
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .calc-btn {
+            background: #334155;
+            border: none;
+            padding: 14px 0;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .calc-btn:active { transform: scale(0.95); background: #475569; }
+        .calc-btn.operator { background: #f59e0b; }
+        .calc-btn.equals { background: #10b981; }
+        .calc-btn.clear { background: #ef4444; }
+        .calc-btn.zero { grid-column: span 2; }
+
+        /* صفحة العامل الشخصية */
+        .worker-profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            padding: 10px;
+        }
+        .worker-profile-content {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 16px;
+            direction: rtl;
+        }
+        .worker-profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+        .worker-profile-header h2 { font-size: 1.1rem; color: #1e293b; }
+        .close-profile-btn {
+            background: #ef4444;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .worker-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .worker-stat-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 10px 6px;
+            border-radius: 14px;
+            text-align: center;
+        }
+        .worker-stat-card.profit { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .worker-stat-card.loss { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
+        .worker-stat-card .stat-icon { font-size: 1.3rem; margin-bottom: 4px; }
+        .worker-stat-card .stat-value { font-size: 1rem; font-weight: bold; }
+        .worker-stat-card .stat-label { font-size: 0.55rem; opacity: 0.8; margin-top: 3px; }
+        .worker-weeks-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin: 12px 0 8px;
+            color: #1e293b;
+        }
+        .worker-weeks-table-wrapper {
+            overflow-x: auto;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+        .worker-weeks-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.6rem;
+        }
+        .worker-weeks-table th {
+            background: #f1f5f9;
+            padding: 6px 3px;
+            position: sticky;
+            top: 0;
+        }
+        .worker-weeks-table td {
+            padding: 5px 3px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .worker-weeks-table td.positive { color: #10b981; font-weight: bold; }
+        .worker-weeks-table td.negative { color: #ef4444; font-weight: bold; }
+        .view-week-btn {
+            background: #3b82f6;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.55rem;
+        }
+        .close-profile-footer {
+            width: 100%;
+            padding: 8px;
+            margin-top: 12px;
+            background: #64748b;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        @media (max-width: 550px) {
+            .worker-stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .worker-weeks-table { font-size: 0.5rem; }
+        }
 
         /* Login */
         .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto; padding: 20px; }
@@ -207,12 +458,10 @@
         .divider { display: flex; align-items: center; text-align: center; margin: 12px 0; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
         .divider span { padding: 0 10px; color: #64748b; font-size: 0.7rem; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-        .modal-content { background: white; border-radius: 20px; padding: 16px; width: 90%; max-width: 500px; max-height: 80%; overflow-y: auto; }
+        .firebase-success { background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
         .verification-warning { background: #fef3c7; padding: 8px; border-radius: 12px; margin-bottom: 10px; text-align: center; font-size: 0.7rem; }
         .resend-small-btn { background: #f59e0b; border: none; padding: 4px 12px; border-radius: 20px; color: white; cursor: pointer; margin-top: 5px; font-size: 0.65rem; }
-        .firebase-success { background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
-        button { transition: opacity 0.2s; }
+        button { transition: opacity 0.2s; cursor: pointer; }
         button:active { opacity: 0.7; }
     </style>
 </head>
@@ -272,10 +521,11 @@
     <div class="app-container">
         <div class="main-header">
             <h1>📁 نظام إدارة المشاريع</h1>
-            <div style="display:flex; gap:8px; align-items:center;">
+            <div class="header-buttons">
+                <button class="calc-btn" onclick="window.openCalculator()">🧮</button>
                 <span class="user-info" id="userNameDisplay"></span>
                 <span class="user-info" id="syncModeDisplay" style="background:#475569;"></span>
-                <button class="logout-btn" onclick="window.logout()">🚪 خروج</button>
+                <button class="logout-btn" onclick="window.logout()">🚪</button>
             </div>
         </div>
         <div id="syncStatus" class="sync-status online">💾 وضع التشغيل المحلي</div>
@@ -357,14 +607,15 @@
             <div class="toolbar">
                 <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 بحث"></div>
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="window.addNewWorker()">➕</button>
-                    <button class="btn btn-warning" onclick="window.toggleArchivePanel()">📂</button>
+                    <button class="btn-primary" onclick="window.addNewWorker()">➕</button>
+                    <button class="btn-warning" onclick="window.toggleArchivePanel()">📂</button>
                 </div>
             </div>
             <div id="archivePanel" class="archive-panel"><div id="archiveList" class="archive-list"></div></div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
-                    <thead><tr><th>#</th><th>الاسم</th><th>س</th><th>ح</th><th>ن</th><th>ث</th><th>ر</th><th>خ</th><th>ج</th><th>مصروف</th><th>سعر</th><th>المجموع</th><th></th></tr></thead>
+                    <thead><tr><th>#</th><th>الاسم</th><th>س</th><th>ح</th><th>ن</th><th>ث</th><th>ر</th><th>خ</th><th>ج</th><th>مصروف</th><th>سعر</th><th>المجموع</th><th></th></tr>
+                    </thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
             </div>
@@ -382,14 +633,20 @@
                 <button class="btn-danger" onclick="window.archiveAndClearAccounting()">📦 حذف وحفظ</button>
                 <button class="btn-info" onclick="window.showAccountingHistory()">📋 السجل</button>
             </div>
-            <table class="accounting-table">
-                <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr></thead>
-                <tbody id="accountingBody"></tbody>
-            </table>
-            <div class="summary">
-                <div class="summary-item"><span>📈 مجموع الإيرادات:</span><span id="totalRevenue">0</span></div>
-                <div class="summary-item"><span>📉 مجموع المصاريف:</span><span id="totalExpense">0</span></div>
-                <div class="summary-item"><span>💰 صافي الربح:</span><span id="netProfit" class="profit">0</span></div>
+
+            <div class="accounting-summary">
+                <div class="summary-item"><div class="label">📈 إجمالي الإيرادات</div><div class="value" id="totalRevenue">0.00</div></div>
+                <div class="summary-item"><div class="label">📉 إجمالي المصاريف</div><div class="value" id="totalExpense">0.00</div></div>
+                <div class="summary-item"><div class="label">💰 صافي الربح</div><div class="value" id="netProfit" class="profit">0.00</div></div>
+            </div>
+
+            <div class="accounting-table-wrapper">
+                <table class="accounting-table">
+                    <thead>
+                        <tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr>
+                    </thead>
+                    <tbody id="accountingBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -409,8 +666,8 @@ const firebaseConfig = {
 let auth = null, db = null, currentUser = null, useCloudSync = false, isOnline = navigator.onLine;
 let currentCustomerId = null, currentProjectId = null, currentWeekOffset = 0;
 const dayKeys = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+const dayNames = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
 
-// بيانات المستخدم
 let userData = {
     customers: [],
     workersByWeek: {},
@@ -422,7 +679,6 @@ let userData = {
     accountingHistory: []
 };
 
-// تهيئة Firebase
 try {
     firebase.initializeApp(firebaseConfig);
     auth = firebase.auth();
@@ -431,96 +687,187 @@ try {
     document.getElementById("firebaseSuccess")?.style.setProperty('display', 'block');
 } catch(e) { console.warn(e); }
 
-// ==================== دوال مساعدة ====================
 function escapeHtml(s) { if(!s) return ''; return s.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
 function getDeviceId() { let id = localStorage.getItem('device_id'); if(!id) { id = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('device_id', id); } return id; }
 const deviceId = getDeviceId();
 
-// تحسين 1: ISO Week Standard (الإثنين أول الأسبوع)
-function getWeekKey(date = new Date()) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    d.setUTCDate(d.getUTCDate() + 3 - (d.getUTCDay() + 6) % 7);
-    const year = d.getUTCFullYear();
-    const startOfYear = new Date(Date.UTC(year, 0, 4));
-    const days = Math.floor((d - startOfYear) / (24 * 60 * 60 * 1000));
-    const weekNum = Math.ceil((days + 1) / 7);
-    return `${year}-W${weekNum.toString().padStart(2, '0')}`;
-}
+// ==================== حاسبة داخلية ====================
+window.openCalculator = function() {
+    let modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="calculator">
+            <div class="calculator-screen" id="calcScreen">0</div>
+            <div class="calculator-buttons">
+                <button class="calc-btn clear" onclick="window.calcClear()">C</button>
+                <button class="calc-btn" onclick="window.calcInput('(')">(</button>
+                <button class="calc-btn" onclick="window.calcInput(')')">)</button>
+                <button class="calc-btn operator" onclick="window.calcInput('/')">÷</button>
+                <button class="calc-btn" onclick="window.calcInput('7')">7</button>
+                <button class="calc-btn" onclick="window.calcInput('8')">8</button>
+                <button class="calc-btn" onclick="window.calcInput('9')">9</button>
+                <button class="calc-btn operator" onclick="window.calcInput('*')">×</button>
+                <button class="calc-btn" onclick="window.calcInput('4')">4</button>
+                <button class="calc-btn" onclick="window.calcInput('5')">5</button>
+                <button class="calc-btn" onclick="window.calcInput('6')">6</button>
+                <button class="calc-btn operator" onclick="window.calcInput('-')">-</button>
+                <button class="calc-btn" onclick="window.calcInput('1')">1</button>
+                <button class="calc-btn" onclick="window.calcInput('2')">2</button>
+                <button class="calc-btn" onclick="window.calcInput('3')">3</button>
+                <button class="calc-btn operator" onclick="window.calcInput('+')">+</button>
+                <button class="calc-btn zero" onclick="window.calcInput('0')">0</button>
+                <button class="calc-btn" onclick="window.calcInput('.')">.</button>
+                <button class="calc-btn equals" onclick="window.calcResult()">=</button>
+            </div>
+            <button onclick="window.closeCalculator()" style="margin-top:10px; width:100%; padding:8px; border-radius:20px; background:#64748b; color:white; border:none;">إغلاق</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    window.calcScreen = document.getElementById('calcScreen');
+};
+window.calcInput = function(value) { if(window.calcScreen) { let current = window.calcScreen.innerText; if(current === '0' && !isNaN(value) && value !== '.') window.calcScreen.innerText = value; else window.calcScreen.innerText = current + value; } };
+window.calcClear = function() { if(window.calcScreen) window.calcScreen.innerText = '0'; };
+window.calcResult = function() { if(window.calcScreen) { try { let expr = window.calcScreen.innerText.replace(/×/g, '*').replace(/÷/g, '/'); let result = eval(expr); window.calcScreen.innerText = result.toString(); } catch(e) { window.calcScreen.innerText = 'خطأ'; } } };
+window.closeCalculator = function() { let modal = document.querySelector('.modal'); if(modal) modal.remove(); };
 
+// حساب الأسبوع (يبدأ من السبت)
+function getWeekKey(date = new Date()) {
+    const d = new Date(date);
+    const startOfYear = new Date(d.getFullYear(), 0, 1);
+    const dayOfYear = Math.floor((d - startOfYear) / (24 * 60 * 60 * 1000));
+    let offset = (6 - d.getDay() + 7) % 7;
+    const weekNum = Math.ceil((dayOfYear + offset + 1) / 7);
+    return `${d.getFullYear()}-W${weekNum.toString().padStart(2, '0')}`;
+}
 function getWeekKeyFromOffset(offset) {
     const today = new Date();
     const targetDate = new Date(today);
     targetDate.setDate(today.getDate() + (offset * 7));
     return getWeekKey(targetDate);
 }
-
-function getCurrentWorkers() { return userData.workersByWeek[getWeekKeyFromOffset(currentWeekOffset)] || []; }
-
+function getCurrentWorkers() {
+    const weekKey = getWeekKeyFromOffset(currentWeekOffset);
+    if(!userData.workersByWeek[weekKey]) {
+        const prevWeekKey = getWeekKeyFromOffset(currentWeekOffset - 1);
+        if(userData.workersByWeek[prevWeekKey] && userData.workersByWeek[prevWeekKey].length > 0) {
+            userData.workersByWeek[weekKey] = userData.workersByWeek[prevWeekKey].map(w => ({
+                id: w.id, name: w.name, price: w.price || 0, expense: 0,
+                days: { sat:0, sun:0, mon:0, tue:0, wed:0, thu:0, fri:0 }
+            }));
+        } else userData.workersByWeek[weekKey] = [];
+    }
+    return userData.workersByWeek[weekKey];
+}
 function saveToLocal() {
     if(currentUser && !currentUser.isLocalOnly) localStorage.setItem(`data_${currentUser.uid}`, JSON.stringify(userData));
     else if(currentUser && currentUser.isLocalOnly) localStorage.setItem(`data_local_${currentUser.uid}`, JSON.stringify(userData));
 }
-
 function loadFromLocal() {
-    if(currentUser && !currentUser.isLocalOnly) {
-        const s = localStorage.getItem(`data_${currentUser.uid}`);
-        if(s) { try { const d = JSON.parse(s); Object.assign(userData, d); return true; } catch(e) {} }
-    } else if(currentUser && currentUser.isLocalOnly) {
-        const s = localStorage.getItem(`data_local_${currentUser.uid}`);
-        if(s) { try { const d = JSON.parse(s); Object.assign(userData, d); return true; } catch(e) {} }
-    }
-    if(Object.keys(userData.workersByWeek).length === 0) { const wk = getWeekKey(); userData.workersByWeek[wk] = []; }
+    if(currentUser && !currentUser.isLocalOnly) { const s = localStorage.getItem(`data_${currentUser.uid}`); if(s) { try { const d = JSON.parse(s); Object.assign(userData, d); return true; } catch(e) {} } }
+    else if(currentUser && currentUser.isLocalOnly) { const s = localStorage.getItem(`data_local_${currentUser.uid}`); if(s) { try { const d = JSON.parse(s); Object.assign(userData, d); return true; } catch(e) {} } }
+    if(Object.keys(userData.workersByWeek).length === 0) userData.workersByWeek[getWeekKey()] = [];
     return false;
 }
 
-async function autoSaveIncremental(type, data) {
-    saveToLocal();
-    if(!useCloudSync || !currentUser || currentUser.isLocalOnly || !db || !isOnline) return;
-    try {
-        const basePath = `users/${currentUser.uid}`;
-        switch(type) {
-            case 'attendance':
-                await db.ref(`${basePath}/workers/${data.weekKey}/attendance/${data.workerId}/${data.day}`).set(data.value);
-                break;
-            case 'workerField':
-                await db.ref(`${basePath}/workers/${data.weekKey}/workers/${data.workerId}/${data.field}`).set(data.value);
-                break;
-            case 'deleteWorker':
-                await db.ref(`${basePath}/workers/${data.weekKey}/workers/${data.workerId}`).remove();
-                break;
-            case 'addWorker':
-                await db.ref(`${basePath}/workers/${data.weekKey}/workers/${data.workerId}`).set(data.workerData);
-                break;
-        }
-    } catch(e) { console.warn("فشل المزامنة:", e); }
-}
-
-// ==================== دوال العمال المحسنة ====================
+// ==================== دوال العمال ====================
 function calculateWorkerTotal(w) {
     let days = dayKeys.reduce((s,k) => s + (w.days[k] || 0), 0);
     return (days * (w.price || 0)) - (w.expense || 0);
 }
-
 function updateWorkersStats() {
     const workers = getCurrentWorkers();
     document.getElementById('totalWorkersCount').innerText = workers.length;
-    const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    const presentToday = workers.filter(w => w.days[dayKeys[todayIdx]] === 1).length;
+    const todayIdx = new Date().getDay();
+    let todayIndex = todayIdx === 0 ? 6 : todayIdx - 1;
+    const presentToday = workers.filter(w => w.days[dayKeys[todayIndex]] === 1).length;
     document.getElementById('presentTodayCount').innerText = presentToday;
     document.getElementById('totalWagesCount').innerText = workers.reduce((s,w) => s + calculateWorkerTotal(w), 0).toFixed(0);
 }
-
-// تحسين 2: تحديث الخلية فقط
 function updateWorkerTotalCell(workerId) {
     const workers = getCurrentWorkers();
     const worker = workers.find(w => w.id == workerId);
     if(!worker) return;
     const row = document.querySelector(`tr[data-worker-id="${workerId}"]`);
-    if(row) {
-        const totalCell = row.querySelector('.total-cell');
-        if(totalCell) totalCell.textContent = calculateWorkerTotal(worker).toFixed(2);
-    }
+    if(row) { const totalCell = row.querySelector('.total-cell'); if(totalCell) totalCell.textContent = calculateWorkerTotal(worker).toFixed(2); }
 }
+
+// ==================== صفحة العامل الشخصية ====================
+window.showWorkerProfile = function(workerId, workerName) {
+    let weeksData = [];
+    let totalDays = 0, totalEarnings = 0, totalExpenses = 0;
+
+    for(let weekKey in userData.workersByWeek) {
+        const workers = userData.workersByWeek[weekKey];
+        const worker = workers.find(w => w.id == workerId);
+        if(worker) {
+            let daysPresent = dayKeys.reduce((sum, day) => sum + (worker.days[day] || 0), 0);
+            let weeklyEarning = daysPresent * (worker.price || 0);
+            let weeklyExpense = worker.expense || 0;
+            weeksData.push({ weekKey, daysPresent, price: worker.price || 0, earnings: weeklyEarning, expense: weeklyExpense, net: weeklyEarning - weeklyExpense });
+            totalDays += daysPresent;
+            totalEarnings += weeklyEarning;
+            totalExpenses += weeklyExpense;
+        }
+    }
+    weeksData.sort((a, b) => b.weekKey.localeCompare(a.weekKey));
+    let remaining = totalEarnings - totalExpenses;
+
+    let modal = document.createElement('div');
+    modal.className = 'worker-profile-modal';
+    modal.innerHTML = `
+        <div class="worker-profile-content">
+            <div class="worker-profile-header">
+                <h2>👤 ${escapeHtml(workerName)}</h2>
+                <button class="close-profile-btn" onclick="this.closest('.worker-profile-modal').remove()">✖</button>
+            </div>
+            <div class="worker-stats-grid">
+                <div class="worker-stat-card"><div class="stat-icon">📅</div><div class="stat-value">${totalDays}</div><div class="stat-label">إجمالي أيام العمل</div></div>
+                <div class="worker-stat-card"><div class="stat-icon">💰</div><div class="stat-value">${totalEarnings.toFixed(2)}</div><div class="stat-label">إجمالي المستحقات</div></div>
+                <div class="worker-stat-card"><div class="stat-icon">📉</div><div class="stat-value">${totalExpenses.toFixed(2)}</div><div class="stat-label">إجمالي المصاريف</div></div>
+                <div class="worker-stat-card ${remaining >= 0 ? 'profit' : 'loss'}"><div class="stat-icon">💵</div><div class="stat-value">${remaining.toFixed(2)}</div><div class="stat-label">المتبقي</div></div>
+            </div>
+            <div class="worker-weeks-title">📋 سجل الأسابيع</div>
+            <div class="worker-weeks-table-wrapper">
+                <table class="worker-weeks-table">
+                    <thead><tr><th>الأسبوع</th><th>أيام الحضور</th><th>سعر اليومية</th><th>المستحقات</th><th>المصروفات</th><th>الصافي</th><th></th></tr></thead>
+                    <tbody>${weeksData.length === 0 ? '<tr><td colspan="7" style="text-align:center;">لا توجد بيانات</td></tr>' : weeksData.map(week => `<tr><td>${week.weekKey}</td><td>${week.daysPresent}</td><td>${week.price.toFixed(2)}</td><td>${week.earnings.toFixed(2)}</td><td>${week.expense.toFixed(2)}</td><td class="${week.net >= 0 ? 'positive' : 'negative'}">${week.net.toFixed(2)}</td><td><button class="view-week-btn" onclick="window.viewWeekDetails('${week.weekKey}', ${workerId}, '${escapeHtml(workerName)}')">📋</button></td></tr>`).join('')}</tbody>
+                </table>
+            </div>
+            <button class="close-profile-footer" onclick="this.closest('.worker-profile-modal').remove()">🔙 إغلاق</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+};
+
+window.viewWeekDetails = function(weekKey, workerId, workerName) {
+    const workers = userData.workersByWeek[weekKey];
+    const worker = workers?.find(w => w.id == workerId);
+    if(!worker) { alert("لا توجد بيانات لهذا الأسبوع"); return; }
+    let daysPresent = dayKeys.reduce((sum, day) => sum + (worker.days[day] || 0), 0);
+    let weekEarnings = daysPresent * (worker.price || 0);
+    let modal = document.createElement('div');
+    modal.className = 'worker-profile-modal';
+    modal.innerHTML = `
+        <div class="worker-profile-content" style="max-width: 400px;">
+            <div class="worker-profile-header"><h2>📅 ${weekKey}</h2><button class="close-profile-btn" onclick="this.closest('.worker-profile-modal').remove()">✖</button></div>
+            <div style="padding: 10px;">
+                <div style="background:#f8fafc; border-radius:16px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>👤 العامل:</span><strong>${escapeHtml(workerName)}</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>📅 أيام الحضور:</span><strong>${daysPresent} / 7</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>💰 سعر اليومية:</span><strong>${(worker.price || 0).toFixed(2)}</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>💵 المستحقات:</span><strong style="color:#10b981;">${weekEarnings.toFixed(2)}</strong></div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>📉 المصروفات:</span><strong style="color:#ef4444;">${(worker.expense || 0).toFixed(2)}</strong></div>
+                    <div style="display:flex; justify-content:space-between; padding-top:8px; border-top:2px solid #e2e8f0;"><span>💵 الصافي:</span><strong class="${weekEarnings - (worker.expense || 0) >= 0 ? 'positive' : 'negative'}">${(weekEarnings - (worker.expense || 0)).toFixed(2)}</strong></div>
+                </div>
+                <div class="worker-weeks-title">📋 تفاصيل الحضور</div>
+                <table style="width:100%; border-collapse:collapse; font-size:0.65rem;"><thead><tr style="background:#f1f5f9;"><th>اليوم</th><th>الحضور</th></tr></thead>
+                <tbody>${dayKeys.map((day, idx) => `<tr><td style="padding:5px;">${dayNames[idx]}</td><td style="text-align:center;">${worker.days[day] ? '✅' : '❌'}</td></tr>`).join('')}</tbody></table>
+            </div>
+            <button class="close-profile-footer" onclick="this.closest('.worker-profile-modal').remove()">🔙 إغلاق</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+};
 
 function renderWorkersTable() {
     const tbody = document.getElementById("workersTableBody");
@@ -529,7 +876,7 @@ function renderWorkersTable() {
     const search = document.getElementById("searchInput")?.value.toLowerCase() || '';
     const filtered = workers.filter(w => w.name.toLowerCase().includes(search));
     if(filtered.length === 0) {
-        tbody.innerHTML = '<td><td colspan="13" style="text-align:center;">📭 لا يوجد عمال<br>اضغط زر + لإضافة عامل</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;">📭 لا يوجد عمال<br>اضغط زر + لإضافة عامل</td></tr>';
         updateWorkersStats();
         return;
     }
@@ -539,63 +886,56 @@ function renderWorkersTable() {
         row.setAttribute('data-worker-id', w.id);
         row.innerHTML = `
             <td style="font-size:0.48rem;">${idx+1}</td>
-            <td><input class="editable name-input" value="${escapeHtml(w.name)}" data-field="name" data-id="${w.id}" style="width:50px;"></td>
+            <td><span class="worker-name-clickable" data-id="${w.id}" data-name="${escapeHtml(w.name)}" style="cursor:pointer; color:#3b82f6; font-weight:bold; background:#eff6ff; padding:2px 6px; border-radius:8px; display:inline-block;">${escapeHtml(w.name)}</span></td>
             ${dayKeys.map(d => `<td style="padding:2px 1px;"><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days[d] ? 'checked' : ''}></td>`).join('')}
             <td><input class="editable" value="${w.expense || 0}" data-field="expense" data-id="${w.id}" step="0.01" type="number" style="width:40px;"></td>
             <td><input class="editable" value="${w.price || 0}" data-field="price" data-id="${w.id}" step="0.01" type="number" style="width:40px;"></td>
-            <td class="total-cell" style="font-size:0.48rem;">${calculateWorkerTotal(w).toFixed(2)}</td>
+            <td class="total-cell">${calculateWorkerTotal(w).toFixed(2)}</td>
             <td><button class="delete-btn" data-id="${w.id}">✖</button></td>
         `;
         fragment.appendChild(row);
     });
     tbody.innerHTML = '';
     tbody.appendChild(fragment);
-    attachWorkerEventsOptimized();
+
+    document.querySelectorAll('.worker-name-clickable').forEach(el => {
+        el.onclick = () => window.showWorkerProfile(parseInt(el.dataset.id), el.dataset.name);
+    });
+
+    attachWorkerEvents();
     updateWorkersStats();
 }
 
-function attachWorkerEventsOptimized() {
+function attachWorkerEvents() {
     const workers = getCurrentWorkers();
-    const weekKey = getWeekKeyFromOffset(currentWeekOffset);
-
     document.querySelectorAll('.attendance-check').forEach(cb => {
         cb.onchange = () => {
             const workerId = parseInt(cb.dataset.id);
             const day = cb.dataset.day;
             let w = workers.find(w => w.id === workerId);
-            if(w) {
-                w.days[day] = cb.checked ? 1 : 0;
-                updateWorkerTotalCell(workerId);
-                updateWorkersStats();
-                autoSaveIncremental('attendance', { weekKey, workerId, day, value: w.days[day] });
-            }
+            if(w) { w.days[day] = cb.checked ? 1 : 0; updateWorkerTotalCell(workerId); updateWorkersStats(); saveToLocal(); }
         };
     });
-
     document.querySelectorAll('.editable').forEach(inp => {
         inp.onblur = () => {
             const workerId = parseInt(inp.dataset.id);
             let w = workers.find(w => w.id === workerId);
             if(w) {
-                let val = inp.value;
-                let field = inp.dataset.field;
+                let val = inp.value, field = inp.dataset.field;
                 if(field === 'name') w.name = val;
                 else w[field] = val === '' ? 0 : parseFloat(val) || 0;
                 if(field === 'expense' || field === 'price') updateWorkerTotalCell(workerId);
-                updateWorkersStats();
-                autoSaveIncremental('workerField', { weekKey, workerId, field, value: w[field] });
+                updateWorkersStats(); saveToLocal();
             }
         };
     });
-
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.onclick = () => {
             if(confirm('حذف العامل؟')) {
                 const workerId = parseInt(btn.dataset.id);
                 const wk = getWeekKeyFromOffset(currentWeekOffset);
                 userData.workersByWeek[wk] = workers.filter(w => w.id !== workerId);
-                renderWorkersTable();
-                autoSaveIncremental('deleteWorker', { weekKey: wk, workerId });
+                renderWorkersTable(); saveToLocal();
             }
         };
     });
@@ -608,50 +948,32 @@ window.addNewWorker = function() {
     const newWorker = { id: newId, name: 'عامل جديد', price: 0, expense: 0, days: { sat:0, sun:0, mon:0, tue:0, wed:0, thu:0, fri:0 } };
     workers.unshift(newWorker);
     userData.workersByWeek[wk] = workers;
-    renderWorkersTable();
-    autoSaveIncremental('addWorker', { weekKey: wk, workerId: newId, workerData: newWorker });
+    renderWorkersTable(); saveToLocal();
 };
-
 window.filterWorkers = function() { renderWorkersTable(); };
 window.toggleArchivePanel = function() { document.getElementById('archivePanel').classList.toggle('show'); loadArchivesList(); };
-
 function loadArchivesList() {
-    const div = document.getElementById('archiveList'); if(!div) return;
+    const div = document.getElementById('archiveList');
     const weeks = Object.keys(userData.workersByWeek).sort().reverse();
     if(weeks.length === 0) { div.innerHTML = '<div class="empty-message">📭 لا توجد سجلات</div>'; return; }
     div.innerHTML = weeks.map(week => `<div class="archive-item" data-week="${week}"><div>📅 ${week}</div><button class="delete-archive-btn" data-week="${week}">🗑</button></div>`).join('');
-    document.querySelectorAll('.archive-item').forEach(item => {
-        item.onclick = (e) => {
-            if(!e.target.classList.contains('delete-archive-btn')) {
-                const targetWeek = item.dataset.week;
-                const currentWeek = getWeekKey();
-                const targetNum = parseInt(targetWeek.split('-W')[1]);
-                const currentNum = parseInt(currentWeek.split('-W')[1]);
-                currentWeekOffset = targetNum - currentNum;
-                updateWeekDisplay(); renderWorkersTable();
-            }
-        };
-    });
-    document.querySelectorAll('.delete-archive-btn').forEach(btn => {
-        btn.onclick = (e) => { e.stopPropagation(); delete userData.workersByWeek[btn.dataset.week]; loadArchivesList(); saveToLocal(); };
-    });
+    document.querySelectorAll('.archive-item').forEach(item => { item.onclick = (e) => { if(!e.target.classList.contains('delete-archive-btn')) { const targetWeek = item.dataset.week; const currentWeek = getWeekKey(); const targetNum = parseInt(targetWeek.split('-W')[1]); const currentNum = parseInt(currentWeek.split('-W')[1]); currentWeekOffset = targetNum - currentNum; updateWeekDisplay(); renderWorkersTable(); } }; });
+    document.querySelectorAll('.delete-archive-btn').forEach(btn => { btn.onclick = (e) => { e.stopPropagation(); delete userData.workersByWeek[btn.dataset.week]; loadArchivesList(); saveToLocal(); }; });
 }
-
 function updateWeekDisplay() {
-    document.getElementById('weekDisplay').innerText = currentWeekOffset === 0 ? `📍 الأسبوع الحالي` : currentWeekOffset === -1 ? `◀ الأسبوع الماضي` : `الأسبوع القادم ▶`;
+    let displayText = currentWeekOffset === 0 ? '📍 الأسبوع الحالي' : currentWeekOffset === -1 ? '◀ الأسبوع الماضي' : currentWeekOffset === 1 ? 'الأسبوع القادم ▶' : currentWeekOffset > 1 ? `بعد ${currentWeekOffset} أسابيع ▶` : `◀ قبل ${Math.abs(currentWeekOffset)} أسابيع`;
+    document.getElementById('weekDisplay').innerText = displayText;
 }
-
 window.changeWeek = function(delta) { currentWeekOffset += delta; updateWeekDisplay(); renderWorkersTable(); };
 window.goToCurrentWeek = function() { currentWeekOffset = 0; updateWeekDisplay(); renderWorkersTable(); };
 
-// ==================== دوال العملاء والمشاريع (كاملة) ====================
+// ==================== العملاء والمشاريع ====================
 function renderCustomersScreen() {
-    const grid = document.getElementById("customersGrid"); if(!grid) return;
+    const grid = document.getElementById("customersGrid");
     if(userData.customers.length === 0) { grid.innerHTML = '<div class="empty-message">📭 لا يوجد عملاء</div>'; return; }
     grid.innerHTML = userData.customers.map(c => `<div class="customer-folder" data-id="${c.id}"><div class="folder-icon">📂</div><div class="customer-info"><div class="customer-name">${escapeHtml(c.name)}</div><div class="customer-stats">📁 ${c.projects?.length || 0} مشروع</div></div></div>`).join('');
     document.querySelectorAll('.customer-folder').forEach(el => el.addEventListener('click', () => window.openCustomerProjects(parseInt(el.dataset.id))));
 }
-
 window.openCustomerProjects = function(custId) {
     currentCustomerId = custId;
     const cust = userData.customers.find(c => c.id === custId);
@@ -664,7 +986,6 @@ window.openCustomerProjects = function(custId) {
     } else grid.innerHTML = '<div class="empty-message">📭 لا توجد مشاريع</div>';
     window.showProjectScreen('projects');
 };
-
 window.openProjectDetail = function(custId, projId) {
     currentCustomerId = custId; currentProjectId = projId;
     const cust = userData.customers.find(c => c.id === custId);
@@ -673,404 +994,184 @@ window.openProjectDetail = function(custId, projId) {
     document.getElementById("navCustomerName").innerText = cust.name;
     document.getElementById("navProjectName").innerText = proj.name;
     document.getElementById("globalPricePerMeter").value = proj.globalPricePerMeter || 50;
-    renderPaymentsTable(proj);
-    renderRoomsTable(proj);
-    updateProjectTotal(proj);
+    renderPaymentsTable(proj); renderRoomsTable(proj); updateProjectTotal(proj);
     window.showProjectScreen('detail');
 };
-
 function renderPaymentsTable(proj) {
     const tbody = document.getElementById("paymentsBody");
-    if(!tbody) return;
     if(!proj.payments) proj.payments = [];
-    if(proj.payments.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4">لا توجد دفعات</td></tr>';
-        document.getElementById("totalPayments").innerText = "0.00";
-        return;
-    }
+    if(proj.payments.length === 0) { tbody.innerHTML = '<tr><td colspan="4">لا توجد دفعات</td></tr>'; document.getElementById("totalPayments").innerText = "0.00"; return; }
     tbody.innerHTML = proj.payments.map((p, idx) => `<tr><td>${p.date}</td><td>${p.amount.toFixed(2)}</td><td>${escapeHtml(p.note || '')}</td><td><button class="delete-payment-btn" data-idx="${idx}">✖</button></td></tr>`).join('');
     const total = proj.payments.reduce((s,p) => s + p.amount, 0);
     document.getElementById("totalPayments").innerHTML = total.toFixed(2);
     const projectTotal = proj.rooms?.reduce((s,r) => s + (r.totalCost || 0), 0) || 0;
     document.getElementById("remainingAmount").innerText = (projectTotal - total).toFixed(2);
-    document.querySelectorAll('.delete-payment-btn').forEach(btn => {
-        btn.onclick = () => { const idx = parseInt(btn.dataset.idx); proj.payments.splice(idx, 1); renderPaymentsTable(proj); saveToLocal(); };
-    });
+    document.querySelectorAll('.delete-payment-btn').forEach(btn => { btn.onclick = () => { const idx = parseInt(btn.dataset.idx); proj.payments.splice(idx, 1); renderPaymentsTable(proj); saveToLocal(); }; });
 }
-
 function renderRoomsTable(proj) {
     const tbody = document.getElementById("roomsTableBody");
-    if(!tbody) return;
     if(!proj.rooms) proj.rooms = [];
-    if(proj.rooms.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7">➕ أضف غرفة</td></tr>';
-        return;
-    }
+    if(proj.rooms.length === 0) { tbody.innerHTML = '<tr><td colspan="7">➕ أضف غرفة</td></tr>'; return; }
     const price = proj.globalPricePerMeter || 50;
-    tbody.innerHTML = proj.rooms.map((r, idx) => {
-        const meters = (r.lengthVal && r.widthVal) ? (r.calcMode === 'area' ? r.lengthVal * r.widthVal : 2 * (r.lengthVal + r.widthVal)) : 0;
-        r.totalCost = meters * price;
-        return `<tr data-room-id="${r.id}">
-            <td>${idx+1}</td>
-            <td><input type="number" class="room-length" step="0.01" value="${r.lengthVal || ''}"></td>
-            <td><input type="number" class="room-width" step="0.01" value="${r.widthVal || ''}"></td>
-            <td><select class="room-mode"><option value="area" ${r.calcMode === 'area' ? 'selected' : ''}>مساحة</option><option value="perimeter" ${r.calcMode === 'perimeter' ? 'selected' : ''}>محيط</option></select></td>
-            <td><span class="calc-val">${meters.toFixed(2)}</span></td>
-            <td><span class="room-total">${r.totalCost.toFixed(2)}</span></td>
-            <td><button class="delete-room-btn" data-id="${r.id}">✖</button></td>
-        </tr>`;
-    }).join('');
+    tbody.innerHTML = proj.rooms.map((r, idx) => { const meters = (r.lengthVal && r.widthVal) ? (r.calcMode === 'area' ? r.lengthVal * r.widthVal : 2 * (r.lengthVal + r.widthVal)) : 0; r.totalCost = meters * price; return `<tr data-room-id="${r.id}"><td>${idx+1}</td><td><input type="number" class="room-length" step="0.01" value="${r.lengthVal || ''}"></td><td><input type="number" class="room-width" step="0.01" value="${r.widthVal || ''}"></td><td><select class="room-mode"><option value="area" ${r.calcMode === 'area' ? 'selected' : ''}>مساحة</option><option value="perimeter" ${r.calcMode === 'perimeter' ? 'selected' : ''}>محيط</option></select></td><td><span class="calc-val">${meters.toFixed(2)}</span></td><td><span class="room-total">${r.totalCost.toFixed(2)}</span></td><td><button class="delete-room-btn" data-id="${r.id}">✖</button></td></tr>`; }).join('');
     attachRoomEvents(proj);
 }
-
 function attachRoomEvents(proj) {
-    document.querySelectorAll('.room-length, .room-width, .room-mode').forEach(el => {
-        el.onchange = () => { syncRoomsFromDOM(proj); updateProjectTotal(proj); saveToLocal(); };
-    });
-    document.querySelectorAll('.delete-room-btn').forEach(btn => {
-        btn.onclick = () => { proj.rooms = proj.rooms.filter(r => r.id != parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); saveToLocal(); };
-    });
+    document.querySelectorAll('.room-length, .room-width, .room-mode').forEach(el => { el.onchange = () => { syncRoomsFromDOM(proj); updateProjectTotal(proj); saveToLocal(); }; });
+    document.querySelectorAll('.delete-room-btn').forEach(btn => { btn.onclick = () => { proj.rooms = proj.rooms.filter(r => r.id != parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); saveToLocal(); }; });
 }
-
 function syncRoomsFromDOM(proj) {
-    document.querySelectorAll('#roomsTableBody tr[data-room-id]').forEach(row => {
-        const id = parseInt(row.dataset.roomId);
-        const room = proj.rooms.find(r => r.id === id);
-        if(room) {
-            room.lengthVal = parseFloat(row.querySelector('.room-length')?.value) || 0;
-            room.widthVal = parseFloat(row.querySelector('.room-width')?.value) || 0;
-            room.calcMode = row.querySelector('.room-mode')?.value;
-        }
-    });
+    document.querySelectorAll('#roomsTableBody tr[data-room-id]').forEach(row => { const id = parseInt(row.dataset.roomId); const room = proj.rooms.find(r => r.id === id); if(room) { room.lengthVal = parseFloat(row.querySelector('.room-length')?.value) || 0; room.widthVal = parseFloat(row.querySelector('.room-width')?.value) || 0; room.calcMode = row.querySelector('.room-mode')?.value; } });
 }
-
 function updateProjectTotal(proj) {
     const price = parseFloat(document.getElementById("globalPricePerMeter").value) || 0;
     proj.globalPricePerMeter = price;
-    proj.rooms.forEach(r => {
-        const m = (r.lengthVal && r.widthVal) ? (r.calcMode === 'area' ? r.lengthVal * r.widthVal : 2 * (r.lengthVal + r.widthVal)) : 0;
-        r.totalCost = m * price;
-    });
-    const grandTotal = proj.rooms.reduce((s,r) => s + r.totalCost, 0).toFixed(2);
+    proj.rooms.forEach(r => { const m = (r.lengthVal && r.widthVal) ? (r.calcMode === 'area' ? r.lengthVal * r.widthVal : 2 * (r.lengthVal + r.widthVal)) : 0; r.totalCost = m * price; });
+    const grandTotal = proj.rooms.reduce((s,r) => s + r.totalCost, 0);
     const totalPayments = proj.payments?.reduce((s,p) => s + p.amount, 0) || 0;
-    document.getElementById("remainingAmount").innerText = (parseFloat(grandTotal) - totalPayments).toFixed(2);
+    document.getElementById("remainingAmount").innerText = (grandTotal - totalPayments).toFixed(2);
 }
+window.addNewCustomer = function() { const name = prompt("اسم العميل:"); if(name) { userData.customers.push({ id: userData.nextCustId++, name, projects: [] }); renderCustomersScreen(); saveToLocal(); } };
+window.addProject = function() { const cust = userData.customers.find(c => c.id === currentCustomerId); if(cust) { const name = prompt("اسم المشروع:"); if(name) { cust.projects.push({ id: userData.nextProjId++, name, rooms: [], globalPricePerMeter: 50, payments: [] }); window.openCustomerProjects(currentCustomerId); saveToLocal(); } } };
+window.addRoom = function() { const cust = userData.customers.find(c => c.id === currentCustomerId); const proj = cust?.projects.find(p => p.id === currentProjectId); if(proj) { proj.rooms.push({ id: userData.nextRoomId++, lengthVal: null, widthVal: null, calcMode: "area", totalCost: 0 }); window.openProjectDetail(currentCustomerId, currentProjectId); saveToLocal(); } };
+window.deleteProject = function() { const cust = userData.customers.find(c => c.id === currentCustomerId); if(cust && confirm("حذف المشروع؟")) { cust.projects = cust.projects.filter(p => p.id !== currentProjectId); window.openCustomerProjects(currentCustomerId); saveToLocal(); } };
+window.saveProject = function() { const cust = userData.customers.find(c => c.id === currentCustomerId); const proj = cust?.projects.find(p => p.id === currentProjectId); if(proj) { syncRoomsFromDOM(proj); updateProjectTotal(proj); saveToLocal(); alert("تم الحفظ"); } };
+window.addPayment = function() { const cust = userData.customers.find(c => c.id === currentCustomerId); const proj = cust?.projects.find(p => p.id === currentProjectId); if(!proj) return; const amount = prompt("المبلغ:"); if(!amount || isNaN(parseFloat(amount))) return; const note = prompt("ملاحظة:", ""); const date = new Date().toLocaleDateString('ar-EG'); if(!proj.payments) proj.payments = []; proj.payments.push({ date, amount: parseFloat(amount) || 0, note }); renderPaymentsTable(proj); updateProjectTotal(proj); saveToLocal(); };
+window.showProjectScreen = function(screen) { document.getElementById("customersScreen").style.display = screen === 'customers' ? 'block' : 'none'; document.getElementById("projectsScreen").style.display = screen === 'projects' ? 'block' : 'none'; document.getElementById("projectDetailScreen").style.display = screen === 'detail' ? 'block' : 'none'; if(screen === 'customers') renderCustomersScreen(); };
 
-window.addNewCustomer = function() {
-    const name = prompt("اسم العميل:");
-    if(name) {
-        userData.customers.push({ id: userData.nextCustId++, name, projects: [] });
-        renderCustomersScreen(); saveToLocal();
-    }
-};
-
-window.addProject = function() {
-    const cust = userData.customers.find(c => c.id === currentCustomerId);
-    if(cust) {
-        const name = prompt("اسم المشروع:");
-        if(name) {
-            cust.projects.push({ id: userData.nextProjId++, name, rooms: [], globalPricePerMeter: 50, payments: [] });
-            window.openCustomerProjects(currentCustomerId); saveToLocal();
-        }
-    }
-};
-
-window.addRoom = function() {
-    const cust = userData.customers.find(c => c.id === currentCustomerId);
-    const proj = cust?.projects.find(p => p.id === currentProjectId);
-    if(proj) {
-        proj.rooms.push({ id: userData.nextRoomId++, lengthVal: null, widthVal: null, calcMode: "area", totalCost: 0 });
-        window.openProjectDetail(currentCustomerId, currentProjectId); saveToLocal();
-    }
-};
-
-window.deleteProject = function() {
-    const cust = userData.customers.find(c => c.id === currentCustomerId);
-    if(cust && confirm("حذف المشروع؟")) {
-        cust.projects = cust.projects.filter(p => p.id !== currentProjectId);
-        window.openCustomerProjects(currentCustomerId); saveToLocal();
-    }
-};
-
-window.saveProject = function() {
-    const cust = userData.customers.find(c => c.id === currentCustomerId);
-    const proj = cust?.projects.find(p => p.id === currentProjectId);
-    if(proj) {
-        syncRoomsFromDOM(proj);
-        updateProjectTotal(proj);
-        saveToLocal();
-        alert("تم الحفظ");
-    }
-};
-
-window.addPayment = function() {
-    const cust = userData.customers.find(c => c.id === currentCustomerId);
-    const proj = cust?.projects.find(p => p.id === currentProjectId);
-    if(!proj) return;
-    const amount = prompt("المبلغ:");
-    if(!amount || isNaN(parseFloat(amount))) return;
-    const note = prompt("ملاحظة:", "");
-    const date = new Date().toLocaleDateString('ar-EG');
-    if(!proj.payments) proj.payments = [];
-    proj.payments.push({ date, amount: parseFloat(amount) || 0, note });
-    renderPaymentsTable(proj);
-    updateProjectTotal(proj);
-    saveToLocal();
-};
-
-window.showProjectScreen = function(screen) {
-    document.getElementById("customersScreen").style.display = screen === 'customers' ? 'block' : 'none';
-    document.getElementById("projectsScreen").style.display = screen === 'projects' ? 'block' : 'none';
-    document.getElementById("projectDetailScreen").style.display = screen === 'detail' ? 'block' : 'none';
-    if(screen === 'customers') renderCustomersScreen();
-};
-
-// ==================== دوال المحاسبة (كاملة) ====================
-function renderPersonSelect() {
-    const sel = document.getElementById("personSelect");
-    if(sel) {
-        sel.innerHTML = Object.keys(userData.accountingPersons).map(id => `<option value="${id}">${escapeHtml(userData.accountingPersons[id].name)}</option>`).join('');
-        sel.value = userData.currentPersonId;
-    }
-}
-
-window.switchPerson = function() {
-    userData.currentPersonId = document.getElementById("personSelect").value;
-    renderAccountingTable(); saveToLocal();
-};
-
-window.addNewPerson = function() {
-    const name = prompt("اسم الشخص:");
-    if(name) {
-        const newId = 'person_' + Date.now();
-        userData.accountingPersons[newId] = { name, rows: [] };
-        renderPersonSelect();
-        userData.currentPersonId = newId;
-        renderAccountingTable(); saveToLocal();
-    }
-};
-
+// ==================== المحاسبة ====================
+function renderPersonSelect() { const sel = document.getElementById("personSelect"); if(sel) { sel.innerHTML = Object.keys(userData.accountingPersons).map(id => `<option value="${id}">${escapeHtml(userData.accountingPersons[id].name)}</option>`).join(''); sel.value = userData.currentPersonId; } }
+window.switchPerson = function() { userData.currentPersonId = document.getElementById("personSelect").value; renderAccountingTable(); saveToLocal(); };
+window.addNewPerson = function() { const name = prompt("اسم الشخص:"); if(name) { const newId = 'person_' + Date.now(); userData.accountingPersons[newId] = { name, rows: [] }; renderPersonSelect(); userData.currentPersonId = newId; renderAccountingTable(); saveToLocal(); } };
 function renderAccountingTable() {
     const tbody = document.getElementById("accountingBody");
-    if(!tbody) return;
-    const person = userData.accountingPersons[userData.currentPersonId] || { rows: [] };
-    const rows = person.rows || [];
-    tbody.innerHTML = rows.map((r, i) => `<tr>
-        <td><input type="number" class="acc-expense" data-i="${i}" value="${r.expense || ''}" step="0.01" style="width:100%;"></td>
-        <td><input type="number" class="acc-revenue" data-i="${i}" value="${r.revenue || ''}" step="0.01" style="width:100%;"></td>
-        <td><input type="text" class="acc-note" data-i="${i}" value="${escapeHtml(r.revenueNote || '')}" style="width:100%;"></td>
-        <td><button class="delete-acc-btn" data-i="${i}">✖</button></td>
-    </tr>`).join('');
-    attachAccountingEvents();
-    updateAccountingSummary();
+    const person = userData.accountingPersons[userData.currentPersonId];
+    if(!person) return;
+    if(!person.rows) person.rows = [];
+    if(person.rows.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;">➕ اضغط إضافة صف</td></tr>'; updateAccountingSummary(); return; }
+    tbody.innerHTML = person.rows.map((r, i) => `<tr data-row-idx="${i}"><td><input type="number" class="expense-amount" data-idx="${i}" value="${r.expense !== null ? r.expense : ''}" step="0.01" style="width:100px;"></td><td><input type="number" class="revenue-amount" data-idx="${i}" value="${r.revenue !== null ? r.revenue : ''}" step="0.01" style="width:100px;"></td><td><input type="text" class="row-note" data-idx="${i}" value="${escapeHtml(r.note || '')}" style="width:100%;"></td><td><button class="delete-acc-btn" data-idx="${i}">✖</button></td></tr>`).join('');
+    attachAccountingEvents(); updateAccountingSummary();
 }
-
 function attachAccountingEvents() {
     const person = userData.accountingPersons[userData.currentPersonId];
     if(!person) return;
-    document.querySelectorAll('.acc-expense').forEach(inp => {
-        inp.oninput = () => { const i = parseInt(inp.dataset.i); person.rows[i].expense = parseFloat(inp.value) || 0; updateAccountingSummary(); saveToLocal(); };
-    });
-    document.querySelectorAll('.acc-revenue').forEach(inp => {
-        inp.oninput = () => { const i = parseInt(inp.dataset.i); person.rows[i].revenue = parseFloat(inp.value) || 0; updateAccountingSummary(); saveToLocal(); };
-    });
-    document.querySelectorAll('.acc-note').forEach(inp => {
-        inp.onchange = () => { const i = parseInt(inp.dataset.i); person.rows[i].revenueNote = inp.value; saveToLocal(); };
-    });
-    document.querySelectorAll('.delete-acc-btn').forEach(btn => {
-        btn.onclick = () => { const i = parseInt(btn.dataset.i); person.rows.splice(i, 1); renderAccountingTable(); saveToLocal(); };
-    });
+    document.querySelectorAll('.expense-amount').forEach(inp => { inp.onchange = () => { const idx = parseInt(inp.dataset.idx); if(person.rows[idx]) { person.rows[idx].expense = inp.value === '' ? null : parseFloat(inp.value) || 0; updateAccountingSummary(); saveToLocal(); } }; });
+    document.querySelectorAll('.revenue-amount').forEach(inp => { inp.onchange = () => { const idx = parseInt(inp.dataset.idx); if(person.rows[idx]) { person.rows[idx].revenue = inp.value === '' ? null : parseFloat(inp.value) || 0; updateAccountingSummary(); saveToLocal(); } }; });
+    document.querySelectorAll('.row-note').forEach(inp => { inp.onchange = () => { const idx = parseInt(inp.dataset.idx); if(person.rows[idx]) { person.rows[idx].note = inp.value; saveToLocal(); } }; });
+    document.querySelectorAll('.delete-acc-btn').forEach(btn => { btn.onclick = () => { const idx = parseInt(btn.dataset.idx); person.rows.splice(idx, 1); renderAccountingTable(); saveToLocal(); }; });
 }
-
 function updateAccountingSummary() {
     const person = userData.accountingPersons[userData.currentPersonId];
     if(!person) return;
-    const rows = person.rows || [];
-    const totalRevenue = rows.reduce((s,r) => s + (parseFloat(r.revenue) || 0), 0);
-    const totalExpense = rows.reduce((s,r) => s + (parseFloat(r.expense) || 0), 0);
+    if(!person.rows) person.rows = [];
+    const totalExpense = person.rows.reduce((s, r) => s + (parseFloat(r.expense) || 0), 0);
+    const totalRevenue = person.rows.reduce((s, r) => s + (parseFloat(r.revenue) || 0), 0);
     const net = totalRevenue - totalExpense;
     document.getElementById("totalRevenue").innerText = totalRevenue.toFixed(2);
     document.getElementById("totalExpense").innerText = totalExpense.toFixed(2);
     const profitEl = document.getElementById("netProfit");
     profitEl.innerText = net.toFixed(2);
-    profitEl.className = 'profit ' + (net >= 0 ? 'positive' : 'negative');
+    profitEl.className = 'value ' + (net >= 0 ? 'profit positive' : 'profit negative');
 }
-
-window.addAccountingRow = function() {
+window.addAccountingRow = function() { const person = userData.accountingPersons[userData.currentPersonId]; if(!person) return; if(!person.rows) person.rows = []; person.rows.unshift({ expense: null, revenue: null, note: '' }); renderAccountingTable(); saveToLocal(); };
+window.archiveAndClearAccounting = function() {
     const person = userData.accountingPersons[userData.currentPersonId];
     if(!person) return;
     if(!person.rows) person.rows = [];
-    person.rows.unshift({ expense: null, revenue: null, revenueNote: '' });
-    renderAccountingTable(); saveToLocal();
-};
-
-window.archiveAndClearAccounting = function() {
-    const person = userData.accountingPersons[userData.currentPersonId];
-    if(!person || person.rows.length === 0) { alert("لا توجد بيانات"); return; }
-    if(confirm("حفظ ومسح الجدول؟")) {
-        const totalExpense = person.rows.reduce((s,r) => s + (parseFloat(r.expense) || 0), 0);
-        const totalRevenue = person.rows.reduce((s,r) => s + (parseFloat(r.revenue) || 0), 0);
+    const totalExpense = person.rows.reduce((s, r) => s + (parseFloat(r.expense) || 0), 0);
+    const totalRevenue = person.rows.reduce((s, r) => s + (parseFloat(r.revenue) || 0), 0);
+    if(totalExpense === 0 && totalRevenue === 0 && person.rows.length === 0) { alert("لا توجد بيانات للحفظ"); return; }
+    if(confirm("حفظ البيانات في السجل ومسح الجدول الحالي؟")) {
         const record = { id: Date.now(), personName: person.name, date: new Date().toLocaleDateString('ar-EG'), time: new Date().toLocaleTimeString('ar-EG'), rows: JSON.parse(JSON.stringify(person.rows)), summary: { totalExpense, totalRevenue, net: totalRevenue - totalExpense } };
         if(!userData.accountingHistory) userData.accountingHistory = [];
         userData.accountingHistory.unshift(record);
-        person.rows = [];
-        renderAccountingTable(); saveToLocal();
-        alert("تم الحفظ والمسح");
+        person.rows = []; renderAccountingTable(); saveToLocal(); alert("تم الحفظ والمسح");
     }
 };
-
 window.showAccountingHistory = function() {
     if(!userData.accountingHistory?.length) { alert("لا توجد سجلات"); return; }
     let modal = document.createElement('div'); modal.className = 'modal';
     let content = document.createElement('div'); content.className = 'modal-content';
-    content.innerHTML = '<h3>📋 سجل المحاسبة</h3>';
+    content.innerHTML = '<h3>📋 سجل المحاسبة</h3><div style="max-height:400px;overflow-y:auto;">';
     userData.accountingHistory.forEach(r => {
-        let div = document.createElement('div');
-        div.style.cssText = 'border-bottom:1px solid #ddd;padding:10px;margin:5px 0;';
-        div.innerHTML = `<div><strong>${r.date} ${r.time}</strong> | ${r.personName}</div><div>💰 إيرادات: ${r.summary.totalRevenue.toFixed(2)} | مصاريف: ${r.summary.totalExpense.toFixed(2)} | صافي: ${r.summary.net.toFixed(2)}</div>`;
+        let rowsHtml = r.rows.map(row => `<div style="font-size:0.65rem;border-bottom:1px solid #eee;padding:4px;">📉 مصروف: ${row.expense || 0} | 📈 إيراد: ${row.revenue || 0} | 📝 ملاحظة: ${row.note || '-'}</div>`).join('');
+        let div = document.createElement('div'); div.style.cssText = 'border-bottom:1px solid #ddd;padding:10px;margin:5px 0;';
+        div.innerHTML = `<div><strong>${r.date} ${r.time}</strong> | ${r.personName}</div><div>💰 إيرادات: ${r.summary.totalRevenue.toFixed(2)} | مصاريف: ${r.summary.totalExpense.toFixed(2)} | صافي: ${r.summary.net.toFixed(2)}</div><details><summary>📄 التفاصيل (${r.rows.length} صف)</summary>${rowsHtml}</details>`;
         content.appendChild(div);
     });
-    let closeBtn = document.createElement('button');
-    closeBtn.innerText = 'إغلاق';
-    closeBtn.className = 'btn-secondary';
-    closeBtn.onclick = () => modal.remove();
-    content.appendChild(closeBtn);
-    modal.appendChild(content);
-    document.body.appendChild(modal);
+    content.innerHTML += '</div><button onclick="this.closest(\'.modal\').remove()" class="btn-secondary" style="margin-top:10px;">إغلاق</button>';
+    modal.appendChild(content); document.body.appendChild(modal);
 };
 
-// ==================== دوال المصادقة ====================
+// ==================== المصادقة ====================
 window.togglePassword = function(id) { const f = document.getElementById(id); f.type = f.type === 'password' ? 'text' : 'password'; };
-
 window.loginLocalOnly = function() {
     currentUser = { uid: 'local_' + deviceId, email: 'local@system.com', name: 'المستخدم المحلي', isLocalOnly: true };
-    useCloudSync = false;
-    loadFromLocal();
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("mainApp").style.display = "block";
-    document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، مستخدم محلي`;
-    document.getElementById("syncModeDisplay").innerHTML = `💾 وضع محلي`;
-    document.getElementById("syncStatus").className = "sync-status offline";
-    document.getElementById("syncStatus").innerHTML = "💾 وضع التشغيل المحلي";
+    useCloudSync = false; loadFromLocal();
+    document.getElementById("loginScreen").style.display = "none"; document.getElementById("mainApp").style.display = "block";
+    document.getElementById("userNameDisplay").innerHTML = `👋 ${currentUser.name}`;
+    document.getElementById("syncModeDisplay").innerHTML = `💾 محلي`;
+    document.getElementById("syncStatus").className = "sync-status offline"; document.getElementById("syncStatus").innerHTML = "💾 وضع التشغيل المحلي";
     renderCustomersScreen(); renderWorkersTable(); renderPersonSelect(); renderAccountingTable(); updateWeekDisplay();
 };
-
 window.login = async function() {
     if(!auth) { document.getElementById("loginError").innerText = "❌ Firebase غير مهيأ"; return; }
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
-    const errorDiv = document.getElementById("loginError");
-    errorDiv.innerText = "";
+    const email = document.getElementById("loginEmail").value.trim(); const password = document.getElementById("loginPassword").value;
+    const errorDiv = document.getElementById("loginError"); errorDiv.innerText = "";
     if(!email || !password) { errorDiv.innerText = "البريد الإلكتروني والرمز السري مطلوبان"; return; }
     try {
         const cred = await auth.signInWithEmailAndPassword(email, password);
-        if(!cred.user.emailVerified) {
-            errorDiv.innerText = "⚠️ يرجى تفعيل حسابك عبر الرابط المرسل إلى بريدك الإلكتروني";
-            document.getElementById("verificationWarning").style.display = "block";
-            return;
-        }
+        if(!cred.user.emailVerified) { errorDiv.innerText = "⚠️ يرجى تفعيل حسابك عبر الرابط المرسل إلى بريدك الإلكتروني"; document.getElementById("verificationWarning").style.display = "block"; return; }
         currentUser = { uid: cred.user.uid, email: email, name: cred.user.displayName || email.split('@')[0], isLocalOnly: false };
-        useCloudSync = true;
-        loadFromLocal();
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-        document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${currentUser.name}`;
+        useCloudSync = true; loadFromLocal();
+        document.getElementById("loginScreen").style.display = "none"; document.getElementById("mainApp").style.display = "block";
+        document.getElementById("userNameDisplay").innerHTML = `👋 ${currentUser.name}`;
         document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
-        document.getElementById("syncStatus").className = "sync-status online";
-        document.getElementById("syncStatus").innerHTML = "☁️ متزامن مع السحابة";
+        document.getElementById("syncStatus").className = "sync-status online"; document.getElementById("syncStatus").innerHTML = "☁️ متزامن مع السحابة";
         renderCustomersScreen(); renderWorkersTable(); renderPersonSelect(); renderAccountingTable(); updateWeekDisplay();
     } catch(e) {
-        console.error("Login error:", e);
-        if(e.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.') {
-            errorDiv.innerText = "❌ خطأ في مفتاح API. تأكد من اتصال الإنترنت وحاول مرة أخرى.";
-        } else if(e.code === 'auth/user-not-found') errorDiv.innerText = "الحساب غير موجود";
+        if(e.code === 'auth/user-not-found') errorDiv.innerText = "الحساب غير موجود";
         else if(e.code === 'auth/wrong-password') errorDiv.innerText = "كلمة المرور غير صحيحة";
         else errorDiv.innerText = e.message;
     }
 };
-
 window.register = async function() {
     if(!auth) { document.getElementById("regError").innerText = "❌ Firebase غير مهيأ"; return; }
-    const email = document.getElementById("regEmail").value.trim();
-    const name = document.getElementById("regName").value.trim();
-    const password = document.getElementById("regPassword").value;
-    const errorDiv = document.getElementById("regError");
-    const successDiv = document.getElementById("regSuccess");
+    const email = document.getElementById("regEmail").value.trim(); const name = document.getElementById("regName").value.trim(); const password = document.getElementById("regPassword").value;
+    const errorDiv = document.getElementById("regError"); const successDiv = document.getElementById("regSuccess");
     errorDiv.innerText = ""; successDiv.innerText = "";
     if(!email || !name || !password) { errorDiv.innerText = "جميع الحقول مطلوبة"; return; }
     if(password.length < 6) { errorDiv.innerText = "الرمز السري 6 أحرف على الأقل"; return; }
     try {
         const cred = await auth.createUserWithEmailAndPassword(email, password);
-        await cred.user.updateProfile({ displayName: name });
-        await cred.user.sendEmailVerification();
+        await cred.user.updateProfile({ displayName: name }); await cred.user.sendEmailVerification();
         successDiv.innerText = "✅ تم إنشاء الحساب! تم إرسال رابط التفعيل إلى بريدك.";
         setTimeout(() => { window.hideRegister(); document.getElementById("loginSuccess").innerText = "✅ تم إنشاء الحساب! يرجى تفعيل حسابك عبر البريد ثم تسجيل الدخول."; setTimeout(() => { document.getElementById("loginSuccess").innerText = ""; }, 5000); }, 2000);
-    } catch(e) {
-        if(e.code === 'auth/email-already-in-use') errorDiv.innerText = "البريد مستخدم بالفعل";
-        else errorDiv.innerText = e.message;
-    }
+    } catch(e) { if(e.code === 'auth/email-already-in-use') errorDiv.innerText = "البريد مستخدم بالفعل"; else errorDiv.innerText = e.message; }
 };
-
 window.showResetPassword = function() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("resetPasswordScreen").style.display = "flex"; };
 window.hideResetPassword = function() { document.getElementById("resetPasswordScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; };
 window.sendPasswordReset = async function() {
     const email = document.getElementById("resetEmail").value.trim();
-    const errorDiv = document.getElementById("resetError");
-    const successDiv = document.getElementById("resetSuccess");
+    const errorDiv = document.getElementById("resetError"); const successDiv = document.getElementById("resetSuccess");
     errorDiv.innerText = ""; successDiv.innerText = "";
     if(!email) { errorDiv.innerText = "❌ الرجاء إدخال بريدك الإلكتروني"; return; }
-    try {
-        await auth.sendPasswordResetEmail(email);
-        successDiv.innerText = "✅ تم إرسال رابط إعادة تعيين كلمة المرور";
-        setTimeout(() => { window.hideResetPassword(); }, 3000);
-    } catch(e) {
-        if(e.code === 'auth/user-not-found') errorDiv.innerText = "❌ لا يوجد حساب مرتبط بهذا البريد";
-        else errorDiv.innerText = "❌ خطأ: " + e.message;
-    }
+    try { await auth.sendPasswordResetEmail(email); successDiv.innerText = "✅ تم إرسال رابط إعادة تعيين كلمة المرور"; setTimeout(() => { window.hideResetPassword(); }, 3000); }
+    catch(e) { if(e.code === 'auth/user-not-found') errorDiv.innerText = "❌ لا يوجد حساب مرتبط بهذا البريد"; else errorDiv.innerText = "❌ خطأ: " + e.message; }
 };
-
-window.resendVerification = async function() {
-    if(auth && auth.currentUser) {
-        try { await auth.currentUser.sendEmailVerification(); alert("✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني"); }
-        catch(e) { alert("❌ خطأ: " + e.message); }
-    } else { alert("❌ الرجاء تسجيل الدخول أولاً"); }
-};
-
+window.resendVerification = async function() { if(auth && auth.currentUser) { try { await auth.currentUser.sendEmailVerification(); alert("✅ تم إرسال رابط التفعيل إلى بريدك الإلكتروني"); } catch(e) { alert("❌ خطأ: " + e.message); } } else { alert("❌ الرجاء تسجيل الدخول أولاً"); } };
 window.showRegister = function() { document.getElementById("loginScreen").style.display = "none"; document.getElementById("registerScreen").style.display = "flex"; };
 window.hideRegister = function() { document.getElementById("registerScreen").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; };
-
-window.logout = async function() {
-    saveToLocal();
-    if(auth && currentUser && !currentUser.isLocalOnly) await auth.signOut();
-    currentUser = null;
-    useCloudSync = false;
-    document.getElementById("mainApp").style.display = "none";
-    document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("loginEmail").value = "";
-    document.getElementById("loginPassword").value = "";
-};
-
+window.logout = async function() { saveToLocal(); if(auth && currentUser && !currentUser.isLocalOnly) await auth.signOut(); currentUser = null; useCloudSync = false; document.getElementById("mainApp").style.display = "none"; document.getElementById("loginScreen").style.display = "flex"; document.getElementById("loginEmail").value = ""; document.getElementById("loginPassword").value = ""; };
 window.showMainTab = function(tab) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    if(tab === 'projects') {
-        document.getElementById('projectsTab').classList.add('active');
-        document.querySelector('.tabs .tab-btn:first-child').classList.add('active');
-        window.showProjectScreen('customers');
-    } else if(tab === 'workers') {
-        document.getElementById('workersTab').classList.add('active');
-        document.querySelector('.tabs .tab-btn:nth-child(2)').classList.add('active');
-        updateWeekDisplay(); renderWorkersTable();
-    } else {
-        document.getElementById('accountingTab').classList.add('active');
-        document.querySelector('.tabs .tab-btn:nth-child(3)').classList.add('active');
-        renderAccountingTable();
-    }
+    if(tab === 'projects') { document.getElementById('projectsTab').classList.add('active'); document.querySelector('.tabs .tab-btn:first-child').classList.add('active'); window.showProjectScreen('customers'); }
+    else if(tab === 'workers') { document.getElementById('workersTab').classList.add('active'); document.querySelector('.tabs .tab-btn:nth-child(2)').classList.add('active'); updateWeekDisplay(); renderWorkersTable(); }
+    else { document.getElementById('accountingTab').classList.add('active'); document.querySelector('.tabs .tab-btn:nth-child(3)').classList.add('active'); renderAccountingTable(); }
 };
-
 window.renderAll = function() { renderCustomersScreen(); renderWorkersTable(); renderPersonSelect(); renderAccountingTable(); };
 
-// ==================== ربط الأحداث ====================
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("addCustomerBtn")?.addEventListener("click", window.addNewCustomer);
     document.getElementById("addProjectBtn")?.addEventListener("click", window.addProject);
@@ -1081,30 +1182,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("searchInput")?.addEventListener("input", window.filterWorkers);
     document.getElementById("globalPricePerMeter")?.addEventListener("change", () => { if(currentProjectId) { const cust = userData.customers.find(c => c.id === currentCustomerId); const proj = cust?.projects.find(p => p.id === currentProjectId); if(proj) updateProjectTotal(proj); } });
 });
-
 window.addEventListener('online', () => { isOnline = true; if(useCloudSync && currentUser && !currentUser.isLocalOnly) { const el = document.getElementById("syncStatus"); if(el) { el.textContent = "☁️ متصل"; el.className = "sync-status online"; } } });
 window.addEventListener('offline', () => { isOnline = false; const el = document.getElementById("syncStatus"); if(el) { el.textContent = "📴 غير متصل"; el.className = "sync-status offline"; } });
-
-// التحقق من جلسة سابقة
-if(auth) {
-    auth.onAuthStateChanged(async (user) => {
-        if(user && user.emailVerified) {
-            currentUser = { uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0], isLocalOnly: false };
-            useCloudSync = true;
-            loadFromLocal();
-            document.getElementById("loginScreen").style.display = "none";
-            document.getElementById("mainApp").style.display = "block";
-            document.getElementById("userNameDisplay").innerHTML = `👋 مرحباً، ${currentUser.name}`;
-            document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`;
-            document.getElementById("verificationWarning").style.display = "none";
-            const el = document.getElementById("syncStatus"); if(el) { el.textContent = "☁️ متزامن مع السحابة"; el.className = "sync-status online"; }
-            window.renderAll(); updateWeekDisplay();
-        } else if(user && !user.emailVerified) {
-            document.getElementById("verificationWarning").style.display = "block";
-        }
-    });
-}
-
+if(auth) { auth.onAuthStateChanged(async (user) => { if(user && user.emailVerified) { currentUser = { uid: user.uid, email: user.email, name: user.displayName || user.email.split('@')[0], isLocalOnly: false }; useCloudSync = true; loadFromLocal(); document.getElementById("loginScreen").style.display = "none"; document.getElementById("mainApp").style.display = "block"; document.getElementById("userNameDisplay").innerHTML = `👋 ${currentUser.name}`; document.getElementById("syncModeDisplay").innerHTML = `☁️ سحابي`; document.getElementById("verificationWarning").style.display = "none"; const el = document.getElementById("syncStatus"); if(el) { el.textContent = "☁️ متزامن مع السحابة"; el.className = "sync-status online"; } window.renderAll(); updateWeekDisplay(); } else if(user && !user.emailVerified) { document.getElementById("verificationWarning").style.display = "block"; } }); }
 console.log("✅ النظام جاهز للاستخدام - جميع الوظائف متكاملة");
 </script>
 </body>
