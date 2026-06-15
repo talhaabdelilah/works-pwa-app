@@ -325,6 +325,9 @@
         <div class="main-header">
             <h1>📁 نظام إدارة المشاريع</h1>
             <div class="header-buttons">
+                <button class="calc-btn-header" onclick="window.exportBackup()">💾 نسخ احتياطي</button>
+                <button class="calc-btn-header" onclick="window.importBackup()" style="background:#8b5cf6;">📥 استيراد</button>
+                <button class="calc-btn-header" onclick="window.openSettings()" style="background:#3b82f6;">⚙️</button>
                 <button class="calc-btn-header" onclick="window.openCalculator()">🧮</button>
                 <span class="user-info" id="userNameDisplay"></span>
                 <button class="logout-btn" onclick="window.logout()">🚪</button>
@@ -1687,6 +1690,84 @@ function showConfirmDialog(message, onConfirm) {
     document.getElementById('dcCancel').onclick=()=>overlay.remove();
     overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
 }
+
+// ===== Backup & Settings =====
+window.exportBackup = function() {
+    const data = JSON.stringify(userData, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup-${new Date().toLocaleDateString('ar-EG')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ تم تحميل النسخة الاحتياطية');
+};
+
+window.importBackup = function() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const imported = JSON.parse(ev.target.result);
+                userData = imported;
+                debouncedSave();
+                window.renderAll();
+                showToast('✅ تم استيراد البيانات بنجاح');
+            } catch (err) {
+                showToast('❌ ملف غير صالح');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+};
+
+window.openSettings = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'dialog-overlay';
+    overlay.innerHTML = `<div class="dialog-box">
+        <h3>⚙️ الإعدادات</h3>
+        <div style="text-align:right;margin-bottom:12px;">
+            <label style="font-size:0.75rem;color:#666;">اسمي:</label>
+            <input type="text" id="settingsMyName" value="${escapeHtml(currentUser?.name || '')}" placeholder="اسمي" style="direction:rtl;">
+        </div>
+        <div style="text-align:right;margin-bottom:12px;">
+            <label style="font-size:0.75rem;color:#666;">اسم الشريك:</label>
+            <input type="text" id="settingsPartnerName" value="${escapeHtml(userData.partnerAccounting?.partnerName || 'الشريك')}" placeholder="اسم الشريك" style="direction:rtl;">
+        </div>
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="settingsSave">💾 حفظ</button>
+            <button class="btn-cancel-red" id="settingsCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+
+    document.getElementById('settingsSave').onclick = () => {
+        const myName = document.getElementById('settingsMyName').value.trim();
+        const partnerName = document.getElementById('settingsPartnerName').value.trim() || 'الشريك';
+
+        if (myName && currentUser) {
+            currentUser.name = myName;
+            document.getElementById('userNameDisplay').innerHTML = `👋 ${myName}`;
+        }
+        userData.partnerAccounting.partnerName = partnerName;
+        document.getElementById('partnerNameDisplay').innerText = partnerName;
+        updatePartnerLabels(partnerName);
+
+        debouncedSave();
+        showToast('✅ تم حفظ الإعدادات');
+        overlay.remove();
+    };
+
+    document.getElementById('settingsCancel').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+};
 
 function showToast(message) {
     const t=document.createElement('div');
