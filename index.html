@@ -62,24 +62,19 @@
         .btn-group { display:flex; gap:6px; flex-wrap:wrap; }
 
         /* Workers Table */
-        .workers-table-wrapper { background:white; border-radius:16px; overflow-x:auto; box-shadow:0 1px 3px rgba(0,0,0,0.1); -webkit-overflow-scrolling:touch; }
-        .workers-table { border-collapse:collapse; font-size:0.55rem; min-width:650px; width:100%; }
-        .workers-table th { background:#1e293b; color:white; padding:8px 3px; font-size:0.55rem; font-weight:bold; text-align:center; white-space:nowrap; position:sticky; top:0; z-index:10; }
-        .workers-table td { padding:6px 3px; text-align:center; border-bottom:1px solid #e2e8f0; white-space:nowrap; font-size:0.55rem; }
-        .workers-table th:nth-child(1) { width:35px; }
-        .workers-table th:nth-child(2) { width:80px; }
-        .workers-table th:nth-child(3), .workers-table th:nth-child(4), .workers-table th:nth-child(5), .workers-table th:nth-child(6), .workers-table th:nth-child(7), .workers-table th:nth-child(8), .workers-table th:nth-child(9) { width:35px; }
-        .workers-table th:nth-child(10) { width:85px; }
-        .workers-table th:nth-child(11) { width:55px; }
-        .workers-table th:nth-child(12) { width:55px; }
-        .workers-table th:nth-child(13) { width:40px; }
-        .attendance-check { width:16px; height:16px; cursor:pointer; accent-color:#10b981; }
-        .editable { width:70px; padding:4px 3px; text-align:center; border:1px solid #cbd5e1; border-radius:8px; font-size:0.52rem; background:#fff; }
-        .expense-text-input { width:80px; background:#fff9c4; border:1px solid #f59e0b; }
-        .total-cell { background:#d1fae5; font-weight:bold; color:#065f46; font-size:0.55rem; padding:4px 3px; border-radius:8px; }
+        .workers-table-wrapper { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); overflow:hidden; }
+        .workers-table { border-collapse:collapse; font-size:0.6rem; width:100%; table-layout:fixed; }
+        .workers-table th { background:#1e293b; color:white; padding:8px 2px; font-size:0.55rem; font-weight:bold; text-align:center; white-space:nowrap; }
+        .workers-table td { padding:6px 2px; text-align:center; border-bottom:1px solid #e2e8f0; font-size:0.55rem; }
+        .workers-table th:nth-child(1), .workers-table td:nth-child(1) { width:28px; }
+        .workers-table th:nth-child(2), .workers-table td:nth-child(2) { width:auto; text-align:right; }
+        .workers-table th:nth-child(10), .workers-table td:nth-child(10) { width:50px; }
+        .workers-table th:nth-child(11), .workers-table td:nth-child(11) { width:36px; }
+        .attendance-check { width:18px; height:18px; cursor:pointer; accent-color:#10b981; }
+        .total-cell { background:#d1fae5; font-weight:bold; color:#065f46; font-size:0.55rem; padding:4px 2px; border-radius:8px; }
         .total-cell.negative { background:#fee2e2; color:#991b1b; }
-        .delete-btn { background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:16px; cursor:pointer; font-size:0.5rem; font-weight:bold; }
-        .worker-name-clickable { cursor:pointer; color:#3b82f6; font-weight:bold; background:#eff6ff; padding:4px 8px; border-radius:12px; display:inline-block; font-size:0.55rem; }
+        .delete-btn { background:#ef4444; color:white; border:none; padding:3px 6px; border-radius:16px; cursor:pointer; font-size:0.5rem; font-weight:bold; }
+        .worker-name-clickable { cursor:pointer; color:#3b82f6; font-weight:bold; background:#eff6ff; padding:4px 8px; border-radius:12px; display:inline-block; font-size:0.55rem; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
         .table-note { font-size:0.45rem; color:#64748b; padding:8px; text-align:center; }
 
         /* Customers/Projects */
@@ -254,16 +249,12 @@
             .workers-table th { font-size:0.48rem; padding:6px 2px; }
             .workers-table td { font-size:0.48rem; padding:5px 2px; }
             .editable { width:60px; font-size:0.45rem; }
-            .expense-text-input { width:70px; }
             .worker-stats-grid { grid-template-columns:repeat(2,1fr); }
             .phone-section { flex-direction:column; }
             .phone-input-group { width:100%; }
             .whatsapp-btn { width:100%; justify-content:center; }
             .customer-info { flex-direction:column; align-items:flex-start; gap:5px; }
             .customer-actions { margin-top:5px; }
-        }
-        @media (max-width:480px) {
-            .workers-table { min-width:550px; }
         }
         button { transition:opacity 0.2s; cursor:pointer; }
         button:active { opacity:0.7; }
@@ -422,10 +413,9 @@
             <div id="archivePanel" class="archive-panel" style="display:none;"><div id="archiveList" class="archive-list"></div></div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
-                    <thead><tr><th>#</th><th>الاسم</th><th>س</th><th>ح</th><th>ن</th><th>ث</th><th>ر</th><th>خ</th><th>ج</th><th>المصروفات</th><th>السعر</th><th>المجموع</th><th></th></tr></thead>
+                    <thead><tr><th>#</th><th>الاسم</th><th>س</th><th>ح</th><th>ن</th><th>ث</th><th>ر</th><th>خ</th><th>ج</th><th>المجموع</th><th></th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
-                <div class="table-note">📝 المصروفات: أكتب أرقاماً مفصولة بمسافات (مثال: 40 30 10) تُضاف تلقائياً للمحاسبة</div>
             </div>
         </div>
 
@@ -760,7 +750,7 @@ function renderWorkersTable() {
     const search = document.getElementById("searchInput")?.value.toLowerCase()||'';
     const filtered = workers.filter(w=>w.name.toLowerCase().includes(search));
     if(!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:20px;">📭 لا يوجد عمال<br>اضغط ➕ للإضافة</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;">📭 لا يوجد عمال<br>اضغط ➕ للإضافة</td></tr>';
         updateWorkersStats(); return;
     }
     tbody.innerHTML = filtered.map((w,idx) => {
@@ -769,8 +759,6 @@ function renderWorkersTable() {
             <td style="font-size:0.5rem;">${idx+1}</td>
             <td><span class="worker-name-clickable" data-id="${w.id}" data-name="${escapeHtml(w.name)}">${escapeHtml(w.name)}</span></td>
             ${dayKeys.map(d=>`<td><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days[d]?'checked':''}></td>`).join('')}
-            <td><input class="editable expense-text-input" value="${escapeHtml(w.expenseText||'')}" data-field="expenseText" data-id="${w.id}" placeholder="40 30"></td>
-            <td><input class="editable" value="${w.price||0}" data-field="price" data-id="${w.id}" step="0.01" type="number" min="0"></td>
             <td class="total-cell ${total<0?'negative':''}">${total.toFixed(2)}</td>
             <td><button class="delete-btn" data-id="${w.id}">✖</button></td>
         </tr>`;
@@ -785,31 +773,6 @@ function attachWorkerEvents() {
         cb.onchange = () => {
             const w = workers.find(w=>w.id===parseInt(cb.dataset.id));
             if(w) { w.days[cb.dataset.day]=cb.checked?1:0; updateWorkerTotalCell(w.id); updateWorkersStats(); debouncedSave(); }
-        };
-    });
-    document.querySelectorAll('.expense-text-input').forEach(inp => {
-        let oldVal = inp.value;
-        inp.onblur = () => {
-            if(inp.value === oldVal) return;
-            const w = workers.find(w=>w.id===parseInt(inp.dataset.id));
-            if(!w) return;
-            const oldData = parseExpensesText(oldVal);
-            const newData = parseExpensesText(inp.value);
-            w.expenseText = newData.text;
-            const added = newData.numbers.filter(n=>!oldData.numbers.includes(n));
-            if(added.length) {
-                const wk = getWeekKeyFromOffset(currentWeekOffset);
-                added.forEach(amt => addWorkerExpenseToAccounting(w.name, amt, wk));
-                showToast(`✅ أضيف ${added.length} مصروف للعامل "${w.name}"`);
-            }
-            updateWorkerTotalCell(w.id); updateWorkersStats(); debouncedSave();
-            oldVal = inp.value;
-        };
-    });
-    document.querySelectorAll('.editable[data-field="price"]').forEach(inp => {
-        inp.onblur = () => {
-            const w = workers.find(w=>w.id===parseInt(inp.dataset.id));
-            if(w) { w.price=parseFloat(inp.value)||0; updateWorkerTotalCell(w.id); updateWorkersStats(); debouncedSave(); }
         };
     });
     document.querySelectorAll('.delete-btn').forEach(btn => {
@@ -891,6 +854,19 @@ window.showWorkerProfile = function(workerId, workerName) {
             <div class="worker-stat-card"><div class="stat-icon">📉</div><div class="stat-value">${totalExpenses.toFixed(2)}</div><div class="stat-label">المصاريف</div></div>
             <div class="worker-stat-card ${rem>=0?'profit':'loss'}"><div class="stat-icon">💵</div><div class="stat-value">${rem.toFixed(2)}</div><div class="stat-label">المتبقي</div></div>
         </div>
+        <div style="background:#f8fafc;padding:12px;border-radius:14px;margin-bottom:14px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:120px;">
+                    <label style="font-size:0.65rem;color:#64748b;display:block;margin-bottom:4px;">💰 السعر اليومي</label>
+                    <input type="number" id="wpPrice" value="${weeksData[0]?.price||0}" step="0.01" min="0" style="width:100%;padding:8px;border:2px solid #3b82f6;border-radius:10px;font-size:0.8rem;text-align:center;">
+                </div>
+                <div style="flex:2;min-width:180px;">
+                    <label style="font-size:0.65rem;color:#64748b;display:block;margin-bottom:4px;">📉 المصروفات (أرقام مفصولة بمسافات)</label>
+                    <input type="text" id="wpExpenses" value="${escapeHtml(weeksData[0]?.expenseText||'')}" placeholder="40 30 10" style="width:100%;padding:8px;border:2px solid #f59e0b;border-radius:10px;font-size:0.8rem;background:#fff9c4;">
+                </div>
+            </div>
+            <button id="saveWorkerDetailsBtn" style="width:100%;margin-top:10px;padding:8px;background:#10b981;color:white;border:none;border-radius:20px;font-weight:bold;cursor:pointer;">💾 حفظ السعر والمصروفات</button>
+        </div>
         <div class="worker-weeks-title">📋 سجل الأسابيع</div>
         <div class="worker-weeks-table-wrapper">
             <table class="worker-weeks-table">
@@ -915,7 +891,18 @@ window.showWorkerProfile = function(workerId, workerName) {
         if(!n.startsWith(COUNTRY_CODE)&&n) n=COUNTRY_CODE+n;
         const link=document.getElementById('wpLink'), btn=link?.querySelector('button');
         if(link) { link.href=newPhone?`https://wa.me/${n}`:'#'; }
-        if(btn) { btn.disabled=!newPhone; btn.classList.toggle('disabled',!newPhone); }
+            if(btn) { btn.disabled=!newPhone; btn.classList.toggle('disabled',!newPhone); }
+    };
+
+    document.getElementById('saveWorkerDetailsBtn').onclick = () => {
+        const newPrice = parseFloat(document.getElementById('wpPrice').value) || 0;
+        const newExpenseText = document.getElementById('wpExpenses').value.trim();
+        let count = 0;
+        for(let wk in userData.workersByWeek) {
+            const w = userData.workersByWeek[wk].find(w=>w.id==workerId);
+            if(w) { w.price = newPrice; w.expenseText = newExpenseText; count++; }
+        }
+        if(count) { debouncedSave(); renderWorkersTable(); showToast(`✅ تم تحديث بيانات "${workerName}"`); }
     };
 };
 
