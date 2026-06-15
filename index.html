@@ -338,8 +338,7 @@
         <div class="tabs">
             <button class="tab-btn active" onclick="window.showMainTab('projects')">📂 العملاء</button>
             <button class="tab-btn" onclick="window.showMainTab('workers')">👥 العمال</button>
-            <button class="tab-btn" onclick="window.showMainTab('accounting')">💰 محاسبتي</button>
-            <button class="tab-btn" onclick="window.showMainTab('partner')">🤝 الشريك</button>
+            <button class="tab-btn" onclick="window.showMainTab('accounting')">💰 محاسبة</button>
         </div>
 
         <!-- تبويب العملاء -->
@@ -427,50 +426,50 @@
             </div>
         </div>
 
-        <!-- تبويب محاسبتي -->
+        <!-- تبويب محاسبة -->
         <div id="accountingTab" class="tab-content">
-            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-                <button class="btn-primary" onclick="window.addAccountingRow('my')">➕ إضافة صف</button>
-                <button class="btn-danger" onclick="window.archiveAndClearAccounting('my')">📦 حذف وحفظ</button>
-                <button class="btn-info" onclick="window.showAccountingHistory('my')">📋 السجل</button>
-            </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-tab="my" data-filter="all" onclick="window.filterAccounting('my','all',this)">📊 الكل</button>
-                <button class="filter-btn" data-tab="my" data-filter="workers" onclick="window.filterAccounting('my','workers',this)">👷 العمال</button>
-                <button class="filter-btn" data-tab="my" data-filter="projects" onclick="window.filterAccounting('my','projects',this)">🏢 المشاريع</button>
-                <button class="filter-btn" data-tab="my" data-filter="manual" onclick="window.filterAccounting('my','manual',this)">✍️ يدوي</button>
-            </div>
-            <div class="accounting-summary">
-                <div class="summary-item"><div class="label">📈 الإيرادات</div><div class="value" id="myTotalRevenue">0.00</div></div>
-                <div class="summary-item"><div class="label">📉 المصاريف</div><div class="value" id="myTotalExpense">0.00</div></div>
-                <div class="summary-item"><div class="label">💰 صافي الربح</div><div class="value profit" id="myNetProfit">0.00</div></div>
-            </div>
-            <div class="accounting-table-wrapper">
-                <table class="accounting-table">
-                    <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr></thead>
-                    <tbody id="myAccountingBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ========== تبويب الشريك ========== -->
-        <div id="partnerTab" class="tab-content">
-            <div class="partner-header-box">
-                <div>
-                    <h3>🤝 محاسبة الشريك</h3>
-                    <div class="partner-name-display" id="partnerNameDisplay">لم يتم تعيين اسم الشريك</div>
-                </div>
-                <button class="partner-edit-btn" onclick="window.editPartnerName()">✏️ تعديل الاسم</button>
-            </div>
-
-            <!-- تبويبات داخلية للشريك -->
+            <!-- تبويبات فرعية -->
             <div class="partner-tabs">
-                <button class="partner-tab-btn active" onclick="window.showPartnerSubTab('partnerAccounting')">📊 جدول المحاسبة</button>
-                <button class="partner-tab-btn" onclick="window.showPartnerSubTab('partnerSettlement')">⚖️ التسوية النهائية</button>
+                <button class="partner-tab-btn active" onclick="window.showPartnerSubTab('myAccounting')">📊 محاسبتي</button>
+                <button class="partner-tab-btn" onclick="window.showPartnerSubTab('partnerAccounting')">🤝 محاسبة الشريك</button>
+                <button class="partner-tab-btn" onclick="window.showPartnerSubTab('partnerSettlement')">⚖️ التسوية</button>
             </div>
 
-            <!-- جدول محاسبة الشريك -->
-            <div id="partnerAccounting">
+            <!-- محاسبتي -->
+            <div id="myAccounting">
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                    <button class="btn-primary" onclick="window.addAccountingRow('my')">➕ إضافة صف</button>
+                    <button class="btn-danger" onclick="window.archiveAndClearAccounting('my')">📦 حذف وحفظ</button>
+                    <button class="btn-info" onclick="window.showAccountingHistory('my')">📋 السجل</button>
+                </div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-tab="my" data-filter="all" onclick="window.filterAccounting('my','all',this)">📊 الكل</button>
+                    <button class="filter-btn" data-tab="my" data-filter="workers" onclick="window.filterAccounting('my','workers',this)">👷 العمال</button>
+                    <button class="filter-btn" data-tab="my" data-filter="projects" onclick="window.filterAccounting('my','projects',this)">🏢 المشاريع</button>
+                    <button class="filter-btn" data-tab="my" data-filter="manual" onclick="window.filterAccounting('my','manual',this)">✍️ يدوي</button>
+                </div>
+                <div class="accounting-summary">
+                    <div class="summary-item"><div class="label">📈 الإيرادات</div><div class="value" id="myTotalRevenue">0.00</div></div>
+                    <div class="summary-item"><div class="label">📉 المصاريف</div><div class="value" id="myTotalExpense">0.00</div></div>
+                    <div class="summary-item"><div class="label">💰 صافي الربح</div><div class="value profit" id="myNetProfit">0.00</div></div>
+                </div>
+                <div class="accounting-table-wrapper">
+                    <table class="accounting-table">
+                        <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr></thead>
+                        <tbody id="myAccountingBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- محاسبة الشريك -->
+            <div id="partnerAccounting" style="display:none;">
+                <div class="partner-header-box">
+                    <div>
+                        <h3>🤝 محاسبة الشريك</h3>
+                        <div class="partner-name-display" id="partnerNameDisplay">لم يتم تعيين اسم الشريك</div>
+                    </div>
+                    <button class="partner-edit-btn" onclick="window.editPartnerName()">✏️ تعديل الاسم</button>
+                </div>
                 <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
                     <button class="btn-primary" onclick="window.addAccountingRow('partner')">➕ إضافة صف</button>
                     <button class="btn-danger" onclick="window.archiveAndClearAccounting('partner')">📦 حذف وحفظ</button>
@@ -1442,12 +1441,15 @@ function updatePartnerLabels(name) {
 }
 
 window.showPartnerSubTab=function(subTab){
+    document.getElementById('myAccounting').style.display=subTab==='myAccounting'?'block':'none';
     document.getElementById('partnerAccounting').style.display=subTab==='partnerAccounting'?'block':'none';
     document.getElementById('partnerSettlement').style.display=subTab==='partnerSettlement'?'block':'none';
     document.querySelectorAll('.partner-tab-btn').forEach((b,i)=>{
-        b.classList.toggle('active',['partnerAccounting','partnerSettlement'][i]===subTab);
+        b.classList.toggle('active',['myAccounting','partnerAccounting','partnerSettlement'][i]===subTab);
     });
+    if(subTab==='partnerAccounting') { renderAccountingTable('partner'); document.getElementById('partnerNameDisplay').innerText=userData.partnerAccounting.partnerName||'الشريك'; }
     if(subTab==='partnerSettlement') window.calcSettlement();
+    if(subTab==='myAccounting') renderAccountingTable('my');
 };
 
 window.calcSettlement=function(){
@@ -1486,16 +1488,16 @@ window.calcSettlement=function(){
         amountEl.innerText='0.00'; dirEl.innerText='الحسابات متساوية تماماً';
         resultBox.style.background='linear-gradient(135deg,#10b981,#059669)';
     } else if(diff>0) {
-        whoLabel.innerText=`🟢 ${pName} مدين لك`;
+        whoLabel.innerText=`🔴 أنت مدين لـ ${pName}`;
         amountEl.innerText=diff.toFixed(2)+' دينار';
-        dirEl.innerText=`يجب على ${pName} دفع ${diff.toFixed(2)} دينار إليك`;
-        resultBox.style.background='linear-gradient(135deg,#10b981,#059669)';
+        dirEl.innerText=`يجب عليك دفع ${diff.toFixed(2)} دينار إلى ${pName}`;
+        resultBox.style.background='linear-gradient(135deg,#ef4444,#b91c1c)';
     } else {
         const absD=Math.abs(diff);
-        whoLabel.innerText=`🔴 أنت مدين لـ ${pName}`;
+        whoLabel.innerText=`🟢 ${pName} مدين لك`;
         amountEl.innerText=absD.toFixed(2)+' دينار';
-        dirEl.innerText=`يجب عليك دفع ${absD.toFixed(2)} دينار إلى ${pName}`;
-        resultBox.style.background='linear-gradient(135deg,#ef4444,#b91c1c)';
+        dirEl.innerText=`يجب على ${pName} دفع ${absD.toFixed(2)} دينار إليك`;
+        resultBox.style.background='linear-gradient(135deg,#10b981,#059669)';
     }
 };
 
@@ -1583,16 +1585,12 @@ window.logout=async function(){
 window.showMainTab=function(tab){
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    const tabMap={projects:'projectsTab',workers:'workersTab',accounting:'accountingTab',partner:'partnerTab'};
+    const tabMap={projects:'projectsTab',workers:'workersTab',accounting:'accountingTab'};
     document.getElementById(tabMap[tab])?.classList.add('active');
-    document.querySelector(`.tab-btn:nth-child(${['projects','workers','accounting','partner'].indexOf(tab)+1})`)?.classList.add('active');
+    document.querySelector(`.tab-btn:nth-child(${['projects','workers','accounting'].indexOf(tab)+1})`)?.classList.add('active');
     if(tab==='projects') window.showProjectScreen('customers');
     else if(tab==='workers') { updateWeekDisplay(); renderWorkersTable(); }
-    else if(tab==='accounting') renderAccountingTable('my');
-    else if(tab==='partner') {
-        renderAccountingTable('partner');
-        document.getElementById('partnerNameDisplay').innerText=userData.partnerAccounting.partnerName||'الشريك';
-    }
+    else if(tab==='accounting') { window.showPartnerSubTab('myAccounting'); }
 };
 
 window.renderAll=function(){
