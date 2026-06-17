@@ -373,6 +373,19 @@
                         <thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></tr></thead>
                         <tbody id="roomsTableBody"></tbody>
                     </table>
+                    <div id="roomsSummary" style="background:#f1f5f9;padding:10px;border-radius:12px;margin-top:10px;font-size:0.65rem;">
+                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                            <span>📐 مجموع المساحة: <strong id="totalArea">0.00</strong> م²</span>
+                            <span>💰 تكلفة المساحة: <strong id="totalAreaCost">0.00</strong> دينار</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-top:4px;">
+                            <span>📏 مجموع المحيط: <strong id="totalPerimeter">0.00</strong> م</span>
+                            <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost">0.00</strong> دينار</span>
+                        </div>
+                        <div style="border-top:2px solid #3b82f6;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;">
+                            <span>🏗️ المجموع الكلي: <strong id="grandTotal" style="color:#065f46;font-size:0.8rem;">0.00</strong> دينار</span>
+                        </div>
+                    </div>
                     <div style="display:flex;gap:8px;margin-top:12px;">
                         <button id="saveProjectBtn" class="btn-secondary">💾 حفظ</button>
                         <button id="deleteProjectBtn" class="btn-danger">🗑️ حذف المشروع</button>
@@ -1116,6 +1129,7 @@ function renderRoomsTable(proj) {
         </tr>`;
     }).join('');
     attachRoomEvents(proj);
+    updateProjectTotal(proj);
 }
 
 function attachRoomEvents(proj) {
@@ -1141,14 +1155,22 @@ function syncRoomsFromDOM(proj) {
 function updateProjectTotal(proj) {
     const price=parseFloat(document.getElementById("globalPricePerMeter")?.value)||0;
     proj.globalPricePerMeter=price;
+    let totalArea=0, totalPerimeter=0;
     proj.rooms.forEach(r=>{
         const m=(r.lengthVal&&r.widthVal)?(r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)):0;
         r.totalCost=m*price;
+        if(r.calcMode==='area') totalArea+=m;
+        else totalPerimeter+=m;
     });
     const gt=proj.rooms.reduce((s,r)=>s+r.totalCost,0);
     const tp=proj.payments?.reduce((s,p)=>s+p.amount,0)||0;
     const rem=document.getElementById("remainingAmount");
     if(rem) rem.innerText=(gt-tp).toFixed(2);
+    document.getElementById('totalArea').innerText=totalArea.toFixed(2);
+    document.getElementById('totalAreaCost').innerText=(totalArea*price).toFixed(2);
+    document.getElementById('totalPerimeter').innerText=totalPerimeter.toFixed(2);
+    document.getElementById('totalPerimeterCost').innerText=(totalPerimeter*price).toFixed(2);
+    document.getElementById('grandTotal').innerText=gt.toFixed(2);
     renderCustomersScreen();
 }
 
