@@ -365,27 +365,29 @@
                             <thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead>
                             <tbody id="paymentsBody"></tbody>
                         </table>
-                        <div><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span> دينار</div>
-                        <div><strong>المتبقي:</strong> <span id="remainingAmount">0.00</span> دينار</div>
+                        <div style="border-top:1px dashed #e2e8f0;margin-top:8px;padding-top:8px;">
+                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                                <span>📐 المساحة: <strong id="totalArea">0.00</strong> م²</span>
+                                <span>💰 تكلفة المساحة: <strong id="totalAreaCost">0.00</strong> دينار</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-top:4px;">
+                                <span>📏 المحيط: <strong id="totalPerimeter">0.00</strong> م</span>
+                                <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost">0.00</strong> دينار</span>
+                            </div>
+                            <div style="border-top:2px solid #3b82f6;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;font-weight:bold;">
+                                <span>🏗️ المجموع الكلي: <strong id="grandTotal" style="color:#065f46;">0.00</strong> دينار</span>
+                            </div>
+                            <div style="margin-top:4px;font-weight:bold;">
+                                <span>💵 إجمالي المدفوعات: <span id="totalPayments">0.00</span> دينار</span>
+                                <span style="margin-right:12px;">📋 الباقي: <span id="remainingAmount" style="color:#065f46;">0.00</span> دينار</span>
+                            </div>
+                        </div>
                     </div>
                     <button id="addRoomBtn" class="btn-primary" style="width:100%;margin-bottom:8px;">➕ إضافة غرفة</button>
                     <table class="rooms-table">
                         <thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></tr></thead>
                         <tbody id="roomsTableBody"></tbody>
                     </table>
-                    <div id="roomsSummary" style="background:#f1f5f9;padding:10px;border-radius:12px;margin-top:10px;font-size:0.65rem;">
-                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
-                            <span>📐 مجموع المساحة: <strong id="totalArea">0.00</strong> م²</span>
-                            <span>💰 تكلفة المساحة: <strong id="totalAreaCost">0.00</strong> دينار</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-top:4px;">
-                            <span>📏 مجموع المحيط: <strong id="totalPerimeter">0.00</strong> م</span>
-                            <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost">0.00</strong> دينار</span>
-                        </div>
-                        <div style="border-top:2px solid #3b82f6;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;">
-                            <span>🏗️ المجموع الكلي: <strong id="grandTotal" style="color:#065f46;font-size:0.8rem;">0.00</strong> دينار</span>
-                        </div>
-                    </div>
                     <div style="display:flex;gap:8px;margin-top:12px;">
                         <button id="saveProjectBtn" class="btn-secondary">💾 حفظ</button>
                         <button id="deleteProjectBtn" class="btn-danger">🗑️ حذف المشروع</button>
@@ -1134,7 +1136,7 @@ function renderRoomsTable(proj) {
 
 function attachRoomEvents(proj) {
     document.querySelectorAll('.room-length,.room-width,.room-mode').forEach(el=>{
-        el.onchange=()=>{syncRoomsFromDOM(proj); updateProjectTotal(proj); debouncedSave();};
+        el.oninput=()=>{syncRoomsFromDOM(proj); updateProjectTotal(proj); debouncedSave();};
     });
     document.querySelectorAll('.delete-room-btn').forEach(btn=>{
         btn.onclick=()=>{proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); debouncedSave();};
@@ -1790,11 +1792,11 @@ document.addEventListener("DOMContentLoaded",()=>{
     document.getElementById("deleteProjectBtn")?.addEventListener("click",window.deleteProject);
     document.getElementById("addPaymentBtn")?.addEventListener("click",window.addPayment);
     document.getElementById("searchInput")?.addEventListener("input",()=>renderWorkersTable());
-    document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{
+    document.getElementById("globalPricePerMeter")?.addEventListener("input",()=>{
         if(currentProjectId) {
             const cust=userData.customers.find(c=>c.id===currentCustomerId);
             const proj=cust?.projects.find(p=>p.id===currentProjectId);
-            if(proj) updateProjectTotal(proj);
+            if(proj) { updateProjectTotal(proj); debouncedSave(); }
         }
     });
 });
