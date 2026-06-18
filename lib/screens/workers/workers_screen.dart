@@ -265,7 +265,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                       ]),
                     )
                   : Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -274,20 +274,20 @@ class _WorkersScreenState extends State<WorkersScreen> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: DataTable(
-                          headingRowHeight: 32,
-                          dataRowMinHeight: 38,
-                          dataRowMaxHeight: 44,
-                          columnSpacing: 2,
-                          horizontalMargin: 4,
+                          headingRowHeight: 30,
+                          dataRowMinHeight: 36,
+                          dataRowMaxHeight: 40,
+                          columnSpacing: 0,
+                          horizontalMargin: 2,
                           headingRowColor: WidgetStateProperty.all(const Color(0xFF1E293B)),
                           columns: [
                             const DataColumn(label: Text('#', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
-                            const DataColumn(label: Text('الاسم', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
+                            DataColumn(label: Text('الاسم', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)), numeric: false),
                             ...List.generate(7, (i) => DataColumn(
-                              label: Text(_dayShort[i], style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)),
+                              label: Text(_dayShort[i], style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white)),
                             )),
-                            const DataColumn(label: Text('الإجمالي', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
-                            const DataColumn(label: Text('', style: TextStyle(fontSize: 9))),
+                            const DataColumn(label: Text('الإجمالي', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white))),
+                            const DataColumn(label: Text('', style: TextStyle(fontSize: 8))),
                           ],
                           rows: List.generate(filtered.length, (i) {
                             final w = filtered[i];
@@ -303,12 +303,12 @@ class _WorkersScreenState extends State<WorkersScreen> {
                                     ),
                                   )),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFEFF6FF),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
-                                    child: Text(w.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 9, color: Color(0xFF3B82F6))),
+                                    child: Text(w.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 8, color: Color(0xFF3B82F6))),
                                   ),
                                 ),
                               ),
@@ -318,24 +318,24 @@ class _WorkersScreenState extends State<WorkersScreen> {
                                   GestureDetector(
                                     onTap: () => _toggleDay(w, dates[j]),
                                     child: Container(
-                                      width: 20, height: 20,
+                                      width: 18, height: 18,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: day.present ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
                                       ),
-                                      child: day.present ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                                      child: day.present ? const Icon(Icons.check, size: 10, color: Colors.white) : null,
                                     ),
                                   ),
                                 );
                               }),
                               DataCell(
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: w.weeklyTotal >= 0 ? const Color(0xFFD1FAE5) : const Color(0xFFFEE2E2),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: Text('${w.weeklyTotal.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9, color: w.weeklyTotal >= 0 ? const Color(0xFF065F46) : const Color(0xFF991B1B))),
+                                  child: Text('${w.weeklyTotal.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 8, color: w.weeklyTotal >= 0 ? const Color(0xFF065F46) : const Color(0xFF991B1B))),
                                 ),
                               ),
                               DataCell(
@@ -351,12 +351,12 @@ class _WorkersScreenState extends State<WorkersScreen> {
                                     ));
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFEF4444),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
-                                    child: const Text('حذف', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold)),
+                                    child: const Text('حذف', style: TextStyle(fontSize: 7, color: Colors.white, fontWeight: FontWeight.bold)),
                                   ),
                                 ),
                               ),
