@@ -4,44 +4,277 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>نظام إدارة المشاريع</title>
-    <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#1e293b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="مدير المشاريع">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <script defer src="js/firebase.js"></script>
-    <script defer src="js/auth.js"></script>
-    <script defer src="js/ui.js"></script>
-    <script defer src="js/app.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui,'Segoe UI','Cairo','Tahoma',sans-serif; }
+        body { background:#eef2f5; padding:8px; min-height:100vh; }
+        .app-container { max-width:800px; margin:0 auto; }
+
+        /* Header */
+        .main-header { background:#1e293b; color:white; padding:8px 12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px; position:sticky; top:0; z-index:100; }
+        .main-header h1 { font-size:0.8rem; }
+        .header-buttons { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+        .calc-btn-header { background:#f59e0b; border:none; padding:4px 10px; border-radius:30px; color:white; font-size:0.7rem; cursor:pointer; font-weight:bold; }
+        .user-info { font-size:0.6rem; background:#334155; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+        .logout-btn { background:#ef4444; border:none; padding:4px 10px; border-radius:30px; color:white; font-size:0.6rem; cursor:pointer; }
+
+        /* Tabs */
+        .tabs { display:flex; gap:4px; margin-bottom:12px; background:#f1f5f9; padding:6px; border-radius:40px; position:sticky; top:60px; z-index:99; overflow-x:auto; }
+        .tab-btn { flex:1; min-width:60px; padding:8px 4px; background:transparent; border:none; border-radius:30px; cursor:pointer; font-weight:bold; font-size:0.7rem; transition:all 0.2s; white-space:nowrap; }
+        .tab-btn.active { background:#3b82f6; color:white; }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+
+        /* Buttons */
+        .btn-primary { background:#10b981; border:none; padding:6px 14px; border-radius:30px; color:white; font-weight:bold; cursor:pointer; font-size:0.7rem; }
+        .btn-secondary { background:#3b82f6; border:none; padding:5px 12px; border-radius:30px; color:white; font-size:0.7rem; cursor:pointer; }
+        .btn-outline { background:white; border:1px solid #cbd5e1; padding:4px 10px; border-radius:30px; cursor:pointer; font-size:0.65rem; }
+        .btn-danger { background:#ef4444; border:none; padding:4px 10px; border-radius:30px; color:white; font-size:0.65rem; cursor:pointer; }
+        .btn-warning { background:#f59e0b; border:none; padding:4px 10px; border-radius:30px; color:white; font-size:0.65rem; cursor:pointer; }
+        .btn-info { background:#8b5cf6; border:none; padding:4px 10px; border-radius:30px; color:white; font-size:0.65rem; cursor:pointer; }
+
+        /* Week Nav */
+        .week-navigation { background:white; border-radius:16px; padding:8px 12px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+        .week-nav-buttons { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .week-nav-btn { background:linear-gradient(135deg,#667eea,#764ba2); border:none; padding:5px 10px; border-radius:25px; color:white; font-size:0.65rem; cursor:pointer; }
+        .current-week-btn { background:linear-gradient(135deg,#10b981,#059669); }
+        .week-display { font-size:0.65rem; font-weight:bold; color:#1e293b; background:#f1f5f9; padding:5px 10px; border-radius:25px; text-align:center; }
+        .week-date-range { font-size:0.6rem; color:#64748b; text-align:center; margin-top:2px; }
+
+        /* Workers Stats */
+        .workers-stats { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+        .stat-card { flex:1; background:white; padding:5px 6px; border-radius:14px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+        .stat-card .icon { font-size:0.9rem; }
+        .stat-card .label { font-size:0.5rem; color:#64748b; }
+        .stat-card .value { font-size:0.8rem; font-weight:bold; color:#1e293b; }
+
+        /* Toolbar */
+        .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; flex-wrap:wrap; }
+        .search-box { flex:2; }
+        .search-box input { width:100%; padding:5px 8px; border:1px solid #ddd; border-radius:25px; font-size:0.65rem; }
+        .btn-group { display:flex; gap:6px; flex-wrap:wrap; }
+
+        /* Workers Table */
+        .workers-table-wrapper { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); overflow:hidden; }
+        .workers-table { border-collapse:collapse; font-size:0.6rem; width:100%; }
+        .workers-table th { background:#1e293b; color:white; padding:6px 1px; font-size:0.5rem; font-weight:bold; text-align:center; white-space:nowrap; }
+        .workers-table td { padding:5px 1px; text-align:center; border-bottom:1px solid #e2e8f0; font-size:0.5rem; }
+        .workers-table th:nth-child(1), .workers-table td:nth-child(1) { width:22px; }
+        .workers-table th:nth-child(2), .workers-table td:nth-child(2) { text-align:right; white-space:nowrap; }
+        .attendance-check { width:20px; height:20px; cursor:pointer; accent-color:#10b981; }
+        .total-cell { background:#d1fae5; font-weight:bold; color:#065f46; font-size:0.5rem; padding:4px 2px; border-radius:8px; white-space:nowrap; }
+        .total-cell.negative { background:#fee2e2; color:#991b1b; }
+        .delete-btn { background:#ef4444; color:white; border:none; padding:4px 6px; border-radius:16px; cursor:pointer; font-size:0.5rem; font-weight:bold; }
+        .worker-name-clickable { cursor:pointer; color:#3b82f6; font-weight:bold; background:#eff6ff; padding:4px 6px; border-radius:12px; display:inline-block; font-size:0.5rem; }
+
+        /* Customers/Projects */
+        .customers-grid, .projects-grid { display:flex; flex-direction:column; gap:8px; }
+        .customer-folder, .project-card { background:white; border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:10px; cursor:pointer; border-right:3px solid #3b82f6; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+        .customer-folder { justify-content:space-between; }
+        .customer-info { flex:1; display:flex; justify-content:space-between; align-items:center; }
+        .customer-actions { display:flex; gap:8px; align-items:center; }
+        .customer-whatsapp-btn { background:#25D366; border:none; border-radius:50%; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; color:white; font-size:0.9rem; text-decoration:none; }
+        .edit-phone-btn { background:#64748b; border:none; border-radius:50%; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; color:white; font-size:0.8rem; }
+        .delete-customer-btn { background:#ef4444; border:none; border-radius:50%; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; color:white; font-size:0.8rem; }
+        .folder-icon { font-size:1.6rem; }
+        .customer-name { font-size:0.85rem; font-weight:bold; }
+        .customer-stats { font-size:0.6rem; color:#475569; }
+        .project-name { font-size:0.85rem; font-weight:bold; }
+        .project-total { font-size:0.6rem; color:#475569; }
+        .breadcrumb { background:#f8fafc; padding:6px 10px; border-radius:30px; margin-bottom:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:0.7rem; }
+        .project-detail-card { background:white; border-radius:16px; padding:12px; }
+        .price-per-meter-box { background:#dbeafe; padding:6px 10px; border-radius:30px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+        .price-per-meter-box input { width:80px; padding:4px; border-radius:30px; border:1px solid #94a3b8; text-align:center; }
+        .payments-section { background:#fef3c7; padding:10px; border-radius:14px; margin:12px 0; }
+        .rooms-table { width:100%; border-collapse:collapse; font-size:0.65rem; }
+        .rooms-table th, .rooms-table td { border:1px solid #e2e8f0; padding:6px 4px; text-align:center; }
+        .rooms-table input { width:70px; padding:4px; border-radius:6px; border:1px solid #cbd5e1; text-align:center; }
+
+        /* ========== المحاسبة ========== */
+        .accounting-summary { background:linear-gradient(135deg,#1e293b,#0f172a); color:white; padding:10px 12px; border-radius:20px; margin-bottom:16px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:10px; }
+        .summary-item { text-align:center; flex:1; min-width:90px; }
+        .summary-item .label { font-size:0.6rem; opacity:0.8; }
+        .summary-item .value { font-size:1rem; font-weight:bold; }
+        .profit.positive { color:#10b981; }
+        .profit.negative { color:#f87171; }
+        .accounting-table-wrapper { background:white; border-radius:16px; overflow-x:auto; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+        .accounting-table { width:100%; border-collapse:collapse; font-size:0.7rem; }
+        .accounting-table th { background:#1e293b; color:white; padding:8px 6px; font-size:0.65rem; }
+        .accounting-table td { padding:6px 4px; text-align:center; border-bottom:1px solid #e2e8f0; }
+        .accounting-table input { width:100%; padding:5px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.65rem; text-align:center; }
+        .delete-acc-btn { background:#ef4444; color:white; border:none; padding:3px 8px; border-radius:20px; cursor:pointer; font-size:0.55rem; }
+        .filter-buttons { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+        .filter-btn { font-size:0.6rem; padding:4px 10px; border-radius:15px; border:1px solid #cbd5e1; background:white; cursor:pointer; }
+        .filter-btn.active { background:#3b82f6; color:white; border-color:#3b82f6; }
+        .row-badge { display:inline-block; padding:2px 6px; border-radius:10px; font-size:0.55rem; margin-right:4px; }
+        .badge-worker { background:#fee2e2; color:#991b1b; }
+        .badge-project { background:#d1fae5; color:#065f46; }
+        .badge-manual { background:#e0e7ff; color:#3730a3; }
+
+        /* ========== نظام الشريك ========== */
+        .partner-header-box {
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .partner-header-box h3 { font-size: 0.9rem; }
+        .partner-name-display { font-size: 0.75rem; opacity: 0.9; }
+        .partner-edit-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); padding: 5px 12px; border-radius: 20px; color: white; font-size: 0.65rem; cursor: pointer; }
+
+        /* بطاقة التسوية */
+        .settlement-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .settlement-card h3 { font-size: 0.9rem; color: #1e293b; margin-bottom: 12px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        .settlement-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; flex-wrap: wrap; gap: 6px; }
+        .settlement-row:last-child { border-bottom: none; }
+        .settlement-label { font-size: 0.7rem; color: #475569; }
+        .settlement-value { font-size: 0.8rem; font-weight: bold; }
+        .settlement-value.positive { color: #10b981; }
+        .settlement-value.negative { color: #ef4444; }
+        .settlement-final {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .settlement-final .who-pays { font-size: 0.75rem; opacity: 0.8; margin-bottom: 4px; }
+        .settlement-final .amount { font-size: 1.4rem; font-weight: bold; color: #fbbf24; }
+        .settlement-final .direction { font-size: 0.8rem; margin-top: 6px; }
+
+        /* الفلاتر والتبويبات داخل الشريك */
+        .partner-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+        .partner-tab-btn { flex: 1; padding: 7px 6px; border: 2px solid #e2e8f0; border-radius: 25px; background: white; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-align: center; }
+        .partner-tab-btn.active { background: #7c3aed; color: white; border-color: #7c3aed; }
+
+        /* Empty */
+        .empty-message { text-align:center; padding:20px; background:white; border-radius:20px; color:#64748b; font-size:0.75rem; }
+
+        /* Modals */
+        .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:2000; }
+        .calculator { background:#1e293b; border-radius:32px; padding:20px; width:90%; max-width:320px; }
+        .calculator-screen { background:#0f172a; color:white; font-size:2rem; text-align:left; padding:15px; border-radius:20px; margin-bottom:20px; font-family:monospace; min-height:70px; word-break:break-all; }
+        .calculator-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .calc-btn { background:#334155; border:none; padding:14px 0; border-radius:20px; font-size:1.2rem; font-weight:bold; color:white; cursor:pointer; }
+        .calc-btn.operator { background:#f59e0b; }
+        .calc-btn.equals { background:#10b981; }
+        .calc-btn.clear { background:#ef4444; }
+        .calc-btn.zero { grid-column:span 2; }
+
+        /* Worker Profile Modal */
+        .worker-profile-modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:3000; padding:10px; }
+        .worker-profile-content { background:white; border-radius:24px; width:100%; max-width:700px; max-height:85vh; overflow-y:auto; padding:16px; }
+        .worker-profile-header { display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:10px; margin-bottom:14px; }
+        .worker-profile-header h2 { font-size:1.1rem; color:#1e293b; }
+        .close-profile-btn { background:#ef4444; border:none; width:30px; height:30px; border-radius:50%; color:white; font-size:0.9rem; cursor:pointer; }
+        .phone-section { background:#f0fdf4; padding:12px; border-radius:16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .phone-input-group { display:flex; align-items:center; gap:8px; flex:2; }
+        .phone-input-group span { font-size:1.2rem; }
+        .phone-input-group input { flex:1; padding:8px; border:1px solid #10b981; border-radius:12px; font-size:0.8rem; direction:ltr; }
+        .whatsapp-btn { background:#25D366; display:flex; align-items:center; gap:6px; padding:8px 16px; }
+        .whatsapp-btn.disabled { opacity:0.5; pointer-events:none; }
+        .worker-stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+        .worker-stat-card { background:linear-gradient(135deg,#1e293b,#0f172a); color:white; padding:10px 6px; border-radius:14px; text-align:center; }
+        .worker-stat-card.profit { background:linear-gradient(135deg,#10b981,#059669); }
+        .worker-stat-card.loss { background:linear-gradient(135deg,#ef4444,#b91c1c); }
+        .worker-stat-card .stat-icon { font-size:1.3rem; margin-bottom:4px; }
+        .worker-stat-card .stat-value { font-size:1rem; font-weight:bold; }
+        .worker-stat-card .stat-label { font-size:0.55rem; opacity:0.8; margin-top:3px; }
+        .worker-weeks-title { font-size:0.85rem; font-weight:bold; margin:12px 0 8px; color:#1e293b; }
+        .worker-weeks-table-wrapper { overflow-x:auto; max-height:280px; overflow-y:auto; }
+        .worker-weeks-table { width:100%; border-collapse:collapse; font-size:0.6rem; }
+        .worker-weeks-table th { background:#f1f5f9; padding:6px 3px; position:sticky; top:0; }
+        .worker-weeks-table td { padding:5px 3px; text-align:center; border-bottom:1px solid #e2e8f0; }
+        .close-profile-footer { width:100%; padding:8px; margin-top:12px; background:#64748b; border:none; border-radius:30px; color:white; font-size:0.75rem; cursor:pointer; }
+
+        /* Dialog overlay */
+        .dialog-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:4000; }
+        .dialog-box { background:white; border-radius:16px; padding:20px; width:90%; max-width:340px; text-align:center; }
+        .dialog-box h3 { margin-bottom:12px; font-size:1rem; }
+        .dialog-box input { width:100%; padding:10px; border:2px solid #3b82f6; border-radius:10px; font-size:0.9rem; text-align:center; margin-bottom:8px; direction:rtl; }
+        .dialog-box input[dir="ltr"] { direction:ltr; }
+        .dialog-box .dialog-buttons { display:flex; gap:8px; margin-top:12px; }
+        .dialog-box .dialog-buttons button { flex:1; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; border:none; color:white; }
+        .btn-confirm { background:#10b981; }
+        .btn-cancel-red { background:#ef4444; }
+
+        /* Archive */
+        .archive-panel { background:white; border-radius:16px; padding:8px; margin-bottom:12px; }
+        .archive-list { max-height:120px; overflow-y:auto; }
+        .archive-item { background:#f8fafc; padding:6px 10px; margin:4px 0; border-radius:12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+
+        /* Login */
+        .login-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; z-index:1000; overflow-y:auto; padding:20px; }
+        .login-card { background:white; padding:20px; border-radius:24px; width:90%; max-width:340px; text-align:center; }
+        .login-card input { width:100%; padding:12px; margin:8px 0; border:1px solid #ccc; border-radius:12px; font-size:14px; }
+        .password-field { position:relative; width:100%; }
+        .password-field input { width:100%; padding:12px; padding-left:45px; }
+        .toggle-password { position:absolute; left:12px; top:50%; transform:translateY(-50%); cursor:pointer; background:none; border:none; font-size:1.2rem; }
+        .remember-me { display:flex; align-items:center; justify-content:flex-start; gap:8px; margin:10px 0; font-size:0.75rem; }
+        .error-msg { color:red; font-size:0.7rem; margin-top:8px; }
+        .success-msg { color:#065f46; font-size:0.7rem; margin-top:8px; }
+        .link-btn { background:none; border:none; color:#3b82f6; cursor:pointer; font-size:0.7rem; text-decoration:underline; }
+        .divider { display:flex; align-items:center; text-align:center; margin:12px 0; }
+        .divider::before,.divider::after { content:''; flex:1; border-bottom:1px solid #e2e8f0; }
+        .divider span { padding:0 10px; color:#64748b; font-size:0.7rem; }
+        .firebase-success { background:#d1fae5; border:2px solid #10b981; border-radius:12px; padding:12px; margin:10px 0; text-align:center; }
+        .verification-warning { background:#fef3c7; padding:8px; border-radius:12px; margin-bottom:10px; text-align:center; font-size:0.7rem; }
+        .resend-small-btn { background:#f59e0b; border:none; padding:4px 12px; border-radius:20px; color:white; cursor:pointer; margin-top:5px; font-size:0.65rem; }
+
+        @media (max-width:700px) {
+            .workers-table { font-size:0.48rem; }
+            .workers-table th { font-size:0.45rem; padding:5px 1px; }
+            .workers-table td { font-size:0.45rem; padding:4px 1px; }
+            .attendance-check { width:18px; height:18px; }
+            .worker-stats-grid { grid-template-columns:repeat(2,1fr); }
+            .phone-section { flex-direction:column; }
+            .phone-input-group { width:100%; }
+            .whatsapp-btn { width:100%; justify-content:center; }
+            .customer-info { flex-direction:column; align-items:flex-start; gap:5px; }
+            .customer-actions { margin-top:5px; }
+        }
+        button { transition:opacity 0.2s; cursor:pointer; }
+        button:active { opacity:0.7; }
+    </style>
 </head>
 <body>
 
-<!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner">⚠️ أنت غير متصل - البيانات قد لا تُحفظ</div>
-
-<!-- ========== LOGIN SCREEN ========== -->
+<!-- Login Screens -->
 <div id="loginScreen" class="login-overlay">
     <div class="login-card">
         <h2>📊 نظام إدارة المشاريع</h2>
-        <p style="font-size:11px;color:#666;margin-bottom:8px;">🔐 بياناتك خاصة بك - نسخ احتياطي يومي</p>
-        <div id="firebaseStatusMsg" style="font-size:0.65rem;margin-bottom:8px;color:#f59e0b;">⏳ جاري الاتصال بـ Firebase...</div>
-        
-        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
+        <p style="font-size:12px;color:#666;margin-bottom:8px;">🔐 بياناتك خاصة بك فقط</p>
+        <div class="firebase-success"><h3>✅ Firebase متصل</h3><p>البيانات محفوظة في السحابة</p></div>
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
         <div class="password-field">
-            <input type="password" id="loginPassword" placeholder="الرمز السري" autocomplete="current-password">
-            <button type="button" class="toggle-password" onclick="Auth.togglePassword('loginPassword')">👁️</button>
+            <input type="password" id="loginPassword" placeholder="الرمز السري">
+            <button type="button" class="toggle-password" onclick="window.togglePassword('loginPassword')">👁️</button>
         </div>
         <div class="remember-me"><input type="checkbox" id="rememberDevice" checked><label for="rememberDevice">تذكر هذا الجهاز</label></div>
-        <button onclick="Auth.login()" class="btn-primary" style="width:100%;margin-top:6px;">🔐 دخول</button>
-        <button onclick="Auth.showResetPassword()" class="link-btn" style="width:100%;">🔑 نسيت كلمة المرور؟</button>
+        <button onclick="window.login()" class="btn-primary" style="width:100%;margin-top:8px;">دخول</button>
+        <button onclick="window.showResetPassword()" class="link-btn" style="width:100%;">🔑 نسيت كلمة المرور؟</button>
         <div class="divider"><span>أو</span></div>
-        <button onclick="Auth.showRegister()" class="btn-outline" style="width:100%;">📝 حساب جديد</button>
-        
+        <button onclick="window.showRegister()" class="btn-outline" style="width:100%;">📝 حساب جديد</button>
         <div id="loginError" class="error-msg"></div>
         <div id="loginSuccess" class="success-msg"></div>
     </div>
@@ -50,14 +283,14 @@
 <div id="registerScreen" class="login-overlay" style="display:none;">
     <div class="login-card">
         <h2>📝 حساب جديد</h2>
-        <input type="email" id="regEmail" placeholder="البريد الإلكتروني" autocomplete="email">
-        <input type="text" id="regName" placeholder="الاسم الكامل" autocomplete="name">
+        <input type="email" id="regEmail" placeholder="البريد الإلكتروني">
+        <input type="text" id="regName" placeholder="الاسم الكامل">
         <div class="password-field">
-            <input type="password" id="regPassword" placeholder="الرمز السري (6 أحرف)" autocomplete="new-password">
-            <button type="button" class="toggle-password" onclick="Auth.togglePassword('regPassword')">👁️</button>
+            <input type="password" id="regPassword" placeholder="الرمز السري (6 أحرف)">
+            <button type="button" class="toggle-password" onclick="window.togglePassword('regPassword')">👁️</button>
         </div>
-        <button onclick="Auth.register()" class="btn-primary" style="width:100%;">تسجيل</button>
-        <button onclick="Auth.hideRegister()" class="btn-outline" style="width:100%;margin-top:6px;">🔙 رجوع</button>
+        <button onclick="window.register()" class="btn-primary" style="width:100%;">تسجيل</button>
+        <button onclick="window.hideRegister()" class="btn-outline" style="width:100%;margin-top:8px;">🔙 رجوع</button>
         <div id="regError" class="error-msg"></div>
         <div id="regSuccess" class="success-msg"></div>
     </div>
@@ -66,161 +299,110 @@
 <div id="resetPasswordScreen" class="login-overlay" style="display:none;">
     <div class="login-card">
         <h2>🔑 إعادة تعيين كلمة المرور</h2>
-        <input type="email" id="resetEmail" placeholder="البريد الإلكتروني" autocomplete="email">
-        <button onclick="Auth.sendPasswordReset()" class="btn-primary" style="width:100%;">إرسال رابط إعادة التعيين</button>
-        <button onclick="Auth.hideResetPassword()" class="btn-outline" style="width:100%;margin-top:6px;">🔙 رجوع</button>
+        <input type="email" id="resetEmail" placeholder="البريد الإلكتروني">
+        <button onclick="window.sendPasswordReset()" class="btn-primary" style="width:100%;">إرسال رابط إعادة التعيين</button>
+        <button onclick="window.hideResetPassword()" class="btn-outline" style="width:100%;margin-top:8px;">🔙 رجوع</button>
         <div id="resetError" class="error-msg"></div>
         <div id="resetSuccess" class="success-msg"></div>
     </div>
 </div>
 
-<!-- ========== MAIN APP ========== -->
+<!-- Main App -->
 <div id="mainApp" style="display:none">
-    <div class="app">
-        <header class="header">
-            <div class="logo">
-                <span>📋</span>
-                <span>مدير المشاريع</span>
-                <span class="firebase-status" id="connectionStatus">⏳</span>
+    <div class="app-container">
+        <div class="main-header">
+            <h1>📁 نظام إدارة المشاريع</h1>
+            <div class="header-buttons">
+                <button class="calc-btn-header" onclick="window.exportBackup()">💾 نسخ احتياطي</button>
+                <button class="calc-btn-header" onclick="window.importBackup()" style="background:#8b5cf6;">📥 استيراد</button>
+                <button class="calc-btn-header" onclick="window.openSettings()" style="background:#3b82f6;">⚙️</button>
+                <button class="calc-btn-header" onclick="window.openCalculator()">🧮</button>
+                <span class="user-info" id="userNameDisplay"></span>
+                <button class="logout-btn" onclick="window.logout()">🚪</button>
             </div>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle" onclick="UI.toggleTheme()" title="الوضع الليلي">🌙</button>
-                <button class="calc-btn-header" onclick="UI.openCalculator()">🧮</button>
-                <button class="user-menu-btn" id="userMenuBtn" onclick="UI.toggleUserMenu()">
-                    <span class="user-avatar" id="userAvatar">أ</span>
-                    <span id="userNameDisplay"></span>
-                    <span class="arrow-down">▼</span>
-                </button>
-                <div class="dropdown-menu" id="dropdownMenu">
-                    <div class="dropdown-header">
-                        <div class="user-name" id="dropdownUserName"></div>
-                        <div class="user-email" id="dropdownUserEmail"></div>
-                    </div>
+        </div>
+        <div id="verificationWarning" class="verification-warning" style="display:none;">
+            ⚠️ بريدك الإلكتروني غير مفعل.
+            <button onclick="window.resendVerification()" class="resend-small-btn">📧 إعادة إرسال التفعيل</button>
+        </div>
 
-                    <button class="dropdown-item" onclick="App.handleMenuAction('partner')">
-                        <span class="item-icon">🤝</span>
-                        <span>تعديل اسم الشريك</span>
-                    </button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="window.showMainTab('projects')">📂 العملاء</button>
+            <button class="tab-btn" onclick="window.showMainTab('workers')">👥 العمال</button>
+            <button class="tab-btn" onclick="window.showMainTab('accounting')">💰 محاسبة</button>
+        </div>
 
-                    <div class="dropdown-divider"></div>
-
-                    <button class="dropdown-item" onclick="App.handleMenuAction('archiveAll')">
-                        <span class="item-icon">📦</span>
-                        <span>أرشفة وتفريغ المحاسبة</span>
-                        <span style="font-size:0.55rem;color:var(--text-light);">لكلا الطرفين</span>
-                    </button>
-                    <button class="dropdown-item" onclick="App.handleMenuAction('showArchive')">
-                        <span class="item-icon">📋</span>
-                        <span>سجل الأرشفة</span>
-                    </button>
-
-                    <div class="dropdown-divider"></div>
-
-                    <button class="dropdown-item" onclick="App.handleMenuAction('backup')">
-                        <span class="item-icon">💾</span>
-                        <span>نسخ احتياطي</span>
-                        <span class="backup-badge" id="backupStatusBadge">✅</span>
-                    </button>
-                    <button class="dropdown-item" onclick="App.handleMenuAction('restore')">
-                        <span class="item-icon">📥</span>
-                        <span>استعادة</span>
-                    </button>
-
-                    <div class="dropdown-divider"></div>
-
-                    <button class="dropdown-item" onclick="App.handleMenuAction('exportPdf')">
-                        <span class="item-icon">📄</span>
-                        <span>تصدير PDF</span>
-                    </button>
-
-                    <div class="dropdown-divider"></div>
-
-                    <button class="dropdown-item danger" onclick="App.handleMenuAction('logout')">
-                        <span class="item-icon">🚪</span>
-                        <span>تسجيل الخروج</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <nav class="nav">
-            <button class="nav-item active" onclick="App.switchMainTab('customers', this)">
-                <span>👥</span><span>العملاء</span>
-                <span class="nav-count" id="customersCount">0</span>
-            </button>
-            <button class="nav-item" onclick="App.switchMainTab('workers', this)">
-                <span>👷</span><span>العمال</span>
-                <span class="nav-count" id="workersCount">0</span>
-            </button>
-            <button class="nav-item" onclick="App.switchMainTab('accounting', this)">
-                <span>💰</span><span>المحاسبة</span>
-            </button>
-        </nav>
-
-        <div class="content active" id="customers">
+        <!-- تبويب العملاء -->
+        <div id="projectsTab" class="tab-content active">
             <div id="customersScreen">
-                <div class="section-top">
-                    <h2>📂 قائمة العملاء</h2>
-                    <button class="btn btn-dark" onclick="App.addNewCustomer()">➕ عميل جديد</button>
-                </div>
-                <div class="customer-list" id="customersGrid"></div>
+                <div style="margin-bottom:10px;"><button id="addCustomerBtn" class="btn-primary" style="width:100%;">➕ عميل جديد</button></div>
+                <div id="customersGrid" class="customers-grid"></div>
             </div>
             <div id="projectsScreen" style="display:none;">
                 <div class="breadcrumb">
                     <span>📂 <span id="currentCustomerNameSpan"></span></span>
-                    <button class="btn btn-dark btn-sm" onclick="App.addProject()">➕ مشروع جديد</button>
-                    <button class="btn btn-outline btn-sm" onclick="App.showProjectScreen('customers')">🔙 رجوع</button>
+                    <button id="addProjectBtn" class="btn-secondary">➕ مشروع جديد</button>
+                    <button onclick="window.showProjectScreen('customers')" class="btn-outline">🔙 رجوع</button>
                 </div>
-                <div class="customer-list" id="projectsGrid"></div>
+                <div id="projectsGrid" class="projects-grid"></div>
             </div>
             <div id="projectDetailScreen" style="display:none;">
                 <div class="breadcrumb">
                     <span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span>
-                    <button class="btn btn-outline btn-sm" onclick="App.openCustomerProjects(App.getCurrentCustomerId())">🔙 رجوع</button>
+                    <button onclick="window.openCustomerProjects(window.currentCustomerId)" class="btn-outline">🔙 رجوع</button>
                 </div>
                 <div class="project-detail-card">
-                    <div class="price-box">
+                    <div class="price-per-meter-box">
                         <span>💰 سعر المتر:</span>
                         <input type="number" id="globalPricePerMeter" step="0.01" value="50">
                     </div>
                     <div class="payments-section">
-                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
-                            <strong>💰 الدفعات المستلمة</strong>
-                            <button class="btn btn-dark btn-sm" onclick="App.addPayment()">➕ دفعة</button>
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                            <h4>💰 الدفعات المستلمة</h4>
+                            <button id="addPaymentBtn" class="btn-secondary">➕ إضافة دفعة</button>
                         </div>
-                        <table style="width:100%;font-size:0.6rem;border-collapse:collapse;margin-top:6px;">
+                        <table style="width:100%;font-size:0.6rem;border-collapse:collapse;">
                             <thead><tr><th>التاريخ</th><th>المبلغ</th><th>ملاحظة</th><th></th></tr></thead>
                             <tbody id="paymentsBody"></tbody>
                         </table>
-                        <div style="margin-top:6px;"><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span></div>
-                        <div><strong>المتبقي:</strong> <span id="remainingAmount">0.00</span></div>
+                        <div style="border-top:1px dashed #e2e8f0;margin-top:8px;padding-top:8px;">
+                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+                                <span>📐 المساحة: <strong id="totalArea">0.00</strong> م²</span>
+                                <span>💰 تكلفة المساحة: <strong id="totalAreaCost">0.00</strong> دينار</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;margin-top:4px;">
+                                <span>📏 المحيط: <strong id="totalPerimeter">0.00</strong> م</span>
+                                <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost">0.00</strong> دينار</span>
+                            </div>
+                            <div style="border-top:2px solid #3b82f6;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;font-weight:bold;">
+                                <span>🏗️ المجموع الكلي: <strong id="grandTotal" style="color:#065f46;">0.00</strong> دينار</span>
+                            </div>
+                            <div style="margin-top:4px;font-weight:bold;">
+                                <span>💵 إجمالي المدفوعات: <span id="totalPayments">0.00</span> دينار</span>
+                                <span style="margin-right:12px;">📋 الباقي: <span id="remainingAmount" style="color:#065f46;">0.00</span> دينار</span>
+                            </div>
+                        </div>
                     </div>
-                    <button class="btn btn-dark" style="width:100%;margin-bottom:6px;" onclick="App.addRoom()">➕ غرفة</button>
-                    <div class="rooms-summary" id="roomsSummary">
-                        <span>📐 مجموع امتار المساحة: <strong id="totalArea">0</strong></span>
-                        <span>📏 مجموع امتار المحيط: <strong id="totalPerimeter">0</strong></span>
-                        <span>💰 تكلفة المساحة: <strong id="totalAreaCost">0.00</strong></span>
-                        <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost">0.00</strong></span>
-                        <span>💰 المجموع الكلي: <strong id="totalRoomsCost">0.00</strong></span>
-                    </div>
+                    <button id="addRoomBtn" class="btn-primary" style="width:100%;margin-bottom:8px;">➕ إضافة غرفة</button>
                     <table class="rooms-table">
                         <thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></tr></thead>
                         <tbody id="roomsTableBody"></tbody>
                     </table>
-                    <div style="display:flex;gap:6px;margin-top:10px;">
-                        <button class="btn btn-dark btn-sm" onclick="App.saveProject()">💾 حفظ</button>
-                        <button class="btn btn-danger btn-sm" onclick="App.deleteProject()">🗑️ حذف</button>
+                    <div style="display:flex;gap:8px;margin-top:12px;">
+                        <button id="saveProjectBtn" class="btn-secondary">💾 حفظ</button>
+                        <button id="deleteProjectBtn" class="btn-danger">🗑️ حذف المشروع</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="content" id="workers">
+        <!-- تبويب العمال -->
+        <div id="workersTab" class="tab-content">
             <div class="week-navigation">
-                <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                    <button class="week-nav-btn" onclick="App.changeWeek(-1)">◀</button>
-                    <button class="week-nav-btn current" onclick="App.goToCurrentWeek()">📍 الحالي</button>
-                    <button class="week-nav-btn" onclick="App.changeWeek(1)">▶</button>
+                <div class="week-nav-buttons">
+                    <button class="week-nav-btn" onclick="window.changeWeek(-1)">◀ السابق</button>
+                    <button class="week-nav-btn current-week-btn" onclick="window.goToCurrentWeek()">📍 الحالي</button>
+                    <button class="week-nav-btn" onclick="window.changeWeek(1)">التالي ▶</button>
                 </div>
                 <div>
                     <div class="week-display" id="weekDisplay"></div>
@@ -233,113 +415,1398 @@
                 <div class="stat-card"><div class="icon">💰</div><div class="value" id="totalWagesCount">0</div><div class="label">المستحقات</div></div>
             </div>
             <div class="toolbar">
-                <div class="search-box" style="flex:2;"><input type="text" id="searchInput" placeholder="🔍 بحث..." oninput="App.renderWorkersTable()"></div>
+                <div class="search-box"><input type="text" id="searchInput" placeholder="🔍 بحث"></div>
                 <div class="btn-group">
-                    <button class="btn btn-dark btn-sm" onclick="App.addNewWorker()">➕ عامل</button>
-                    <button class="btn btn-info btn-sm" onclick="App.copyWorkersToNextWeek()">📋 نسخ للأسبوع القادم</button>
+                    <button class="btn-primary" onclick="window.addNewWorker()">➕ إضافة عامل</button>
+                    <button class="btn-info" onclick="window.copyWorkersToNextWeek()">📋 نسخ للأسبوع القادم</button>
+                    <button class="btn-warning" onclick="window.toggleArchivePanel()">📂 الأسبوع</button>
                 </div>
             </div>
-            <div class="table-wrap">
+            <div id="archivePanel" class="archive-panel" style="display:none;"><div id="archiveList" class="archive-list"></div></div>
+            <div class="workers-table-wrapper">
                 <table class="workers-table">
-                    <thead><tr><th>#</th><th>الاسم</th><th>س</th><th>ح</th><th>ن</th><th>ث</th><th>ر</th><th>خ</th><th>ج</th><th>مصروفات</th><th>السعر</th><th>المجموع</th><th></th></tr></thead>
+                    <thead><tr><th>#</th><th>الاسم</th><th>س</th><th>ح</th><th>ن</th><th>ث</th><th>ر</th><th>خ</th><th>ج</th><th>المجموع</th><th></th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
-                <div class="table-note">📝 أكتب أرقاماً مفصولة بمسافات (مثال: 40 30) تُضاف تلقائياً للمحاسبة</div>
             </div>
         </div>
 
-        <div class="content" id="accounting">
-            <div class="sub-tabs">
-                <button class="sub-tab active" onclick="App.switchSubTab('my-accounting', this)">
-                    <span>💰</span><span id="myAccountingTabLabel">محاسبة</span>
-                </button>
-                <button class="sub-tab" onclick="App.switchSubTab('partner-accounting', this)">
-                    <span>🤝</span><span id="partnerAccountingTabLabel">محاسبة الشريك</span>
-                </button>
-                <button class="sub-tab" onclick="App.switchSubTab('settlement', this)">
-                    <span>⚖️</span><span>التسوية النهائية</span>
-                </button>
+        <!-- تبويب محاسبة -->
+        <div id="accountingTab" class="tab-content">
+            <!-- تبويبات فرعية -->
+            <div class="partner-tabs">
+                <button class="partner-tab-btn active" onclick="window.showPartnerSubTab('myAccounting')">📊 محاسبتي</button>
+                <button class="partner-tab-btn" onclick="window.showPartnerSubTab('partnerAccounting')">🤝 محاسبة الشريك</button>
+                <button class="partner-tab-btn" onclick="window.showPartnerSubTab('partnerSettlement')">⚖️ التسوية</button>
             </div>
 
-            <div class="accounting-inner active" id="my-accounting">
-                <div class="section-top">
-                    <h2>📋 سجل <span id="myAccountingTitle">أحمد</span></h2>
-                    <button class="btn btn-dark btn-sm" onclick="App.addAccountingRow('my')">➕ معاملة</button>
+            <!-- محاسبتي -->
+            <div id="myAccounting">
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                    <button class="btn-primary" onclick="window.addAccountingRow('my')">➕ إضافة صف</button>
+                    <button class="btn-danger" onclick="window.archiveAndClearAccounting('my')">📦 حذف وحفظ</button>
+                    <button class="btn-info" onclick="window.showAccountingHistory('my')">📋 السجل</button>
                 </div>
                 <div class="filter-buttons">
-                    <button class="filter-btn active-filter" onclick="App.filterAccounting('my','all',this)">📊 الكل</button>
-                    <button class="filter-btn" onclick="App.filterAccounting('my','workers',this)">👷 العمال</button>
-                    <button class="filter-btn" onclick="App.filterAccounting('my','projects',this)">🏢 المشاريع</button>
-                    <button class="filter-btn" onclick="App.filterAccounting('my','manual',this)">✍️ يدوي</button>
+                    <button class="filter-btn active" data-tab="my" data-filter="all" onclick="window.filterAccounting('my','all',this)">📊 الكل</button>
+                    <button class="filter-btn" data-tab="my" data-filter="workers" onclick="window.filterAccounting('my','workers',this)">👷 العمال</button>
+                    <button class="filter-btn" data-tab="my" data-filter="projects" onclick="window.filterAccounting('my','projects',this)">🏢 المشاريع</button>
+                    <button class="filter-btn" data-tab="my" data-filter="manual" onclick="window.filterAccounting('my','manual',this)">✍️ يدوي</button>
                 </div>
                 <div class="accounting-summary">
-                    <div class="summary-item"><div class="label">📈 إيرادات</div><div class="value" id="myTotalRevenue">0</div></div>
-                    <div class="summary-item"><div class="label">📉 مصاريف</div><div class="value" id="myTotalExpense">0</div></div>
-                    <div class="summary-item"><div class="label">💰 الصافي</div><div class="value profit" id="myNetProfit">0</div></div>
+                    <div class="summary-item"><div class="label">📈 الإيرادات</div><div class="value" id="myTotalRevenue">0.00</div></div>
+                    <div class="summary-item"><div class="label">📉 المصاريف</div><div class="value" id="myTotalExpense">0.00</div></div>
+                    <div class="summary-item"><div class="label">💰 صافي الربح</div><div class="value profit" id="myNetProfit">0.00</div></div>
                 </div>
-                <div class="accounting-table-wrap">
+                <div class="accounting-table-wrapper">
                     <table class="accounting-table">
-                        <thead><tr><th>مصروف</th><th>إيراد</th><th>ملاحظة</th><th></th></tr></thead>
+                        <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr></thead>
                         <tbody id="myAccountingBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="accounting-inner" id="partner-accounting">
-                <div class="section-top">
-                    <h2>📋 سجل <span id="partnerAccountingTitle">الشريك</span></h2>
-                    <button class="btn btn-dark btn-sm" onclick="App.addAccountingRow('partner')">➕ معاملة</button>
+            <!-- محاسبة الشريك -->
+            <div id="partnerAccounting" style="display:none;">
+                <div class="partner-header-box">
+                    <div>
+                        <h3>🤝 محاسبة الشريك</h3>
+                        <div class="partner-name-display" id="partnerNameDisplay">لم يتم تعيين اسم الشريك</div>
+                    </div>
+                    <button class="partner-edit-btn" onclick="window.editPartnerName()">✏️ تعديل الاسم</button>
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+                    <button class="btn-primary" onclick="window.addAccountingRow('partner')">➕ إضافة صف</button>
+                    <button class="btn-danger" onclick="window.archiveAndClearAccounting('partner')">📦 حذف وحفظ</button>
+                    <button class="btn-info" onclick="window.showAccountingHistory('partner')">📋 السجل</button>
                 </div>
                 <div class="filter-buttons">
-                    <button class="filter-btn active-filter" onclick="App.filterAccounting('partner','all',this)">📊 الكل</button>
-                    <button class="filter-btn" onclick="App.filterAccounting('partner','manual',this)">✍️ يدوي</button>
+                    <button class="filter-btn active" data-tab="partner" data-filter="all" onclick="window.filterAccounting('partner','all',this)">📊 الكل</button>
+                    <button class="filter-btn" data-tab="partner" data-filter="manual" onclick="window.filterAccounting('partner','manual',this)">✍️ يدوي</button>
                 </div>
                 <div class="accounting-summary" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
-                    <div class="summary-item"><div class="label">📈 إيرادات</div><div class="value" id="partnerTotalRevenue">0</div></div>
-                    <div class="summary-item"><div class="label">📉 مصاريف</div><div class="value" id="partnerTotalExpense">0</div></div>
-                    <div class="summary-item"><div class="label">💰 الصافي</div><div class="value profit" id="partnerNetProfit">0</div></div>
+                    <div class="summary-item"><div class="label">📈 إيرادات الشريك</div><div class="value" id="partnerTotalRevenue">0.00</div></div>
+                    <div class="summary-item"><div class="label">📉 مصاريف الشريك</div><div class="value" id="partnerTotalExpense">0.00</div></div>
+                    <div class="summary-item"><div class="label">💰 صافي الشريك</div><div class="value profit" id="partnerNetProfit">0.00</div></div>
                 </div>
-                <div class="accounting-table-wrap">
+                <div class="accounting-table-wrapper">
                     <table class="accounting-table">
-                        <thead><tr><th>مصروف</th><th>إيراد</th><th>ملاحظة</th><th></th></tr></thead>
+                        <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th></th></tr></thead>
                         <tbody id="partnerAccountingBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="accounting-inner" id="settlement">
-                <h3 style="margin-bottom:16px;">⚖️ التسوية النهائية</h3>
-                <div class="settlement-grid">
-                    <div class="settlement-card">
-                        <h4>👤 <span id="settleMyName">أحمد</span></h4>
-                        <div class="settlement-row"><span>الإيرادات</span><span class="settlement-value positive" id="settleMy_revenue">0</span></div>
-                        <div class="settlement-row"><span>المصاريف</span><span class="settlement-value negative" id="settleMy_expense">0</span></div>
-                        <div class="settlement-row"><span>الصافي</span><span id="settleMy_net">0</span></div>
+            <!-- التسوية النهائية -->
+            <div id="partnerSettlement" style="display:none;">
+                <div class="settlement-card">
+                    <h3>📊 ملخص مالي مقارن</h3>
+                    <div class="settlement-row">
+                        <span class="settlement-label">👤 إيراداتي</span>
+                        <span class="settlement-value positive" id="settleMy_revenue">0.00</span>
                     </div>
-                    <div class="settlement-card">
-                        <h4>🤝 <span id="settlePartnerName">الشريك</span></h4>
-                        <div class="settlement-row"><span>الإيرادات</span><span class="settlement-value positive" id="settlePartner_revenue">0</span></div>
-                        <div class="settlement-row"><span>المصاريف</span><span class="settlement-value negative" id="settlePartner_expense">0</span></div>
-                        <div class="settlement-row"><span>الصافي</span><span id="settlePartner_net">0</span></div>
+                    <div class="settlement-row">
+                        <span class="settlement-label">👤 مصاريفي</span>
+                        <span class="settlement-value negative" id="settleMy_expense">0.00</span>
+                    </div>
+                    <div class="settlement-row">
+                        <span class="settlement-label">👤 صافي ربحي</span>
+                        <span class="settlement-value" id="settleMy_net">0.00</span>
+                    </div>
+                    <hr style="margin:10px 0; border-color:#e2e8f0;">
+                    <div class="settlement-row">
+                        <span class="settlement-label" id="settlePartner_label_rev">🤝 إيرادات الشريك</span>
+                        <span class="settlement-value positive" id="settlePartner_revenue">0.00</span>
+                    </div>
+                    <div class="settlement-row">
+                        <span class="settlement-label" id="settlePartner_label_exp">🤝 مصاريف الشريك</span>
+                        <span class="settlement-value negative" id="settlePartner_expense">0.00</span>
+                    </div>
+                    <div class="settlement-row">
+                        <span class="settlement-label" id="settlePartner_label_net">🤝 صافي ربح الشريك</span>
+                        <span class="settlement-value" id="settlePartner_net">0.00</span>
+                    </div>
+                    <hr style="margin:10px 0; border-color:#e2e8f0;">
+                    <div class="settlement-row">
+                        <span class="settlement-label">🔢 إجمالي الأرباح المشتركة</span>
+                        <span class="settlement-value positive" id="settleTotalProfit">0.00</span>
+                    </div>
+                    <div class="settlement-row">
+                        <span class="settlement-label">➗ نصيب كل شريك (50%)</span>
+                        <span class="settlement-value" id="settleEachShare">0.00</span>
                     </div>
                 </div>
-                <div class="settlement-total">
-                    <div>💰 إجمالي الأرباح</div>
-                    <div class="big-number" id="settleTotalProfit">0.00</div>
-                    <div>➗ نصيب كل شريك = <strong id="settleEachShare">0.00</strong></div>
-                    <div class="direction" id="settlementDirection">جاري الحساب...</div>
+
+                <!-- النتيجة النهائية -->
+                <div class="settlement-final" id="settlementResult">
+                    <div class="who-pays" id="settleWhoLabel">جاري الحساب...</div>
+                    <div class="amount" id="settleAmount">0.00</div>
+                    <div class="direction" id="settleDirection"></div>
                 </div>
-                <button onclick="App.calcSettlement()" class="btn btn-dark" style="width:100%;margin-top:10px;padding:9px;">🔄 إعادة حساب</button>
+
+                <button onclick="window.calcSettlement()" class="btn-primary" style="width:100%;margin-top:10px;padding:10px;">🔄 إعادة حساب التسوية</button>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- Loading overlay -->
-<div id="loadingOverlay" class="loading-overlay" style="display:none;">
-    <div class="loading-spinner"></div>
-    <div class="loading-text" id="loadingText">جاري التحميل...</div>
-</div>
+<script>
+// ===== Firebase Config =====
+const firebaseConfig = {
+    apiKey: "AIzaSyA7hVCo7no6VlCTSDtvz0NEB1WS5bDRau0",
+    authDomain: "worksv3.firebaseapp.com",
+    projectId: "worksv3",
+    storageBucket: "worksv3.firebasestorage.app",
+    messagingSenderId: "672087668925",
+    appId: "1:672087668925:web:93f274851162c8ae15dfd4",
+    databaseURL: "https://worksv3-default-rtdb.firebaseio.com"
+};
 
+let auth = null, db = null, currentUser = null, realtimeDbRef = null;
+let currentCustomerId = null, currentProjectId = null, currentWeekOffset = 0;
+let currentMyFilter = 'all', currentPartnerFilter = 'all';
+let isInitialLoad = true;
+let saveDebounceTimer = null;
+
+const dayKeys = ['sat','sun','mon','tue','wed','thu','fri'];
+const COUNTRY_CODE = '218';
+
+let userData = {
+    customers: [],
+    workersByWeek: {},
+    accounting: { rows: [], history: [] },
+    partnerAccounting: { rows: [], history: [], partnerName: 'الشريك' }
+};
+
+function escapeHtml(s) {
+    if(!s) return '';
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ===== Debounced Save =====
+function debouncedSave() {
+    clearTimeout(saveDebounceTimer);
+    saveDebounceTimer = setTimeout(() => saveUserDataToFirebase(), 1200);
+}
+
+// ===== Firebase =====
+try {
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.database();
+} catch(e) { console.warn(e); }
+
+function getUserDataPath() {
+    return currentUser ? `users/${currentUser.uid}/data` : null;
+}
+
+async function saveUserDataToFirebase() {
+    if(!currentUser || !db) return;
+    const path = getUserDataPath();
+    if(!path) return;
+    try {
+        await db.ref(path).set({
+            customers: userData.customers || [],
+            workersByWeek: userData.workersByWeek || {},
+            accounting: userData.accounting || { rows:[], history:[] },
+            partnerAccounting: userData.partnerAccounting || { rows:[], history:[], partnerName:'الشريك' },
+            lastUpdated: Date.now()
+        });
+    } catch(e) { console.error("Save error:", e); }
+}
+
+async function loadUserDataFromFirebase() {
+    if(!currentUser || !db) return;
+    const path = getUserDataPath();
+    if(!path) return;
+    try {
+        const snap = await db.ref(path).once('value');
+        const data = snap.val();
+        if(data) {
+            userData.customers = data.customers || [];
+            userData.workersByWeek = data.workersByWeek || {};
+            userData.accounting = data.accounting || { rows:[], history:[] };
+            userData.partnerAccounting = data.partnerAccounting || { rows:[], history:[], partnerName:'الشريك' };
+        } else {
+            userData = { customers:[], workersByWeek:{}, accounting:{rows:[],history:[]}, partnerAccounting:{rows:[],history:[],partnerName:'الشريك'} };
+            await saveUserDataToFirebase();
+        }
+    } catch(e) { console.error("Load error:", e); }
+}
+
+function setupRealtimeSync() {
+    if(!currentUser || !db) return;
+    const path = getUserDataPath();
+    if(!path) return;
+    if(realtimeDbRef) realtimeDbRef.off();
+    realtimeDbRef = db.ref(path);
+    realtimeDbRef.on('value', snap => {
+        if(!isInitialLoad) {
+            const data = snap.val();
+            if(data) {
+                let changed = false;
+                ['customers','workersByWeek','accounting','partnerAccounting'].forEach(key => {
+                    if(JSON.stringify(userData[key]) !== JSON.stringify(data[key])) {
+                        userData[key] = data[key] || (key === 'customers' ? [] : key === 'workersByWeek' ? {} : { rows:[], history:[] });
+                        changed = true;
+                    }
+                });
+                if(changed) window.renderAll();
+            }
+        }
+        isInitialLoad = false;
+    });
+}
+
+// ===== Weeks =====
+function getWeekStartDate(offset=0) {
+    const today = new Date();
+    const dow = today.getDay();
+    const start = new Date(today);
+    start.setDate(today.getDate() - ((dow+1)%7) + (offset*7));
+    start.setHours(0,0,0,0);
+    return start;
+}
+
+function getWeekEndDate(start) {
+    const end = new Date(start);
+    end.setDate(start.getDate()+6);
+    end.setHours(23,59,59,999);
+    return end;
+}
+
+function getWeekKeyFromOffset(offset) {
+    const d = getWeekStartDate(offset);
+    const startOfYear = new Date(d.getFullYear(),0,1);
+    const dayOfYear = Math.floor((d-startOfYear)/(864e5));
+    const dow = d.getDay();
+    const offsetDays = (6-dow+7)%7;
+    const weekNum = Math.ceil((dayOfYear+offsetDays+1)/7);
+    return `${d.getFullYear()}-W${weekNum.toString().padStart(2,'0')}`;
+}
+
+function formatDate(date) {
+    return date.toLocaleDateString('ar-EG',{day:'numeric',month:'numeric',year:'numeric'});
+}
+
+function updateWeekDisplay() {
+    const start = getWeekStartDate(currentWeekOffset);
+    const end = getWeekEndDate(start);
+    const labels = { 0:'📍 الأسبوع الحالي', '-1':'◀ الأسبوع الماضي', '1':'الأسبوع القادم ▶' };
+    const label = labels[currentWeekOffset] || (currentWeekOffset > 1 ? `بعد ${currentWeekOffset} أسابيع ▶` : `◀ قبل ${Math.abs(currentWeekOffset)} أسابيع`);
+    document.getElementById('weekDisplay').innerText = label;
+    document.getElementById('weekDateRange').innerText = `📅 ${formatDate(start)} - ${formatDate(end)}`;
+}
+
+window.changeWeek = o => { currentWeekOffset += o; updateWeekDisplay(); renderWorkersTable(); };
+window.goToCurrentWeek = () => { currentWeekOffset = 0; updateWeekDisplay(); renderWorkersTable(); };
+
+// ===== Workers =====
+function getCurrentWorkers() {
+    const wk = getWeekKeyFromOffset(currentWeekOffset);
+    if(!userData.workersByWeek[wk]) {
+        const prevWk = getWeekKeyFromOffset(currentWeekOffset-1);
+        if(userData.workersByWeek[prevWk]?.length) {
+            userData.workersByWeek[wk] = userData.workersByWeek[prevWk].map(w => ({
+                id:w.id, name:w.name, phone:w.phone||'', price:w.price||0, expenseText:'',
+                days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}
+            }));
+        } else userData.workersByWeek[wk] = [];
+        debouncedSave();
+    }
+    return userData.workersByWeek[wk];
+}
+
+function parseExpensesText(text) {
+    if(!text?.trim()) return { numbers:[], total:0, text:'' };
+    const parts = text.trim().split(/\s+/);
+    const numbers = parts.map(p=>parseFloat(p)).filter(n=>!isNaN(n));
+    return { numbers, total:numbers.reduce((a,b)=>a+b,0), text:text.trim() };
+}
+
+function calculateWorkerTotal(worker) {
+    const days = dayKeys.reduce((s,k)=>s+(worker.days[k]||0),0);
+    const expTotal = parseExpensesText(worker.expenseText||'').total;
+    return (days*(worker.price||0)) - expTotal;
+}
+
+function addWorkerExpenseToAccounting(workerName, amount, weekKey) {
+    if(!userData.accounting.rows) userData.accounting.rows=[];
+    userData.accounting.rows.unshift({
+        expense:amount, revenue:null,
+        note:`مصروف ${workerName} - الأسبوع ${weekKey}`,
+        timestamp:Date.now(), autoGenerated:true, source:'worker_expense', workerName, weekKey
+    });
+    debouncedSave();
+    if(document.getElementById('accountingTab').classList.contains('active')) renderAccountingTable('my');
+}
+
+function addProjectPaymentToAccounting(customerName, projectName, amount, note) {
+    if(!userData.accounting.rows) userData.accounting.rows=[];
+    let fullNote = `دفعة من ${customerName} - مشروع ${projectName}`;
+    if(note?.trim()) fullNote += ` | ${note}`;
+    userData.accounting.rows.unshift({
+        expense:null, revenue:amount, note:fullNote,
+        timestamp:Date.now(), autoGenerated:true, source:'project_payment', customerName, projectName
+    });
+    debouncedSave();
+    if(document.getElementById('accountingTab').classList.contains('active')) renderAccountingTable('my');
+    showToast(`✅ دفعة "${customerName}" (${amount.toFixed(2)}) أضيفت للإيرادات`);
+}
+
+function renderWorkersTable() {
+    const tbody = document.getElementById("workersTableBody");
+    if(!tbody) return;
+    const workers = getCurrentWorkers();
+    const search = document.getElementById("searchInput")?.value.toLowerCase()||'';
+    const filtered = workers.filter(w=>w.name.toLowerCase().includes(search));
+    if(!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;">📭 لا يوجد عمال<br>اضغط ➕ للإضافة</td></tr>';
+        updateWorkersStats(); return;
+    }
+    tbody.innerHTML = filtered.map((w,idx) => {
+        const total = calculateWorkerTotal(w);
+        return `<tr data-worker-id="${w.id}">
+            <td style="font-size:0.5rem;">${idx+1}</td>
+            <td><span class="worker-name-clickable" data-id="${w.id}" data-name="${escapeHtml(w.name)}">${escapeHtml(w.name)}</span></td>
+            ${dayKeys.map(d=>`<td><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days[d]?'checked':''}></td>`).join('')}
+            <td class="total-cell ${total<0?'negative':''}">${total.toFixed(2)}</td>
+            <td><button class="delete-btn" data-id="${w.id}">✖</button></td>
+        </tr>`;
+    }).join('');
+    attachWorkerEvents();
+    updateWorkersStats();
+}
+
+function attachWorkerEvents() {
+    const workers = getCurrentWorkers();
+    document.querySelectorAll('.attendance-check').forEach(cb => {
+        cb.onchange = () => {
+            const w = workers.find(w=>w.id===parseInt(cb.dataset.id));
+            if(w) { w.days[cb.dataset.day]=cb.checked?1:0; updateWorkerTotalCell(w.id); updateWorkersStats(); debouncedSave(); }
+        };
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.onclick = () => {
+            showConfirmDialog('حذف العامل من هذا الأسبوع؟', () => {
+                const wk = getWeekKeyFromOffset(currentWeekOffset);
+                userData.workersByWeek[wk] = workers.filter(w=>w.id!==parseInt(btn.dataset.id));
+                renderWorkersTable(); debouncedSave();
+            });
+        };
+    });
+    document.querySelectorAll('.worker-name-clickable').forEach(el => {
+        el.onclick = () => showWorkerProfile(parseInt(el.dataset.id), el.dataset.name);
+    });
+}
+
+function updateWorkerTotalCell(workerId) {
+    const w = getCurrentWorkers().find(w=>w.id==workerId);
+    if(!w) return;
+    const row = document.querySelector(`tr[data-worker-id="${workerId}"]`);
+    if(row) {
+        const cell = row.querySelector('.total-cell');
+        if(cell) { const t=calculateWorkerTotal(w); cell.textContent=t.toFixed(2); cell.className='total-cell'+(t<0?' negative':''); }
+    }
+}
+
+function updateWorkersStats() {
+    const workers = getCurrentWorkers();
+    document.getElementById('totalWorkersCount').innerText = workers.length;
+    const todayDow = new Date().getDay();
+    const todayKey = dayKeys[todayDow===0?6:todayDow-1];
+    document.getElementById('presentTodayCount').innerText = workers.filter(w=>w.days[todayKey]===1).length;
+    document.getElementById('totalWagesCount').innerText = workers.reduce((s,w)=>s+calculateWorkerTotal(w),0).toFixed(0);
+}
+
+// Worker Profile
+window.showWorkerProfile = function(workerId, workerName) {
+    let weeksData=[], totalDays=0, totalEarnings=0, totalExpenses=0, phone='';
+    for(let wk in userData.workersByWeek) {
+        const w = userData.workersByWeek[wk].find(w=>w.id==workerId);
+        if(w?.phone) { phone=w.phone; break; }
+    }
+    for(let wk in userData.workersByWeek) {
+        const w = userData.workersByWeek[wk].find(w=>w.id==workerId);
+        if(w) {
+            const d=dayKeys.reduce((s,k)=>s+(w.days[k]||0),0);
+            const e=d*(w.price||0), x=parseExpensesText(w.expenseText||'').total;
+            weeksData.push({wk,d,price:w.price||0,e,x,net:e-x});
+            totalDays+=d; totalEarnings+=e; totalExpenses+=x;
+        }
+    }
+    weeksData.sort((a,b)=>b.wk.localeCompare(a.wk));
+    const rem=totalEarnings-totalExpenses;
+    let wpNum=phone.replace(/[^0-9]/g,'');
+    if(wpNum.startsWith('0')) wpNum=wpNum.substring(1);
+    if(!wpNum.startsWith(COUNTRY_CODE)&&wpNum) wpNum=COUNTRY_CODE+wpNum;
+    const hasPhone=phone.trim()!=='';
+
+    const modal=document.createElement('div');
+    modal.className='worker-profile-modal';
+    modal.innerHTML=`<div class="worker-profile-content">
+        <div class="worker-profile-header">
+            <h2>👤 ${escapeHtml(workerName)}</h2>
+            <button class="close-profile-btn" onclick="this.closest('.worker-profile-modal').remove()">✖</button>
+        </div>
+        <div class="phone-section">
+            <div class="phone-input-group">
+                <span>📱</span>
+                <input type="tel" id="wpInput" value="${escapeHtml(phone)}" placeholder="912345678" dir="ltr">
+                <button id="savePhoneBtn" class="btn-secondary" style="padding:6px 12px;">💾</button>
+            </div>
+            <a id="wpLink" href="${hasPhone?`https://wa.me/${wpNum}`:'#'}" target="_blank" style="text-decoration:none;">
+                <button class="btn-primary whatsapp-btn ${!hasPhone?'disabled':''}" ${!hasPhone?'disabled':''}>💬 واتساب</button>
+            </a>
+        </div>
+        <div class="worker-stats-grid">
+            <div class="worker-stat-card"><div class="stat-icon">📅</div><div class="stat-value">${totalDays}</div><div class="stat-label">أيام العمل</div></div>
+            <div class="worker-stat-card"><div class="stat-icon">💰</div><div class="stat-value">${totalEarnings.toFixed(2)}</div><div class="stat-label">المستحقات</div></div>
+            <div class="worker-stat-card"><div class="stat-icon">📉</div><div class="stat-value">${totalExpenses.toFixed(2)}</div><div class="stat-label">المصاريف</div></div>
+            <div class="worker-stat-card ${rem>=0?'profit':'loss'}"><div class="stat-icon">💵</div><div class="stat-value">${rem.toFixed(2)}</div><div class="stat-label">المتبقي</div></div>
+        </div>
+        <div style="background:#f8fafc;padding:12px;border-radius:14px;margin-bottom:14px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:120px;">
+                    <label style="font-size:0.65rem;color:#64748b;display:block;margin-bottom:4px;">💰 السعر اليومي</label>
+                    <input type="number" id="wpPrice" value="${weeksData[0]?.price||0}" step="0.01" min="0" style="width:100%;padding:8px;border:2px solid #3b82f6;border-radius:10px;font-size:0.8rem;text-align:center;">
+                </div>
+                <div style="flex:2;min-width:180px;">
+                    <label style="font-size:0.65rem;color:#64748b;display:block;margin-bottom:4px;">📉 المصروفات (أرقام مفصولة بمسافات)</label>
+                    <input type="text" id="wpExpenses" value="${escapeHtml(weeksData[0]?.expenseText||'')}" placeholder="40 30 10" style="width:100%;padding:8px;border:2px solid #f59e0b;border-radius:10px;font-size:0.8rem;background:#fff9c4;">
+                </div>
+            </div>
+            <button id="saveWorkerDetailsBtn" style="width:100%;margin-top:10px;padding:8px;background:#10b981;color:white;border:none;border-radius:20px;font-weight:bold;cursor:pointer;">💾 حفظ السعر والمصروفات</button>
+        </div>
+        <div class="worker-weeks-title">📋 سجل الأسابيع</div>
+        <div class="worker-weeks-table-wrapper">
+            <table class="worker-weeks-table">
+                <thead><tr><th>الأسبوع</th><th>أيام</th><th>السعر</th><th>مستحق</th><th>مصروف</th><th>صافي</th></tr></thead>
+                <tbody>${weeksData.length?weeksData.map(w=>`<tr><td>${w.wk}</td><td>${w.d}</td><td>${w.price.toFixed(2)}</td><td>${w.e.toFixed(2)}</td><td>${w.x.toFixed(2)}</td><td style="color:${w.net>=0?'#10b981':'#ef4444'}">${w.net.toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="6">لا توجد بيانات</td></tr>'}</tbody>
+            </table>
+        </div>
+        <button class="close-profile-footer" onclick="this.closest('.worker-profile-modal').remove()">🔙 إغلاق</button>
+    </div>`;
+    document.body.appendChild(modal);
+
+    document.getElementById('savePhoneBtn').onclick = () => {
+        const newPhone = document.getElementById('wpInput').value.trim();
+        let count=0;
+        for(let wk in userData.workersByWeek) {
+            const w=userData.workersByWeek[wk].find(w=>w.id==workerId);
+            if(w) { w.phone=newPhone; count++; }
+        }
+        if(count) { debouncedSave(); showToast(`✅ تم تحديث رقم "${workerName}"`); }
+        let n=newPhone.replace(/[^0-9]/g,'');
+        if(n.startsWith('0')) n=n.substring(1);
+        if(!n.startsWith(COUNTRY_CODE)&&n) n=COUNTRY_CODE+n;
+        const link=document.getElementById('wpLink'), btn=link?.querySelector('button');
+        if(link) { link.href=newPhone?`https://wa.me/${n}`:'#'; }
+            if(btn) { btn.disabled=!newPhone; btn.classList.toggle('disabled',!newPhone); }
+    };
+
+    document.getElementById('saveWorkerDetailsBtn').onclick = () => {
+        const newPrice = parseFloat(document.getElementById('wpPrice').value) || 0;
+        const newExpenseText = document.getElementById('wpExpenses').value.trim();
+        let count = 0;
+        for(let wk in userData.workersByWeek) {
+            const w = userData.workersByWeek[wk].find(w=>w.id==workerId);
+            if(w) { w.price = newPrice; w.expenseText = newExpenseText; count++; }
+        }
+        if(count) { debouncedSave(); renderWorkersTable(); showToast(`✅ تم تحديث بيانات "${workerName}"`); }
+    };
+};
+
+window.addNewWorker = function() {
+    const overlay=document.createElement('div');
+    overlay.className='dialog-overlay';
+    overlay.innerHTML=`<div class="dialog-box">
+        <h3>👷 إضافة عامل جديد</h3>
+        <input type="text" id="nwName" placeholder="اسم العامل" autofocus>
+        <input type="tel" id="nwPhone" placeholder="رقم الهاتف (اختياري)" dir="ltr">
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="cwConfirm">✅ إضافة</button>
+            <button class="btn-cancel-red" id="cwCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const nameInp=document.getElementById('nwName'); nameInp.focus();
+    const doAdd=()=>{
+        const name=nameInp.value.trim();
+        if(!name) { showToast('⚠️ الرجاء إدخال اسم'); return; }
+        const phone=document.getElementById('nwPhone').value.trim()||'';
+        const workers=getCurrentWorkers();
+        const newId=workers.length?Math.max(...workers.map(w=>w.id))+1:1;
+        const wk=getWeekKeyFromOffset(currentWeekOffset);
+        workers.unshift({id:newId,name,phone,price:0,expenseText:'',days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}});
+        userData.workersByWeek[wk]=workers;
+        renderWorkersTable(); debouncedSave();
+        showToast(`✅ تم إضافة "${name}"`);
+        overlay.remove();
+    };
+    document.getElementById('cwConfirm').onclick=doAdd;
+    document.getElementById('cwCancel').onclick=()=>overlay.remove();
+    nameInp.onkeypress=e=>{if(e.key==='Enter') doAdd();};
+    overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
+};
+
+window.copyWorkersToNextWeek = function() {
+    const curWk=getWeekKeyFromOffset(currentWeekOffset);
+    const nextWk=getWeekKeyFromOffset(currentWeekOffset+1);
+    const cw=userData.workersByWeek[curWk];
+    if(!cw?.length) { showToast('⚠️ لا يوجد عمال للنسخ'); return; }
+    showConfirmDialog(`نسخ ${cw.length} عامل للأسبوع القادم؟\n(أسماء وأسعار وهواتف فقط)`, ()=>{
+        userData.workersByWeek[nextWk]=cw.map(w=>({id:w.id,name:w.name,phone:w.phone||'',price:w.price||0,expenseText:'',days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}}));
+        debouncedSave(); showToast(`✅ تم نسخ ${cw.length} عامل`);
+        currentWeekOffset++; updateWeekDisplay(); renderWorkersTable();
+    });
+};
+
+window.toggleArchivePanel = function() {
+    const p=document.getElementById('archivePanel');
+    if(p.style.display==='none'||!p.style.display) { loadArchivesList(); p.style.display='block'; }
+    else p.style.display='none';
+};
+
+function loadArchivesList() {
+    const div=document.getElementById('archiveList');
+    const weeks=Object.keys(userData.workersByWeek).sort().reverse();
+    if(!weeks.length) { div.innerHTML='<div class="empty-message">📭 لا توجد سجلات</div>'; return; }
+    div.innerHTML=weeks.map(wk=>`<div class="archive-item" data-week="${wk}"><div>📅 ${wk} (${userData.workersByWeek[wk].length} عامل)</div><button class="delete-archive-btn btn-danger" data-week="${wk}" style="font-size:0.55rem;">🗑</button></div>`).join('');
+    document.querySelectorAll('.archive-item').forEach(item=>{
+        item.onclick=e=>{
+            if(e.target.classList.contains('delete-archive-btn')) return;
+            const tw=item.dataset.week;
+            const [yr,wn]=tw.split('-W');
+            const [cyr,cwn]=getWeekKeyFromOffset(0).split('-W');
+            currentWeekOffset=parseInt(wn)-parseInt(cwn)+(parseInt(yr)-parseInt(cyr))*52;
+            updateWeekDisplay(); renderWorkersTable();
+        };
+    });
+    document.querySelectorAll('.delete-archive-btn').forEach(btn=>{
+        btn.onclick=e=>{e.stopPropagation(); delete userData.workersByWeek[btn.dataset.week]; loadArchivesList(); debouncedSave();};
+    });
+}
+
+// ===== Customers & Projects =====
+function showCustomerPhoneModal(custId, custName, curPhone) {
+    const overlay=document.createElement('div');
+    overlay.className='dialog-overlay';
+    overlay.innerHTML=`<div class="dialog-box">
+        <h3>📱 هاتف العميل</h3>
+        <p style="font-size:0.75rem;color:#666;margin-bottom:8px;">${escapeHtml(custName)}</p>
+        <input type="tel" id="cpInput" value="${escapeHtml(curPhone||'')}" placeholder="912345678" dir="ltr">
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="cpConfirm" style="background:#3b82f6;">💾 حفظ</button>
+            <button class="btn-cancel-red" id="cpCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const inp=document.getElementById('cpInput'); inp.focus();
+    const doSave=()=>{
+        const c=userData.customers.find(c=>c.id===custId);
+        if(c) { c.phone=inp.value.trim(); debouncedSave(); renderCustomersScreen(); showToast(`✅ تم تحديث هاتف "${custName}"`); }
+        overlay.remove();
+    };
+    document.getElementById('cpConfirm').onclick=doSave;
+    document.getElementById('cpCancel').onclick=()=>overlay.remove();
+    inp.onkeypress=e=>{if(e.key==='Enter') doSave();};
+    overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
+}
+window.showCustomerPhoneModal=showCustomerPhoneModal;
+
+function renderCustomersScreen() {
+    const grid=document.getElementById("customersGrid");
+    if(!userData.customers?.length) { grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء<br>اضغط "➕ عميل جديد" للإضافة</div>'; return; }
+    grid.innerHTML=userData.customers.map(c=>{
+        let wpNum=(c.phone||'').replace(/[^0-9]/g,'');
+        if(wpNum.startsWith('0')) wpNum=wpNum.substring(1);
+        if(!wpNum.startsWith(COUNTRY_CODE)&&wpNum) wpNum=COUNTRY_CODE+wpNum;
+        const hasPhone=c.phone?.trim();
+        return `<div class="customer-folder" data-id="${c.id}">
+            <div class="folder-icon">📂</div>
+            <div class="customer-info">
+                <div>
+                    <div class="customer-name">${escapeHtml(c.name)}</div>
+                    <div class="customer-stats">📁 ${c.projects?.length||0} مشروع</div>
+                </div>
+                <div class="customer-actions">
+                    <button class="edit-phone-btn" onclick="event.stopPropagation();showCustomerPhoneModal(${c.id},'${escapeHtml(c.name)}','${escapeHtml(c.phone||'')}')">📱</button>
+                    ${hasPhone?`<a href="https://wa.me/${wpNum}" target="_blank" class="customer-whatsapp-btn" onclick="event.stopPropagation()">💬</a>`:''}
+                    <button class="delete-customer-btn" onclick="event.stopPropagation();window.deleteCustomer(${c.id})">🗑</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+    document.querySelectorAll('.customer-folder').forEach(el=>{
+        el.addEventListener('click',e=>{if(!e.target.closest('.customer-actions')) window.openCustomerProjects(parseInt(el.dataset.id));});
+    });
+}
+
+window.deleteCustomer = function(custId) {
+    const c=userData.customers.find(c=>c.id===custId);
+    if(!c) return;
+    showConfirmDialog(`حذف العميل "${c.name}" وجميع مشاريعه؟`, ()=>{
+        userData.customers=userData.customers.filter(c=>c.id!==custId);
+        renderCustomersScreen(); debouncedSave(); showToast(`✅ تم حذف "${c.name}"`);
+    });
+};
+
+window.openCustomerProjects = function(custId) {
+    currentCustomerId=custId;
+    const cust=userData.customers.find(c=>c.id===custId);
+    if(!cust) return;
+    document.getElementById("currentCustomerNameSpan").innerText=cust.name;
+    const grid=document.getElementById("projectsGrid");
+    if(cust.projects?.length) {
+        grid.innerHTML=cust.projects.map(p=>`<div class="project-card" data-id="${p.id}">
+            <div><div class="project-name">🏢 ${escapeHtml(p.name)}</div>
+            <div class="project-total">💰 ${(p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2)} دينار</div></div>
+        </div>`).join('');
+        document.querySelectorAll('.project-card').forEach(el=>{
+            el.addEventListener('click',()=>window.openProjectDetail(custId,parseInt(el.dataset.id)));
+        });
+    } else grid.innerHTML='<div class="empty-message">📭 لا توجد مشاريع</div>';
+    window.showProjectScreen('projects');
+};
+
+window.openProjectDetail = function(custId, projId) {
+    currentCustomerId=custId; currentProjectId=projId;
+    const cust=userData.customers.find(c=>c.id===custId);
+    const proj=cust?.projects.find(p=>p.id===projId);
+    if(!proj) return;
+    document.getElementById("navCustomerName").innerText=cust.name;
+    document.getElementById("navProjectName").innerText=proj.name;
+    document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50;
+    renderPaymentsTable(proj,cust);
+    renderRoomsTable(proj);
+    updateProjectTotal(proj);
+    window.showProjectScreen('detail');
+};
+
+function renderPaymentsTable(proj, cust) {
+    const tbody=document.getElementById("paymentsBody");
+    if(!proj.payments) proj.payments=[];
+    if(!proj.payments.length) {
+        tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#999;">لا توجد دفعات</td></tr>';
+        document.getElementById("totalPayments").innerText="0.00";
+        document.getElementById("remainingAmount").innerText="0.00";
+        return;
+    }
+    tbody.innerHTML=proj.payments.map((p,i)=>`<tr>
+        <td>${p.date}</td><td>${p.amount.toFixed(2)}</td><td>${escapeHtml(p.note||'')}</td>
+        <td><button class="delete-payment-btn btn-danger" data-idx="${i}">✖</button></td>
+    </tr>`).join('');
+    const total=proj.payments.reduce((s,p)=>s+p.amount,0);
+    document.getElementById("totalPayments").innerText=total.toFixed(2);
+    const projTotal=proj.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0;
+    document.getElementById("remainingAmount").innerText=(projTotal-total).toFixed(2);
+    document.querySelectorAll('.delete-payment-btn').forEach(btn=>{
+        btn.onclick=()=>{
+            showConfirmDialog(`حذف دفعة ${proj.payments[parseInt(btn.dataset.idx)].amount.toFixed(2)} دينار؟`, ()=>{
+                proj.payments.splice(parseInt(btn.dataset.idx),1);
+                renderPaymentsTable(proj,cust); updateProjectTotal(proj); debouncedSave();
+            });
+        };
+    });
+}
+
+function renderRoomsTable(proj) {
+    const tbody=document.getElementById("roomsTableBody");
+    if(!proj.rooms) proj.rooms=[];
+    if(!proj.rooms.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;">➕ أضف غرفة</td></tr>'; return; }
+    const price=proj.globalPricePerMeter||50;
+    tbody.innerHTML=proj.rooms.map((r,idx)=>{
+        const m=(r.lengthVal&&r.widthVal)?(r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)):0;
+        r.totalCost=m*price;
+        return `<tr data-room-id="${r.id}">
+            <td>${idx+1}</td>
+            <td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||''}"></td>
+            <td><input type="number" class="room-width" step="0.01" value="${r.widthVal||''}"></td>
+            <td><select class="room-mode"><option value="area" ${r.calcMode==='area'?'selected':''}>مساحة</option><option value="perimeter" ${r.calcMode==='perimeter'?'selected':''}>محيط</option></select></td>
+            <td class="calc-val">${m.toFixed(2)}</td>
+            <td class="room-total">${r.totalCost.toFixed(2)}</td>
+            <td><button class="delete-room-btn btn-danger" data-id="${r.id}">✖</button></td>
+        </tr>`;
+    }).join('');
+    attachRoomEvents(proj);
+    updateProjectTotal(proj);
+}
+
+function attachRoomEvents(proj) {
+    document.querySelectorAll('.room-length,.room-width,.room-mode').forEach(el=>{
+        el.oninput=()=>{syncRoomsFromDOM(proj); updateProjectTotal(proj); debouncedSave();};
+    });
+    document.querySelectorAll('.delete-room-btn').forEach(btn=>{
+        btn.onclick=()=>{proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); debouncedSave();};
+    });
+}
+
+function syncRoomsFromDOM(proj) {
+    document.querySelectorAll('#roomsTableBody tr[data-room-id]').forEach(row=>{
+        const r=proj.rooms.find(r=>r.id===parseInt(row.dataset.roomId));
+        if(r) {
+            r.lengthVal=parseFloat(row.querySelector('.room-length')?.value)||0;
+            r.widthVal=parseFloat(row.querySelector('.room-width')?.value)||0;
+            r.calcMode=row.querySelector('.room-mode')?.value;
+        }
+    });
+}
+
+function updateProjectTotal(proj) {
+    const price=parseFloat(document.getElementById("globalPricePerMeter")?.value)||0;
+    proj.globalPricePerMeter=price;
+    let totalArea=0, totalPerimeter=0;
+    proj.rooms.forEach(r=>{
+        const m=(r.lengthVal&&r.widthVal)?(r.calcMode==='area'?r.lengthVal*r.widthVal:2*(r.lengthVal+r.widthVal)):0;
+        r.totalCost=m*price;
+        if(r.calcMode==='area') totalArea+=m;
+        else totalPerimeter+=m;
+    });
+    const gt=proj.rooms.reduce((s,r)=>s+r.totalCost,0);
+    const tp=proj.payments?.reduce((s,p)=>s+p.amount,0)||0;
+    const rem=document.getElementById("remainingAmount");
+    if(rem) rem.innerText=(gt-tp).toFixed(2);
+    document.getElementById('totalArea').innerText=totalArea.toFixed(2);
+    document.getElementById('totalAreaCost').innerText=(totalArea*price).toFixed(2);
+    document.getElementById('totalPerimeter').innerText=totalPerimeter.toFixed(2);
+    document.getElementById('totalPerimeterCost').innerText=(totalPerimeter*price).toFixed(2);
+    document.getElementById('grandTotal').innerText=gt.toFixed(2);
+    renderCustomersScreen();
+}
+
+window.addNewCustomer=function(){
+    const overlay=document.createElement('div');
+    overlay.className='dialog-overlay';
+    overlay.innerHTML=`<div class="dialog-box">
+        <h3>📂 عميل جديد</h3>
+        <input type="text" id="ncName" placeholder="اسم العميل">
+        <input type="tel" id="ncPhone" placeholder="رقم الهاتف (اختياري)" dir="ltr">
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="ncConfirm">✅ إضافة</button>
+            <button class="btn-cancel-red" id="ncCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const inp=document.getElementById('ncName'); inp.focus();
+    const doAdd=()=>{
+        const name=inp.value.trim();
+        if(!name) { showToast('⚠️ أدخل اسم العميل'); return; }
+        userData.customers.push({id:Date.now(),name,phone:document.getElementById('ncPhone').value.trim()||'',projects:[]});
+        renderCustomersScreen(); debouncedSave(); showToast(`✅ تم إضافة "${name}"`); overlay.remove();
+    };
+    document.getElementById('ncConfirm').onclick=doAdd;
+    document.getElementById('ncCancel').onclick=()=>overlay.remove();
+    inp.onkeypress=e=>{if(e.key==='Enter') doAdd();};
+    overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
+};
+
+window.addProject=function(){
+    const cust=userData.customers.find(c=>c.id===currentCustomerId);
+    if(!cust) { showToast("⚠️ اختر عميلاً أولاً"); return; }
+    const overlay=document.createElement('div');
+    overlay.className='dialog-overlay';
+    overlay.innerHTML=`<div class="dialog-box">
+        <h3>🏢 مشروع جديد</h3>
+        <input type="text" id="npName" placeholder="اسم المشروع">
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="npConfirm">✅ إضافة</button>
+            <button class="btn-cancel-red" id="npCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const inp=document.getElementById('npName'); inp.focus();
+    const doAdd=()=>{
+        const name=inp.value.trim();
+        if(!name) { showToast('⚠️ أدخل اسم المشروع'); return; }
+        if(!cust.projects) cust.projects=[];
+        cust.projects.push({id:Date.now(),name,rooms:[],globalPricePerMeter:50,payments:[]});
+        debouncedSave(); window.openCustomerProjects(currentCustomerId); showToast(`✅ تم إضافة "${name}"`); overlay.remove();
+    };
+    document.getElementById('npConfirm').onclick=doAdd;
+    document.getElementById('npCancel').onclick=()=>overlay.remove();
+    inp.onkeypress=e=>{if(e.key==='Enter') doAdd();};
+    overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
+};
+
+window.addRoom=function(){
+    const cust=userData.customers.find(c=>c.id===currentCustomerId);
+    const proj=cust?.projects.find(p=>p.id===currentProjectId);
+    if(proj){proj.rooms.push({id:Date.now(),lengthVal:null,widthVal:null,calcMode:'area',totalCost:0}); window.openProjectDetail(currentCustomerId,currentProjectId); debouncedSave();}
+};
+window.deleteProject=function(){
+    const cust=userData.customers.find(c=>c.id===currentCustomerId);
+    if(cust) showConfirmDialog('حذف المشروع؟',()=>{cust.projects=cust.projects.filter(p=>p.id!==currentProjectId); window.openCustomerProjects(currentCustomerId); debouncedSave();});
+};
+window.saveProject=function(){
+    const cust=userData.customers.find(c=>c.id===currentCustomerId);
+    const proj=cust?.projects.find(p=>p.id===currentProjectId);
+    if(proj){syncRoomsFromDOM(proj); updateProjectTotal(proj); debouncedSave(); showToast("✅ تم حفظ المشروع");}
+};
+window.addPayment=function(){
+    const cust=userData.customers.find(c=>c.id===currentCustomerId);
+    const proj=cust?.projects.find(p=>p.id===currentProjectId);
+    if(!proj) return;
+    const overlay=document.createElement('div');
+    overlay.className='dialog-overlay';
+    overlay.innerHTML=`<div class="dialog-box">
+        <h3>💰 إضافة دفعة</h3>
+        <input type="number" id="payAmt" placeholder="المبلغ" step="0.01" min="0">
+        <input type="text" id="payNote" placeholder="ملاحظة (اختياري)">
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="payConfirm" style="background:#3b82f6;">✅ إضافة</button>
+            <button class="btn-cancel-red" id="payCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const amtInp=document.getElementById('payAmt'); amtInp.focus();
+    const doAdd=()=>{
+        const amt=parseFloat(amtInp.value);
+        if(isNaN(amt)||amt<=0) { showToast('⚠️ أدخل مبلغاً صحيحاً'); return; }
+        const note=document.getElementById('payNote').value.trim();
+        if(!proj.payments) proj.payments=[];
+        proj.payments.push({date:new Date().toLocaleDateString('ar-EG'),amount:amt,note});
+        addProjectPaymentToAccounting(cust.name,proj.name,amt,note);
+        renderPaymentsTable(proj,cust); updateProjectTotal(proj); debouncedSave();
+        overlay.remove();
+    };
+    document.getElementById('payConfirm').onclick=doAdd;
+    document.getElementById('payCancel').onclick=()=>overlay.remove();
+    overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
+};
+window.showProjectScreen=function(screen){
+    document.getElementById("customersScreen").style.display=screen==='customers'?'block':'none';
+    document.getElementById("projectsScreen").style.display=screen==='projects'?'block':'none';
+    document.getElementById("projectDetailScreen").style.display=screen==='detail'?'block':'none';
+    if(screen==='customers') renderCustomersScreen();
+};
+
+// ===== Accounting (shared for 'my' and 'partner') =====
+function getAccountingData(tab) {
+    if(tab==='partner') return userData.partnerAccounting;
+    return userData.accounting;
+}
+
+function renderAccountingTable(tab) {
+    const bodyId = tab==='partner' ? 'partnerAccountingBody' : 'myAccountingBody';
+    const tbody = document.getElementById(bodyId);
+    if(!tbody) return;
+    const data = getAccountingData(tab);
+    if(!data.rows) data.rows=[];
+    const filter = tab==='partner' ? currentPartnerFilter : currentMyFilter;
+
+    let rows = data.rows;
+    if(filter==='workers') rows=rows.filter(r=>r.source==='worker_expense');
+    else if(filter==='projects') rows=rows.filter(r=>r.source==='project_payment');
+    else if(filter==='manual') rows=rows.filter(r=>!r.autoGenerated);
+
+    if(!rows.length) {
+        tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#999;padding:16px;">لا توجد بيانات</td></tr>';
+        updateAccountingSummary(tab); return;
+    }
+
+    tbody.innerHTML=rows.map(r=>{
+        const oi=data.rows.indexOf(r);
+        let badge='';
+        if(r.autoGenerated) badge=r.source==='worker_expense'?'<span class="row-badge badge-worker">👷 عامل</span>':'<span class="row-badge badge-project">🏢 مشروع</span>';
+        else badge='<span class="row-badge badge-manual">✍️ يدوي</span>';
+        return `<tr data-row-idx="${oi}">
+            <td><input type="number" class="acc-expense" data-idx="${oi}" data-tab="${tab}" value="${r.expense!==null?r.expense:''}" step="0.01" style="width:95px;"></td>
+            <td><input type="number" class="acc-revenue" data-idx="${oi}" data-tab="${tab}" value="${r.revenue!==null?r.revenue:''}" step="0.01" style="width:95px;"></td>
+            <td><div style="display:flex;flex-direction:column;gap:3px;"><input type="text" class="acc-note" data-idx="${oi}" data-tab="${tab}" value="${escapeHtml(r.note||'')}" style="font-size:0.6rem;">${badge}</div></td>
+            <td><button class="delete-acc-btn" data-idx="${oi}" data-tab="${tab}">✖</button></td>
+        </tr>`;
+    }).join('');
+
+    attachAccountingEvents(tab);
+    updateAccountingSummary(tab);
+}
+
+function attachAccountingEvents(tab) {
+    document.querySelectorAll(`.acc-expense[data-tab="${tab}"]`).forEach(inp=>{
+        inp.onchange=()=>{
+            const d=getAccountingData(tab); const i=parseInt(inp.dataset.idx);
+            if(d.rows[i]) { d.rows[i].expense=inp.value===''?null:parseFloat(inp.value)||0; updateAccountingSummary(tab); debouncedSave(); }
+        };
+    });
+    document.querySelectorAll(`.acc-revenue[data-tab="${tab}"]`).forEach(inp=>{
+        inp.onchange=()=>{
+            const d=getAccountingData(tab); const i=parseInt(inp.dataset.idx);
+            if(d.rows[i]) { d.rows[i].revenue=inp.value===''?null:parseFloat(inp.value)||0; updateAccountingSummary(tab); debouncedSave(); }
+        };
+    });
+    document.querySelectorAll(`.acc-note[data-tab="${tab}"]`).forEach(inp=>{
+        inp.onchange=()=>{
+            const d=getAccountingData(tab); const i=parseInt(inp.dataset.idx);
+            if(d.rows[i]) { d.rows[i].note=inp.value; debouncedSave(); }
+        };
+    });
+    document.querySelectorAll(`.delete-acc-btn[data-tab="${tab}"]`).forEach(btn=>{
+        btn.onclick=()=>{
+            const d=getAccountingData(tab); d.rows.splice(parseInt(btn.dataset.idx),1);
+            renderAccountingTable(tab); debouncedSave();
+        };
+    });
+}
+
+function updateAccountingSummary(tab) {
+    const data=getAccountingData(tab);
+    const rows=data.rows||[];
+    const exp=rows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
+    const rev=rows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
+    const net=rev-exp;
+    if(tab==='partner') {
+        document.getElementById('partnerTotalRevenue').innerText=rev.toFixed(2);
+        document.getElementById('partnerTotalExpense').innerText=exp.toFixed(2);
+        const el=document.getElementById('partnerNetProfit');
+        el.innerText=net.toFixed(2); el.className='value profit '+(net>=0?'positive':'negative');
+    } else {
+        document.getElementById('myTotalRevenue').innerText=rev.toFixed(2);
+        document.getElementById('myTotalExpense').innerText=exp.toFixed(2);
+        const el=document.getElementById('myNetProfit');
+        el.innerText=net.toFixed(2); el.className='value profit '+(net>=0?'positive':'negative');
+    }
+}
+
+window.filterAccounting=function(tab, filter, btn) {
+    if(tab==='partner') currentPartnerFilter=filter; else currentMyFilter=filter;
+    document.querySelectorAll(`.filter-btn[data-tab="${tab}"]`).forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    renderAccountingTable(tab);
+};
+
+window.addAccountingRow=function(tab){
+    const d=getAccountingData(tab);
+    if(!d.rows) d.rows=[];
+    d.rows.unshift({expense:null,revenue:null,note:'',autoGenerated:false});
+    renderAccountingTable(tab); debouncedSave();
+};
+
+window.archiveAndClearAccounting=function(tab){
+    const d=getAccountingData(tab);
+    if(!d.rows?.length) { showToast('⚠️ لا توجد بيانات'); return; }
+    showConfirmDialog('حفظ البيانات في السجل ومسح الجدول؟',()=>{
+        if(!d.history) d.history=[];
+        const exp=d.rows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
+        const rev=d.rows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
+        d.history.unshift({id:Date.now(),date:new Date().toLocaleDateString('ar-EG'),time:new Date().toLocaleTimeString('ar-EG'),rows:JSON.parse(JSON.stringify(d.rows)),summary:{exp,rev,net:rev-exp}});
+        d.rows=[]; renderAccountingTable(tab); debouncedSave(); showToast('✅ تم الحفظ والمسح');
+    });
+};
+
+window.showAccountingHistory=function(tab){
+    const d=getAccountingData(tab);
+    if(!d.history?.length) { showToast('📭 لا توجد سجلات'); return; }
+    const modal=document.createElement('div'); modal.className='dialog-overlay';
+    const content=document.createElement('div');
+    content.style.cssText='background:white;border-radius:16px;padding:20px;max-width:500px;width:90%;max-height:70vh;overflow-y:auto;';
+    content.innerHTML=`<h3 style="margin-bottom:12px;">📋 سجل المحاسبة</h3>`;
+    d.history.forEach(r=>{
+        const div=document.createElement('div');
+        div.style.cssText='border-bottom:1px solid #eee;padding:10px 0;';
+        div.innerHTML=`<div><strong>${r.date} ${r.time}</strong></div><div style="font-size:0.7rem;">📈 إيرادات: ${r.summary.rev.toFixed(2)} | 📉 مصاريف: ${r.summary.exp.toFixed(2)} | 💰 صافي: <strong style="color:${r.summary.net>=0?'#10b981':'#ef4444'}">${r.summary.net.toFixed(2)}</strong></div>`;
+        content.appendChild(div);
+    });
+    const closeBtn=document.createElement('button');
+    closeBtn.className='btn-secondary'; closeBtn.style.cssText='margin-top:12px;width:100%;';
+    closeBtn.innerText='إغلاق'; closeBtn.onclick=()=>modal.remove();
+    content.appendChild(closeBtn);
+    modal.appendChild(content); document.body.appendChild(modal);
+    modal.onclick=e=>{if(e.target===modal) modal.remove();};
+};
+
+// ===== Partner =====
+window.editPartnerName=function(){
+    const overlay=document.createElement('div');
+    overlay.className='dialog-overlay';
+    overlay.innerHTML=`<div class="dialog-box">
+        <h3>✏️ اسم الشريك</h3>
+        <input type="text" id="pnInput" value="${escapeHtml(userData.partnerAccounting.partnerName||'الشريك')}" placeholder="اسم الشريك">
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="pnConfirm">✅ حفظ</button>
+            <button class="btn-cancel-red" id="pnCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const inp=document.getElementById('pnInput'); inp.focus(); inp.select();
+    const doSave=()=>{
+        const name=inp.value.trim()||'الشريك';
+        userData.partnerAccounting.partnerName=name;
+        document.getElementById('partnerNameDisplay').innerText=name;
+        updatePartnerLabels(name);
+        debouncedSave(); showToast(`✅ تم تحديث اسم الشريك: ${name}`); overlay.remove();
+    };
+    document.getElementById('pnConfirm').onclick=doSave;
+    document.getElementById('pnCancel').onclick=()=>overlay.remove();
+    inp.onkeypress=e=>{if(e.key==='Enter') doSave();};
+    overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
+};
+
+function updatePartnerLabels(name) {
+    const n=name||userData.partnerAccounting.partnerName||'الشريك';
+    ['settlePartner_label_rev','settlePartner_label_exp','settlePartner_label_net'].forEach((id,i)=>{
+        const el=document.getElementById(id);
+        if(el) el.innerText=[`🤝 إيرادات ${n}`,`🤝 مصاريف ${n}`,`🤝 صافي ربح ${n}`][i];
+    });
+}
+
+window.showPartnerSubTab=function(subTab){
+    document.getElementById('myAccounting').style.display=subTab==='myAccounting'?'block':'none';
+    document.getElementById('partnerAccounting').style.display=subTab==='partnerAccounting'?'block':'none';
+    document.getElementById('partnerSettlement').style.display=subTab==='partnerSettlement'?'block':'none';
+    document.querySelectorAll('.partner-tab-btn').forEach((b,i)=>{
+        b.classList.toggle('active',['myAccounting','partnerAccounting','partnerSettlement'][i]===subTab);
+    });
+    if(subTab==='partnerAccounting') { renderAccountingTable('partner'); document.getElementById('partnerNameDisplay').innerText=userData.partnerAccounting.partnerName||'الشريك'; }
+    if(subTab==='partnerSettlement') window.calcSettlement();
+    if(subTab==='myAccounting') renderAccountingTable('my');
+};
+
+window.calcSettlement=function(){
+    const myRows=userData.accounting.rows||[];
+    const partnerRows=userData.partnerAccounting.rows||[];
+    const myExp=myRows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
+    const myRev=myRows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
+    const myNet=myRev-myExp;
+    const pExp=partnerRows.reduce((s,r)=>s+(parseFloat(r.expense)||0),0);
+    const pRev=partnerRows.reduce((s,r)=>s+(parseFloat(r.revenue)||0),0);
+    const pNet=pRev-pExp;
+    const totalNet=myNet+pNet;
+    const eachShare=totalNet/2;
+
+    document.getElementById('settleMy_revenue').innerText=myRev.toFixed(2);
+    document.getElementById('settleMy_expense').innerText=myExp.toFixed(2);
+    const myNetEl=document.getElementById('settleMy_net');
+    myNetEl.innerText=myNet.toFixed(2); myNetEl.className='settlement-value '+(myNet>=0?'positive':'negative');
+    document.getElementById('settlePartner_revenue').innerText=pRev.toFixed(2);
+    document.getElementById('settlePartner_expense').innerText=pExp.toFixed(2);
+    const pNetEl=document.getElementById('settlePartner_net');
+    pNetEl.innerText=pNet.toFixed(2); pNetEl.className='settlement-value '+(pNet>=0?'positive':'negative');
+    document.getElementById('settleTotalProfit').innerText=totalNet.toFixed(2);
+    document.getElementById('settleEachShare').innerText=eachShare.toFixed(2);
+    updatePartnerLabels();
+
+    const diff=myNet-eachShare;
+    const pName=userData.partnerAccounting.partnerName||'الشريك';
+    const amountEl=document.getElementById('settleAmount');
+    const whoLabel=document.getElementById('settleWhoLabel');
+    const dirEl=document.getElementById('settleDirection');
+    const resultBox=document.getElementById('settlementResult');
+
+    if(Math.abs(diff)<0.01) {
+        whoLabel.innerText='⚖️ لا يوجد تسوية مطلوبة';
+        amountEl.innerText='0.00'; dirEl.innerText='الحسابات متساوية تماماً';
+        resultBox.style.background='linear-gradient(135deg,#10b981,#059669)';
+    } else if(diff>0) {
+        whoLabel.innerText=`🔴 أنت مدين لـ ${pName}`;
+        amountEl.innerText=diff.toFixed(2)+' دينار';
+        dirEl.innerText=`يجب عليك دفع ${diff.toFixed(2)} دينار إلى ${pName}`;
+        resultBox.style.background='linear-gradient(135deg,#ef4444,#b91c1c)';
+    } else {
+        const absD=Math.abs(diff);
+        whoLabel.innerText=`🟢 ${pName} مدين لك`;
+        amountEl.innerText=absD.toFixed(2)+' دينار';
+        dirEl.innerText=`يجب على ${pName} دفع ${absD.toFixed(2)} دينار إليك`;
+        resultBox.style.background='linear-gradient(135deg,#10b981,#059669)';
+    }
+};
+
+// ===== Auth =====
+window.togglePassword=function(id){const f=document.getElementById(id); f.type=f.type==='password'?'text':'password';};
+
+window.login=async function(){
+    if(!auth) { document.getElementById("loginError").innerText="❌ Firebase غير متاح"; return; }
+    const email=document.getElementById("loginEmail").value.trim();
+    const pass=document.getElementById("loginPassword").value;
+    const errDiv=document.getElementById("loginError"); errDiv.innerText='';
+    if(!email||!pass) { errDiv.innerText='البريد والرمز مطلوبان'; return; }
+    try {
+        const cred=await auth.signInWithEmailAndPassword(email,pass);
+        if(!cred.user.emailVerified) { errDiv.innerText='⚠️ يرجى تفعيل حسابك عبر الرابط المرسل لبريدك'; return; }
+        await initUser(cred.user);
+    } catch(e) {
+        const msgs={'auth/user-not-found':'الحساب غير موجود','auth/wrong-password':'كلمة المرور غير صحيحة','auth/invalid-email':'البريد الإلكتروني غير صحيح','auth/too-many-requests':'محاولات كثيرة, حاول لاحقاً'};
+        errDiv.innerText=msgs[e.code]||e.message;
+    }
+};
+
+async function initUser(firebaseUser) {
+    currentUser={uid:firebaseUser.uid,email:firebaseUser.email,name:firebaseUser.displayName||firebaseUser.email.split('@')[0]};
+    await loadUserDataFromFirebase();
+    if(!userData.partnerAccounting) userData.partnerAccounting={rows:[],history:[],partnerName:'الشريك'};
+    setupRealtimeSync();
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("mainApp").style.display="block";
+    document.getElementById("userNameDisplay").innerHTML=`👋 ${currentUser.name}`;
+    document.getElementById("verificationWarning").style.display="none";
+    document.getElementById("partnerNameDisplay").innerText=userData.partnerAccounting.partnerName||'الشريك';
+    window.renderAll();
+}
+
+window.register=async function(){
+    if(!auth) return;
+    const email=document.getElementById("regEmail").value.trim();
+    const name=document.getElementById("regName").value.trim();
+    const pass=document.getElementById("regPassword").value;
+    const errDiv=document.getElementById("regError"); const okDiv=document.getElementById("regSuccess");
+    errDiv.innerText=''; okDiv.innerText='';
+    if(!email||!name||!pass) { errDiv.innerText='جميع الحقول مطلوبة'; return; }
+    if(pass.length<6) { errDiv.innerText='الرمز السري 6 أحرف على الأقل'; return; }
+    try {
+        const cred=await auth.createUserWithEmailAndPassword(email,pass);
+        await cred.user.updateProfile({displayName:name});
+        await cred.user.sendEmailVerification();
+        okDiv.innerText='✅ تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتفعيل الحساب.';
+        setTimeout(()=>{window.hideRegister(); document.getElementById("loginSuccess").innerText='✅ تم الإنشاء! فعّل حسابك ثم سجّل دخولك.'; setTimeout(()=>{document.getElementById("loginSuccess").innerText='';},5000);},2000);
+    } catch(e) { errDiv.innerText=e.code==='auth/email-already-in-use'?'البريد مستخدم بالفعل':e.message; }
+};
+
+window.showRegister=()=>{document.getElementById("loginScreen").style.display="none"; document.getElementById("registerScreen").style.display="flex";};
+window.hideRegister=()=>{document.getElementById("registerScreen").style.display="none"; document.getElementById("loginScreen").style.display="flex";};
+window.showResetPassword=()=>{document.getElementById("loginScreen").style.display="none"; document.getElementById("resetPasswordScreen").style.display="flex";};
+window.hideResetPassword=()=>{document.getElementById("resetPasswordScreen").style.display="none"; document.getElementById("loginScreen").style.display="flex";};
+
+window.sendPasswordReset=async function(){
+    const email=document.getElementById("resetEmail").value.trim();
+    const errDiv=document.getElementById("resetError"); const okDiv=document.getElementById("resetSuccess");
+    errDiv.innerText=''; okDiv.innerText='';
+    if(!email) { errDiv.innerText='أدخل بريدك الإلكتروني'; return; }
+    try { await auth.sendPasswordResetEmail(email); okDiv.innerText='✅ تم إرسال رابط إعادة التعيين'; setTimeout(()=>window.hideResetPassword(),3000); }
+    catch(e) { errDiv.innerText=e.code==='auth/user-not-found'?'لا يوجد حساب بهذا البريد':e.message; }
+};
+
+window.resendVerification=async function(){
+    if(auth?.currentUser) { try { await auth.currentUser.sendEmailVerification(); showToast('✅ تم إرسال رابط التفعيل'); } catch(e) { showToast('❌ '+e.message); } }
+};
+
+window.logout=async function(){
+    showConfirmDialog('تأكيد تسجيل الخروج؟', async ()=>{
+        await saveUserDataToFirebase();
+        if(auth&&currentUser) await auth.signOut();
+        currentUser=null;
+        if(realtimeDbRef) realtimeDbRef.off();
+        document.getElementById("mainApp").style.display="none";
+        document.getElementById("loginScreen").style.display="flex";
+        document.getElementById("loginEmail").value=''; document.getElementById("loginPassword").value='';
+        userData={customers:[],workersByWeek:{},accounting:{rows:[],history:[]},partnerAccounting:{rows:[],history:[],partnerName:'الشريك'}};
+    });
+};
+
+window.showMainTab=function(tab){
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const tabMap={projects:'projectsTab',workers:'workersTab',accounting:'accountingTab'};
+    document.getElementById(tabMap[tab])?.classList.add('active');
+    document.querySelector(`.tab-btn:nth-child(${['projects','workers','accounting'].indexOf(tab)+1})`)?.classList.add('active');
+    if(tab==='projects') window.showProjectScreen('customers');
+    else if(tab==='workers') { updateWeekDisplay(); renderWorkersTable(); }
+    else if(tab==='accounting') { window.showPartnerSubTab('myAccounting'); }
+};
+
+window.renderAll=function(){
+    renderCustomersScreen(); updateWeekDisplay(); renderWorkersTable();
+    renderAccountingTable('my'); renderAccountingTable('partner');
+    document.getElementById('partnerNameDisplay').innerText=userData.partnerAccounting.partnerName||'الشريك';
+};
+
+// ===== Calculator (safe - no eval) =====
+let calcExpression='';
+
+window.openCalculator=function(){
+    const modal=document.createElement('div'); modal.className='modal'; modal.id='calcModal';
+    modal.innerHTML=`<div class="calculator">
+        <div class="calculator-screen" id="calcScreen">0</div>
+        <div class="calculator-buttons">
+            <button class="calc-btn clear" onclick="window.calcClear()">C</button>
+            <button class="calc-btn" onclick="window.calcDel()">⌫</button>
+            <button class="calc-btn operator" onclick="window.calcOp('%')">%</button>
+            <button class="calc-btn operator" onclick="window.calcOp('/')">÷</button>
+            <button class="calc-btn" onclick="window.calcDigit('7')">7</button>
+            <button class="calc-btn" onclick="window.calcDigit('8')">8</button>
+            <button class="calc-btn" onclick="window.calcDigit('9')">9</button>
+            <button class="calc-btn operator" onclick="window.calcOp('*')">×</button>
+            <button class="calc-btn" onclick="window.calcDigit('4')">4</button>
+            <button class="calc-btn" onclick="window.calcDigit('5')">5</button>
+            <button class="calc-btn" onclick="window.calcDigit('6')">6</button>
+            <button class="calc-btn operator" onclick="window.calcOp('-')">−</button>
+            <button class="calc-btn" onclick="window.calcDigit('1')">1</button>
+            <button class="calc-btn" onclick="window.calcDigit('2')">2</button>
+            <button class="calc-btn" onclick="window.calcDigit('3')">3</button>
+            <button class="calc-btn operator" onclick="window.calcOp('+')">+</button>
+            <button class="calc-btn zero" onclick="window.calcDigit('0')">0</button>
+            <button class="calc-btn" onclick="window.calcDot()">.</button>
+            <button class="calc-btn equals" onclick="window.calcResult()">=</button>
+        </div>
+        <button onclick="document.getElementById('calcModal').remove()" style="margin-top:10px;width:100%;padding:8px;border-radius:20px;background:#64748b;color:white;border:none;">إغلاق</button>
+    </div>`;
+    document.body.appendChild(modal);
+    calcExpression=''; updateCalcScreen('0');
+};
+
+function updateCalcScreen(val) {
+    const s=document.getElementById('calcScreen');
+    if(s) s.innerText=val||'0';
+}
+
+let calcCurrent='0', calcPrev='', calcOperator='', calcResult_flag=false;
+
+window.calcDigit=function(d){
+    if(calcResult_flag) { calcCurrent=d; calcResult_flag=false; }
+    else calcCurrent=calcCurrent==='0'?d:calcCurrent+d;
+    updateCalcScreen(calcCurrent);
+};
+window.calcDot=function(){
+    if(calcResult_flag) { calcCurrent='0.'; calcResult_flag=false; }
+    else if(!calcCurrent.includes('.')) calcCurrent+='.';
+    updateCalcScreen(calcCurrent);
+};
+window.calcOp=function(op){
+    if(calcOperator&&!calcResult_flag) window.calcResult();
+    calcPrev=calcCurrent; calcOperator=op; calcResult_flag=false;
+    updateCalcScreen(calcCurrent+(op==='/'?'÷':op==='*'?'×':op));
+    calcCurrent='0';
+};
+window.calcResult=function(){
+    if(!calcOperator||!calcPrev) return;
+    const a=parseFloat(calcPrev), b=parseFloat(calcCurrent);
+    let res;
+    if(calcOperator==='+') res=a+b;
+    else if(calcOperator==='-') res=a-b;
+    else if(calcOperator==='*') res=a*b;
+    else if(calcOperator==='/') res=b!==0?a/b:0;
+    else if(calcOperator==='%') res=a*(b/100);
+    const rounded=parseFloat(res.toFixed(10));
+    calcCurrent=String(rounded); calcPrev=''; calcOperator=''; calcResult_flag=true;
+    updateCalcScreen(calcCurrent);
+};
+window.calcClear=function(){ calcCurrent='0'; calcPrev=''; calcOperator=''; calcResult_flag=false; updateCalcScreen('0'); };
+window.calcDel=function(){ calcCurrent=calcCurrent.length>1?calcCurrent.slice(0,-1):'0'; updateCalcScreen(calcCurrent); };
+
+// ===== Confirm Dialog (replaces native confirm) =====
+function showConfirmDialog(message, onConfirm) {
+    const overlay=document.createElement('div'); overlay.className='dialog-overlay';
+    overlay.innerHTML=`<div class="dialog-box">
+        <p style="font-size:0.85rem;margin-bottom:12px;">${escapeHtml(message)}</p>
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="dcConfirm">✅ تأكيد</button>
+            <button class="btn-cancel-red" id="dcCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    document.getElementById('dcConfirm').onclick=()=>{ overlay.remove(); onConfirm(); };
+    document.getElementById('dcCancel').onclick=()=>overlay.remove();
+    overlay.onclick=e=>{if(e.target===overlay) overlay.remove();};
+}
+
+// ===== Backup & Settings =====
+window.exportBackup = function() {
+    const data = JSON.stringify(userData, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup-${new Date().toLocaleDateString('ar-EG')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ تم تحميل النسخة الاحتياطية');
+};
+
+window.importBackup = function() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const imported = JSON.parse(ev.target.result);
+                userData = imported;
+                debouncedSave();
+                window.renderAll();
+                showToast('✅ تم استيراد البيانات بنجاح');
+            } catch (err) {
+                showToast('❌ ملف غير صالح');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+};
+
+window.openSettings = function() {
+    const overlay = document.createElement('div');
+    overlay.className = 'dialog-overlay';
+    overlay.innerHTML = `<div class="dialog-box">
+        <h3>⚙️ الإعدادات</h3>
+        <div style="text-align:right;margin-bottom:12px;">
+            <label style="font-size:0.75rem;color:#666;">اسمي:</label>
+            <input type="text" id="settingsMyName" value="${escapeHtml(currentUser?.name || '')}" placeholder="اسمي" style="direction:rtl;">
+        </div>
+        <div style="text-align:right;margin-bottom:12px;">
+            <label style="font-size:0.75rem;color:#666;">اسم الشريك:</label>
+            <input type="text" id="settingsPartnerName" value="${escapeHtml(userData.partnerAccounting?.partnerName || 'الشريك')}" placeholder="اسم الشريك" style="direction:rtl;">
+        </div>
+        <div class="dialog-buttons">
+            <button class="btn-confirm" id="settingsSave">💾 حفظ</button>
+            <button class="btn-cancel-red" id="settingsCancel">❌ إلغاء</button>
+        </div>
+    </div>`;
+    document.body.appendChild(overlay);
+
+    document.getElementById('settingsSave').onclick = () => {
+        const myName = document.getElementById('settingsMyName').value.trim();
+        const partnerName = document.getElementById('settingsPartnerName').value.trim() || 'الشريك';
+
+        if (myName && currentUser) {
+            currentUser.name = myName;
+            document.getElementById('userNameDisplay').innerHTML = `👋 ${myName}`;
+        }
+        userData.partnerAccounting.partnerName = partnerName;
+        document.getElementById('partnerNameDisplay').innerText = partnerName;
+        updatePartnerLabels(partnerName);
+
+        debouncedSave();
+        showToast('✅ تم حفظ الإعدادات');
+        overlay.remove();
+    };
+
+    document.getElementById('settingsCancel').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+};
+
+function showToast(message) {
+    const t=document.createElement('div');
+    t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:8px 16px;border-radius:30px;font-size:0.7rem;z-index:9999;white-space:nowrap;max-width:90%;text-align:center;';
+    t.innerText=message; document.body.appendChild(t); setTimeout(()=>t.remove(),2500);
+}
+
+// ===== Init =====
+document.addEventListener("DOMContentLoaded",()=>{
+    document.getElementById("addCustomerBtn")?.addEventListener("click",window.addNewCustomer);
+    document.getElementById("addProjectBtn")?.addEventListener("click",window.addProject);
+    document.getElementById("addRoomBtn")?.addEventListener("click",window.addRoom);
+    document.getElementById("saveProjectBtn")?.addEventListener("click",window.saveProject);
+    document.getElementById("deleteProjectBtn")?.addEventListener("click",window.deleteProject);
+    document.getElementById("addPaymentBtn")?.addEventListener("click",window.addPayment);
+    document.getElementById("searchInput")?.addEventListener("input",()=>renderWorkersTable());
+    document.getElementById("globalPricePerMeter")?.addEventListener("input",()=>{
+        if(currentProjectId) {
+            const cust=userData.customers.find(c=>c.id===currentCustomerId);
+            const proj=cust?.projects.find(p=>p.id===currentProjectId);
+            if(proj) { updateProjectTotal(proj); debouncedSave(); }
+        }
+    });
+});
+
+if(auth) {
+    auth.onAuthStateChanged(async user=>{
+        if(user&&user.emailVerified) { await initUser(user); }
+        else if(user&&!user.emailVerified) { document.getElementById("verificationWarning").style.display="block"; }
+    });
+}
+</script>
 </body>
 </html>
