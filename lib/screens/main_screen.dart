@@ -200,6 +200,16 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  static Widget _menuItem(IconData icon, String text, Color color) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 18),
+        const SizedBox(width: 10),
+        Text(text, style: TextStyle(fontSize: 12, color: color)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -242,42 +252,17 @@ class _MainScreenState extends State<MainScreen> {
                   value: 'toggleAutoSync',
                   child: Row(
                     children: [
-                      Icon(_data.autoSync ? Icons.toggle_on : Icons.toggle_off_outlined, color: _data.autoSync ? Colors.green : Colors.grey, size: 22),
+                      Icon(_data.autoSync ? Icons.toggle_on : Icons.toggle_off_outlined, color: _data.autoSync ? Colors.green : Colors.grey, size: 20),
                       const SizedBox(width: 8),
-                      Text(_data.autoSync ? 'التسجيل التلقائي: مفعل' : 'التسجيل التلقائي: معطل', style: TextStyle(fontSize: 13, color: _data.autoSync ? Colors.green : Colors.grey[600])),
+                      Text(_data.autoSync ? 'التسجيل التلقائي: مفعل' : 'التسجيل التلقائي: معطل', style: TextStyle(fontSize: 12, color: _data.autoSync ? Colors.green : Colors.grey[600])),
                     ],
                   ),
                 ),
-                const PopupMenuItem(value: 'sync', child: ListTile(
-                  leading: Icon(Icons.sync, color: Colors.blue, size: 20),
-                  title: Text('مزامنة يدوية', style: TextStyle(fontSize: 13)),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                )),
-                const PopupMenuItem(value: 'partners', child: ListTile(
-                  leading: Icon(Icons.people, color: Colors.indigo, size: 20),
-                  title: Text('تعديل أسماء الشركاء', style: TextStyle(fontSize: 13)),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                )),
-                const PopupMenuItem(value: 'export', child: ListTile(
-                  leading: Icon(Icons.download, color: Colors.green, size: 20),
-                  title: Text('تصدير JSON', style: TextStyle(fontSize: 13)),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                )),
-                const PopupMenuItem(value: 'import', child: ListTile(
-                  leading: Icon(Icons.upload, color: Colors.orange, size: 20),
-                  title: Text('استيراد JSON', style: TextStyle(fontSize: 13)),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                )),
-                const PopupMenuItem(value: 'reset', child: ListTile(
-                  leading: Icon(Icons.delete_forever, color: Colors.red, size: 20),
-                  title: Text('حذف كل البيانات', style: TextStyle(fontSize: 13, color: Colors.red)),
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                )),
+                PopupMenuItem(value: 'sync', child: _menuItem(Icons.sync, 'مزامنة يدوية', const Color(0xFF3B82F6))),
+                PopupMenuItem(value: 'partners', child: _menuItem(Icons.people, 'تعديل أسماء الشركاء', const Color(0xFF8B5CF6))),
+                PopupMenuItem(value: 'export', child: _menuItem(Icons.download, 'تصدير JSON', const Color(0xFF10B981))),
+                PopupMenuItem(value: 'import', child: _menuItem(Icons.upload, 'استيراد JSON', const Color(0xFFF59E0B))),
+                PopupMenuItem(value: 'reset', child: _menuItem(Icons.delete_forever, 'حذف كل البيانات', const Color(0xFFEF4444))),
               ],
             ),
           ],

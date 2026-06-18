@@ -155,39 +155,42 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(title: Text(widget.workerName)),
+        appBar: AppBar(title: Text(widget.workerName, style: const TextStyle(fontSize: 13))),
         body: sortedWeeks.isEmpty
             ? const Center(child: Text('لا توجد بيانات'))
             : ListView(
                 padding: const EdgeInsets.all(12),
                 children: [
                   Row(children: [
-                    Expanded(child: _statCard('المستحقات', '${totalDues.toStringAsFixed(0)}', Colors.green, Icons.monetization_on)),
+                    Expanded(child: _statCardDark('المستحقات', '${totalDues.toStringAsFixed(0)}', const Color(0xFF10B981))),
                     const SizedBox(width: 8),
-                    Expanded(child: _statCard('أيام العمل', '$totalDays', Colors.blue, Icons.calendar_today)),
+                    Expanded(child: _statCardDark('أيام العمل', '$totalDays', const Color(0xFF3B82F6))),
                   ]),
                   const SizedBox(height: 8),
                   Row(children: [
-                    Expanded(child: _statCard('المصروفات', '${totalExpenses.toStringAsFixed(0)}', Colors.red, Icons.money_off)),
+                    Expanded(child: _statCardDark('المصروفات', '${totalExpenses.toStringAsFixed(0)}', const Color(0xFFEF4444))),
                     const SizedBox(width: 8),
-                    Expanded(child: _statCard('الصافي', '${totalNet.toStringAsFixed(0)}', totalNet >= 0 ? Colors.teal : Colors.red, Icons.balance)),
+                    Expanded(child: _statCardDark('الصافي', '${totalNet.toStringAsFixed(0)}', totalNet >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444))),
                   ]),
-                  const SizedBox(height: 8),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _infoChip('عدد الأسابيع', '${sortedWeeks.length}'),
-                          _infoChip('متوسط الأيام/أسبوع', '${(totalDays / sortedWeeks.length).toStringAsFixed(1)}'),
-                          _infoChip('متوسط الدخل/أسبوع', '${(totalDues / sortedWeeks.length).toStringAsFixed(0)}'),
-                        ],
-                      ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4)],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _infoChip('عدد الأسابيع', '${sortedWeeks.length}'),
+                        _infoChip('متوسط الأيام', '${(totalDays / sortedWeeks.length).toStringAsFixed(1)}'),
+                        _infoChip('متوسط الدخل', '${(totalDues / sortedWeeks.length).toStringAsFixed(0)}'),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text('أسابيع العمل', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                  const Text('أسابيع العمل', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
                   const SizedBox(height: 6),
                   ...sortedWeeks.map((e) {
                     final w = e.value;
@@ -196,37 +199,43 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
                     final wages = days * w.dailyWage;
                     final net = wages - w.weeklyExpenses;
 
-                    return Card(
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 1))],
+                      ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         child: Column(
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.date_range, size: 16, color: Colors.grey[500]),
-                                const SizedBox(width: 6),
-                                Text(_fmtWeek(wk), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                                Icon(Icons.date_range, size: 14, color: Colors.grey[400]),
+                                const SizedBox(width: 4),
+                                Text(_fmtWeek(wk), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11)),
                                 const Spacer(),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: Colors.green.withValues(alpha: 0.1),
+                                    color: const Color(0xFFD1FAE5),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Text('$days أيام', style: TextStyle(fontSize: 11, color: Colors.green[700], fontWeight: FontWeight.w600)),
+                                  child: Text('$days أيام', style: TextStyle(fontSize: 10, color: const Color(0xFF065F46), fontWeight: FontWeight.w600)),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                _detailChip('الأجر', '${w.dailyWage.toStringAsFixed(0)} د.ل', Colors.blue, () => _editWage(wk, w)),
-                                const SizedBox(width: 6),
-                                _detailChip('المستحق', '${wages.toStringAsFixed(0)} د.ل', Colors.green, null),
-                                const SizedBox(width: 6),
-                                _detailChip('مصروفات', '${w.weeklyExpenses.toStringAsFixed(0)} د.ل', Colors.red, () => _editExpenses(wk, w)),
-                                const SizedBox(width: 6),
-                                _detailChip('الصافي', '${net.toStringAsFixed(0)} د.ل', Colors.teal, null),
+                                _detailChip('الأجر', '${w.dailyWage.toStringAsFixed(0)}', const Color(0xFF3B82F6), () => _editWage(wk, w)),
+                                const SizedBox(width: 4),
+                                _detailChip('المستحق', '${wages.toStringAsFixed(0)}', const Color(0xFF10B981), null),
+                                const SizedBox(width: 4),
+                                _detailChip('مصروفات', '${w.weeklyExpenses.toStringAsFixed(0)}', const Color(0xFFEF4444), () => _editExpenses(wk, w)),
+                                const SizedBox(width: 4),
+                                _detailChip('الصافي', '${net.toStringAsFixed(0)}', const Color(0xFF0D9488), null),
                               ],
                             ),
                           ],
@@ -234,28 +243,26 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
                       ),
                     );
                   }),
-                  // Total row
-                  Card(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.summarize, size: 16),
-                          const SizedBox(width: 6),
-                          const Text('المجموع الكلي', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                          const Spacer(),
-                          Text('${totalDues.toStringAsFixed(0)}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green[700])),
-                          const SizedBox(width: 4),
-                          Text('|', style: TextStyle(color: Colors.grey[400])),
-                          const SizedBox(width: 4),
-                          Text('${totalExpenses.toStringAsFixed(0)}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red[700])),
-                          const SizedBox(width: 4),
-                          Text('|', style: TextStyle(color: Colors.grey[400])),
-                          const SizedBox(width: 4),
-                          Text('${totalNet.toStringAsFixed(0)}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.teal[700])),
-                        ],
-                      ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Color(0xFF1E293B), Color(0xFF0F172A)]),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    child: Row(
+                      children: [
+                        const Text('المجموع الكلي', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white70)),
+                        const Spacer(),
+                        Text('${totalDues.toStringAsFixed(0)}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF10B981))),
+                        const SizedBox(width: 4),
+                        Text('|', style: TextStyle(color: Colors.grey[500])),
+                        const SizedBox(width: 4),
+                        Text('${totalExpenses.toStringAsFixed(0)}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFFF87171))),
+                        const SizedBox(width: 4),
+                        Text('|', style: TextStyle(color: Colors.grey[500])),
+                        const SizedBox(width: 4),
+                        Text('${totalNet.toStringAsFixed(0)}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF34D399))),
+                      ],
                     ),
                   ),
                 ],
@@ -264,27 +271,38 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
     );
   }
 
-  Widget _statCard(String label, String value, Color color, IconData icon) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-        child: Column(
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 4),
-            Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-            Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
-          ],
-        ),
+  Widget _statCardDark(String label, String value, Color accent) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFF1E293B), Color(0xFF0F172A)]),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        children: [
+          Icon(_statIcon(label), size: 22, color: accent),
+          const SizedBox(height: 4),
+          Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: accent)),
+          Text(label, style: TextStyle(fontSize: 10, color: Colors.white.withOpacity(0.7))),
+        ],
       ),
     );
+  }
+
+  IconData _statIcon(String label) {
+    switch (label) {
+      case 'المستحقات': return Icons.monetization_on;
+      case 'أيام العمل': return Icons.calendar_today;
+      case 'المصروفات': return Icons.money_off;
+      default: return Icons.balance;
+    }
   }
 
   Widget _infoChip(String label, String value) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[500])),
       ],
     );
   }
@@ -294,16 +312,16 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
           decoration: BoxDecoration(
-            color: onTap != null ? color.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(6),
-            border: onTap != null ? Border.all(color: color.withValues(alpha: 0.2)) : null,
+            color: onTap != null ? color.withOpacity(0.08) : Colors.grey.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(8),
+            border: onTap != null ? Border.all(color: color.withOpacity(0.2)) : null,
           ),
           child: Column(
             children: [
-              Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
-              Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[500])),
+              Text(value, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color)),
+              Text(label, style: TextStyle(fontSize: 8, color: Colors.grey[500])),
             ],
           ),
         ),

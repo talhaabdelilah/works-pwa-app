@@ -1,151 +1,156 @@
 import 'package:flutter/material.dart';
 
 ThemeData getTheme(bool isDark) {
-  final Color primary = const Color(0xFF059669);
-  final Color primaryLight = const Color(0xFF34D399);
-  final Color surface = isDark ? const Color(0xFF1E1E2E) : Colors.white;
-  final Color background = isDark ? const Color(0xFF121212) : const Color(0xFFF0FDF4);
-  final Color onSurface = isDark ? Colors.white : const Color(0xFF1F2937);
-  final Color onBackground = isDark ? Colors.white70 : const Color(0xFF6B7280);
-  final Color cardColor = isDark ? const Color(0xFF2A2A3E) : Colors.white;
+  const Color darkNavy = Color(0xFF1E293B);
+  const Color bluePrimary = Color(0xFF3B82F6);
+  const Color greenSuccess = Color(0xFF10B981);
+  const Color redDanger = Color(0xFFEF4444);
+  const Color bgColor = Color(0xFFEEF2F5);
+  const Color surfaceColor = Colors.white;
+  const Color textPrimary = Color(0xFF1E293B);
 
   return ThemeData(
     useMaterial3: true,
     brightness: isDark ? Brightness.dark : Brightness.light,
-    primaryColor: primary,
-    scaffoldBackgroundColor: background,
+    primaryColor: bluePrimary,
+    scaffoldBackgroundColor: isDark ? darkNavy : bgColor,
     colorScheme: ColorScheme(
       brightness: isDark ? Brightness.dark : Brightness.light,
-      primary: primary,
+      primary: bluePrimary,
       onPrimary: Colors.white,
-      secondary: primaryLight,
+      secondary: greenSuccess,
       onSecondary: Colors.white,
-      surface: surface,
-      onSurface: onSurface,
-      error: const Color(0xFFEF4444),
+      surface: isDark ? const Color(0xFF334155) : surfaceColor,
+      onSurface: isDark ? Colors.white : textPrimary,
+      error: redDanger,
       onError: Colors.white,
     ),
-    cardColor: cardColor,
-    dividerColor: isDark ? Colors.white12 : Colors.black12,
+    cardColor: isDark ? const Color(0xFF334155) : surfaceColor,
+    dividerColor: isDark ? Colors.white12 : const Color(0xFFE2E8F0),
     appBarTheme: AppBarTheme(
-      backgroundColor: primary,
+      backgroundColor: darkNavy,
       foregroundColor: Colors.white,
-      elevation: 2,
-      shadowColor: primary.withValues(alpha: 0.3),
+      elevation: 0,
       centerTitle: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
+      titleTextStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+      toolbarHeight: 44,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: primary,
+      backgroundColor: bluePrimary,
       foregroundColor: Colors.white,
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: isDark ? const Color(0xFF1E1E2E) : Colors.white,
-      selectedItemColor: primary,
+      backgroundColor: isDark ? darkNavy : surfaceColor,
+      selectedItemColor: bluePrimary,
       unselectedItemColor: Colors.grey,
       elevation: 8,
       type: BottomNavigationBarType.fixed,
-      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-      unselectedLabelStyle: const TextStyle(fontSize: 11),
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+      unselectedLabelStyle: const TextStyle(fontSize: 10),
     ),
     textTheme: TextTheme(
-      displayLarge: TextStyle(fontFamily: 'Cairo', fontSize: 28, fontWeight: FontWeight.bold, color: onSurface),
-      displayMedium: TextStyle(fontFamily: 'Cairo', fontSize: 24, fontWeight: FontWeight.bold, color: onSurface),
-      headlineLarge: TextStyle(fontFamily: 'Cairo', fontSize: 22, fontWeight: FontWeight.w600, color: onSurface),
-      headlineMedium: TextStyle(fontFamily: 'Cairo', fontSize: 20, fontWeight: FontWeight.w600, color: onSurface),
-      titleLarge: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.w600, color: onSurface),
-      titleMedium: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w500, color: onSurface),
-      bodyLarge: TextStyle(fontFamily: 'Cairo', fontSize: 16, color: onSurface),
-      bodyMedium: TextStyle(fontFamily: 'Cairo', fontSize: 14, color: onSurface),
-      bodySmall: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: onBackground),
-      labelLarge: TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600, color: onSurface),
+      displayLarge: TextStyle(fontFamily: 'Cairo', fontSize: 28, fontWeight: FontWeight.bold, color: textPrimary),
+      displayMedium: TextStyle(fontFamily: 'Cairo', fontSize: 24, fontWeight: FontWeight.bold, color: textPrimary),
+      headlineLarge: TextStyle(fontFamily: 'Cairo', fontSize: 22, fontWeight: FontWeight.w600, color: textPrimary),
+      headlineMedium: TextStyle(fontFamily: 'Cairo', fontSize: 20, fontWeight: FontWeight.w600, color: textPrimary),
+      titleLarge: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.w600, color: textPrimary),
+      titleMedium: TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600, color: textPrimary),
+      bodyLarge: TextStyle(fontFamily: 'Cairo', fontSize: 14, color: textPrimary),
+      bodyMedium: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: textPrimary),
+      bodySmall: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Color(0xFF64748B)),
+      labelLarge: TextStyle(fontFamily: 'Cairo', fontSize: 13, fontWeight: FontWeight.w600, color: textPrimary),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF3F4F6),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      fillColor: isDark ? const Color(0xFF334155) : const Color(0xFFF8FAFC),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: isDark ? Colors.white12 : Colors.black12),
+        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primary, width: 2),
+        borderSide: const BorderSide(color: bluePrimary, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFEF4444)),
+        borderSide: const BorderSide(color: redDanger),
       ),
-      labelStyle: TextStyle(color: onBackground, fontFamily: 'Cairo'),
-      hintStyle: TextStyle(color: onBackground, fontFamily: 'Cairo'),
+      labelStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 12),
+      hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 12),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primary,
+        backgroundColor: bluePrimary,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 2,
-        shadowColor: primary.withValues(alpha: 0.3),
-        textStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w600),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        elevation: 0,
+        textStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 13, fontWeight: FontWeight.bold),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: primary,
-        side: BorderSide(color: primary),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w600),
+        foregroundColor: bluePrimary,
+        side: const BorderSide(color: Color(0xFFCBD5E1)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        textStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: primary,
-        textStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600),
+        foregroundColor: bluePrimary,
+        textStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600),
       ),
     ),
     chipTheme: ChipThemeData(
-      backgroundColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF3F4F6),
-      selectedColor: primary,
-      labelStyle: TextStyle(color: onSurface, fontFamily: 'Cairo'),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+      selectedColor: bluePrimary,
+      labelStyle: TextStyle(color: isDark ? Colors.white : textPrimary, fontFamily: 'Cairo', fontSize: 11),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),
     dialogTheme: DialogThemeData(
-      backgroundColor: surface,
+      backgroundColor: isDark ? const Color(0xFF334155) : surfaceColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     ),
     cardTheme: CardThemeData(
-      color: cardColor,
-      elevation: 3,
-      shadowColor: primary.withValues(alpha: 0.15),
+      color: isDark ? const Color(0xFF334155) : surfaceColor,
+      elevation: 1,
+      shadowColor: Colors.black.withAlpha(20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
     ),
     bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: surface,
+      backgroundColor: isDark ? const Color(0xFF334155) : surfaceColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
     ),
     popupMenuTheme: PopupMenuThemeData(
-      color: surface,
+      color: isDark ? const Color(0xFF334155) : surfaceColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFF1F2937),
-      contentTextStyle: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+      backgroundColor: darkNavy,
+      contentTextStyle: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontSize: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       behavior: SnackBarBehavior.floating,
+    ),
+    dividerTheme: const DividerThemeData(
+      color: Color(0xFFE2E8F0),
+      thickness: 1,
+      space: 1,
     ),
   );
 }

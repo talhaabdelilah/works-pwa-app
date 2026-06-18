@@ -161,51 +161,89 @@ class _WorkersScreenState extends State<WorkersScreen> {
       child: Scaffold(
         body: Column(
           children: [
+            // Week navigation - like HTML card style
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 1))],
+              ),
               child: Row(
                 children: [
-                  IconButton(icon: const Icon(Icons.chevron_right, size: 28), onPressed: _prevWeek, padding: EdgeInsets.zero, constraints: const BoxConstraints()),
+                  GestureDetector(
+                    onTap: _prevWeek,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: const Icon(Icons.chevron_right, size: 16, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Column(
                       children: [
-                        Text(_formatWeek(_currentWeek), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                        if (_isCurrentWeek) Text('الأسبوع الحالي', style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                        Text(_formatWeek(_currentWeek), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                        if (_isCurrentWeek) Text('الأسبوع الحالي', style: TextStyle(fontSize: 9, color: Colors.grey[500])),
                       ],
                     ),
                   ),
-                  IconButton(icon: const Icon(Icons.chevron_left, size: 28), onPressed: _nextWeek, padding: EdgeInsets.zero, constraints: const BoxConstraints()),
-                  const SizedBox(width: 4),
-                  TextButton(
-                    onPressed: _copyToNext,
-                    style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), minimumSize: Size.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                    child: const Text('نسخ', style: TextStyle(fontSize: 11)),
+                  GestureDetector(
+                    onTap: _nextWeek,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: const Icon(Icons.chevron_left, size: 16, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: _copyToNext,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      child: const Text('نسخ', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
                   ),
                 ],
               ),
             ),
+            // Stats
             if (workers.isNotEmpty)
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 12),
                 child: Row(
                   children: [
-                    _statBox('👥', '${workers.length}', 'العمال', Colors.blue),
-                    const SizedBox(width: 8),
-                    _statBox('✅', '$presentToday', 'حضور اليوم', Colors.green),
-                    const SizedBox(width: 8),
-                    _statBox('💰', '${totalWages.toStringAsFixed(0)}', 'المستحقات', Colors.orange),
+                    _statBox('👥', '${workers.length}', 'العمال'),
+                    const SizedBox(width: 6),
+                    _statBox('✅', '$presentToday', 'حضور اليوم'),
+                    const SizedBox(width: 6),
+                    _statBox('💰', '${totalWages.toStringAsFixed(0)}', 'المستحقات'),
                   ],
                 ),
               ),
+            // Search
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.fromLTRB(12, 6, 12, 4),
               child: TextField(
                 controller: _searchCtrl,
                 decoration: InputDecoration(
                   hintText: '🔍 بحث...',
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+                  filled: true,
+                  fillColor: Colors.white,
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(icon: const Icon(Icons.clear, size: 16), onPressed: () {
                           _searchCtrl.clear();
@@ -216,73 +254,115 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 onChanged: (v) => setState(() => _searchQuery = v),
               ),
             ),
+            // Table
             Expanded(
               child: filtered.isEmpty
                   ? Center(
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        Icon(_searchQuery.isNotEmpty ? Icons.search_off : Icons.engineering_outlined, size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        Text(_searchQuery.isNotEmpty ? 'لا توجد نتائج بحث' : 'لا يوجد عمال', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey)),
+                        Icon(_searchQuery.isNotEmpty ? Icons.search_off : Icons.engineering_outlined, size: 48, color: Colors.grey[300]),
+                        const SizedBox(height: 12),
+                        Text(_searchQuery.isNotEmpty ? 'لا توجد نتائج بحث' : 'لا يوجد عمال', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
                       ]),
                     )
-                  : SingleChildScrollView(
-                      child: DataTable(
-                        headingRowHeight: 36,
-                        dataRowMinHeight: 44,
-                        dataRowMaxHeight: 52,
-                        columnSpacing: 4,
-                        horizontalMargin: 6,
-                        columns: [
-                          const DataColumn(label: Text('#', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))),
-                          const DataColumn(label: Text('الاسم', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))),
-                          ...List.generate(7, (i) => DataColumn(
-                            label: Text(_dayShort[i], style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                          )),
-                          const DataColumn(label: Text('الإجمالي', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold))),
-                          const DataColumn(label: Text('', style: TextStyle(fontSize: 10))),
-                        ],
-                        rows: List.generate(filtered.length, (i) {
-                          final w = filtered[i];
-                          return DataRow(cells: [
-                            DataCell(Text('${i + 1}', style: const TextStyle(fontSize: 11))),
-                            DataCell(
-                              GestureDetector(
-                                onTap: () => Navigator.push(context, MaterialPageRoute(
-                                  builder: (_) => WorkerDetailScreen(
-                                    workerName: w.name,
-                                    userData: widget.userData,
-                                    onSave: widget.onSave,
-                                  ),
-                                )),
-                                child: Text(w.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, decoration: TextDecoration.underline, color: Colors.blue)),
-                              ),
-                            ),
-                            ...List.generate(7, (j) {
-                              final day = w.weekDays[dates[j]] ?? WorkerDay();
-                              return DataCell(
+                  : Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 1))],
+                      ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowHeight: 32,
+                          dataRowMinHeight: 38,
+                          dataRowMaxHeight: 44,
+                          columnSpacing: 2,
+                          horizontalMargin: 4,
+                          headingRowColor: WidgetStateProperty.all(const Color(0xFF1E293B)),
+                          columns: [
+                            const DataColumn(label: Text('#', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
+                            const DataColumn(label: Text('الاسم', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
+                            ...List.generate(7, (i) => DataColumn(
+                              label: Text(_dayShort[i], style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)),
+                            )),
+                            const DataColumn(label: Text('الإجمالي', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
+                            const DataColumn(label: Text('', style: TextStyle(fontSize: 9))),
+                          ],
+                          rows: List.generate(filtered.length, (i) {
+                            final w = filtered[i];
+                            return DataRow(cells: [
+                              DataCell(Text('${i + 1}', style: const TextStyle(fontSize: 9))),
+                              DataCell(
                                 GestureDetector(
-                                  onTap: () => _toggleDay(w, dates[j]),
-                                  child: Container(
-                                    width: 22, height: 22,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: day.present ? Colors.green : Colors.grey[300],
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(
+                                    builder: (_) => WorkerDetailScreen(
+                                      workerName: w.name,
+                                      userData: widget.userData,
+                                      onSave: widget.onSave,
                                     ),
-                                    child: day.present ? const Icon(Icons.check, size: 14, color: Colors.white) : null,
+                                  )),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEFF6FF),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(w.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 9, color: Color(0xFF3B82F6))),
                                   ),
                                 ),
-                              );
-                            }),
-                            DataCell(Text('${w.weeklyTotal.toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                            DataCell(
-                              IconButton(
-                                icon: Icon(Icons.delete_outline, size: 16, color: Colors.red[300]),
-                                onPressed: () => _save(workers.where((x) => x.id != w.id).toList()),
-                                padding: EdgeInsets.zero, constraints: const BoxConstraints(),
                               ),
-                            ),
-                          ]);
-                        }),
+                              ...List.generate(7, (j) {
+                                final day = w.weekDays[dates[j]] ?? WorkerDay();
+                                return DataCell(
+                                  GestureDetector(
+                                    onTap: () => _toggleDay(w, dates[j]),
+                                    child: Container(
+                                      width: 20, height: 20,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: day.present ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
+                                      ),
+                                      child: day.present ? const Icon(Icons.check, size: 12, color: Colors.white) : null,
+                                    ),
+                                  ),
+                                );
+                              }),
+                              DataCell(
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: w.weeklyTotal >= 0 ? const Color(0xFFD1FAE5) : const Color(0xFFFEE2E2),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text('${w.weeklyTotal.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9, color: w.weeklyTotal >= 0 ? const Color(0xFF065F46) : const Color(0xFF991B1B))),
+                                ),
+                              ),
+                              DataCell(
+                                GestureDetector(
+                                  onTap: () {
+                                    final workers = _getWorkers();
+                                    widget.onSave(UserData(
+                                      customers: widget.userData.customers,
+                                      workersByWeek: Map<String, List<Worker>>.from(widget.userData.workersByWeek)..[_currentWeek] = workers.where((x) => x.id != w.id).toList(),
+                                      accounting: widget.userData.accounting,
+                                      partnerAccounting: widget.userData.partnerAccounting,
+                                      lastBackupDate: widget.userData.lastBackupDate,
+                                    ));
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEF4444),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: const Text('حذف', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ),
+                            ]);
+                          }),
+                        ),
                       ),
                     ),
             ),
@@ -296,19 +376,20 @@ class _WorkersScreenState extends State<WorkersScreen> {
     );
   }
 
-  Widget _statBox(String icon, String value, String label, Color color) {
+  Widget _statBox(String icon, String value, String label) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 1))],
         ),
         child: Column(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 18)),
-            Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
-            Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
+            Text(icon, style: const TextStyle(fontSize: 16)),
+            Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[500])),
           ],
         ),
       ),

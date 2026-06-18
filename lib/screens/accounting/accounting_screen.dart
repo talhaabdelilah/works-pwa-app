@@ -226,74 +226,102 @@ class _AccountingScreenState extends State<AccountingScreen> {
         body: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Column(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Row(
                 children: [
-                  SegmentedButton<bool>(
-                    segments: [
-                      ButtonSegment(value: false, label: Text(widget.userData.accounting.partnerName.isNotEmpty ? widget.userData.accounting.partnerName : 'الشريك الأول')),
-                      ButtonSegment(value: true, label: Text(widget.userData.partnerAccounting.partnerName.isNotEmpty ? widget.userData.partnerAccounting.partnerName : 'الشريك الثاني')),
-                    ],
-                    selected: {_showPartner},
-                    onSelectionChanged: (v) => setState(() => _showPartner = v.first),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _showPartner = false),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _showPartner ? const Color(0xFFF1F5F9) : const Color(0xFF7C3AED),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Text(
+                          widget.userData.accounting.partnerName,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold,
+                            color: _showPartner ? const Color(0xFF475569) : Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      _filterBtn('الكل', 'all'),
-                      const SizedBox(width: 4),
-                      _filterBtn('العمال', 'worker'),
-                      const SizedBox(width: 4),
-                      _filterBtn('المشاريع', 'project'),
-                      const SizedBox(width: 4),
-                      _filterBtn('يدوي', 'manual'),
-                    ],
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _showPartner = true),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: _showPartner ? const Color(0xFF7C3AED) : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: Text(
+                          widget.userData.partnerAccounting.partnerName,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.bold,
+                            color: _showPartner ? Colors.white : const Color(0xFF475569),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _summaryRow('إجمالي الإيرادات', _data.totalRevenue, Colors.green),
-                    const Divider(),
-                    _summaryRow('إجمالي المصروفات', _data.totalExpense, Colors.red),
-                    const Divider(),
-                    _summaryRow('صافي الربح', _data.netProfit, _data.netProfit >= 0 ? Colors.green : Colors.red),
-                  ],
-                ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [Color(0xFF1E293B), Color(0xFF0F172A)]),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  _summaryItem('إيرادات', _data.totalRevenue, const Color(0xFF10B981)),
+                  _summaryItem('مصروفات', _data.totalExpense, const Color(0xFFF87171)),
+                  _summaryItem('صافي', _data.netProfit, _data.netProfit >= 0 ? const Color(0xFF10B981) : const Color(0xFFF87171)),
+                ],
               ),
             ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton.icon(
-                  onPressed: _archiveBoth,
-                  icon: const Icon(Icons.archive, size: 16),
-                  label: const Text('أرشفة الكل', style: TextStyle(fontSize: 12)),
-                ),
-                const SizedBox(width: 8),
-                TextButton.icon(
-                  onPressed: _showArchive,
-                  icon: const Icon(Icons.history, size: 16),
-                  label: const Text('سجل الأرشفة', style: TextStyle(fontSize: 12)),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                children: [
+                  _filterBtn('الكل', 'all'),
+                  const SizedBox(width: 4),
+                  _filterBtn('عمال', 'worker'),
+                  const SizedBox(width: 4),
+                  _filterBtn('مشاريع', 'project'),
+                  const SizedBox(width: 4),
+                  _filterBtn('يدوي', 'manual'),
+                ],
+              ),
             ),
-            const Divider(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              child: Row(
+                children: [
+                  _actionBtn(Icons.archive, 'أرشفة', _archiveBoth, const Color(0xFF3B82F6)),
+                  const SizedBox(width: 8),
+                  _actionBtn(Icons.history, 'السجل', _showArchive, const Color(0xFF8B5CF6)),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
             Expanded(
               child: filtered.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.receipt_long_outlined, size: 64, color: Colors.grey[400]),
-                          const SizedBox(height: 16),
-                          Text('لا توجد سجلات', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey)),
+                          Icon(Icons.receipt_long_outlined, size: 48, color: Colors.grey[300]),
+                          const SizedBox(height: 8),
+                          Text('لا توجد سجلات', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
                         ],
                       ),
                     )
@@ -303,14 +331,20 @@ class _AccountingScreenState extends State<AccountingScreen> {
                       itemBuilder: (_, i) {
                         final row = filtered[i];
                         final realIdx = _data.rows.indexOf(row);
-                        return Card(
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 1))],
+                          ),
                           child: Padding(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                             child: Row(
                               children: [
                                 Expanded(
                                   child: TextField(
-                                    decoration: const InputDecoration(labelText: 'إيراد', isDense: true),
+                                    decoration: const InputDecoration(labelText: 'إيراد', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6)),
                                     keyboardType: TextInputType.number,
                                     controller: TextEditingController(
                                       text: row.revenue > 0 ? row.revenue.toStringAsFixed(0) : '',
@@ -324,7 +358,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: TextField(
-                                    decoration: const InputDecoration(labelText: 'مصروف', isDense: true),
+                                    decoration: const InputDecoration(labelText: 'مصروف', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6)),
                                     keyboardType: TextInputType.number,
                                     controller: TextEditingController(
                                       text: row.expense > 0 ? row.expense.toStringAsFixed(0) : '',
@@ -338,7 +372,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: TextField(
-                                    decoration: const InputDecoration(labelText: 'ملاحظة', isDense: true),
+                                    decoration: const InputDecoration(labelText: 'ملاحظة', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6)),
                                     controller: TextEditingController(text: row.note),
                                     onChanged: (v) {
                                       row.note = v;
@@ -349,14 +383,9 @@ class _AccountingScreenState extends State<AccountingScreen> {
                                 Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    if (row.source == 'worker')
-                                      Icon(Icons.engineering, size: 12, color: Colors.blue[300])
-                                    else if (row.source == 'project')
-                                      Icon(Icons.build, size: 12, color: Colors.green[300])
-                                    else if (row.source == 'manual')
-                                      Icon(Icons.edit, size: 12, color: Colors.orange[300]),
+                                    _sourceBadge(row.source),
                                     IconButton(
-                                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
+                                      icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444), size: 16),
                                       onPressed: () => _deleteRow(realIdx),
                                       padding: EdgeInsets.zero,
                                       constraints: const BoxConstraints(),
@@ -374,7 +403,63 @@ class _AccountingScreenState extends State<AccountingScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: _addRow,
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.add, size: 22),
+        ),
+      ),
+    );
+  }
+
+  Widget _sourceBadge(String source) {
+    Color bg;
+    Color fg;
+    String label;
+    switch (source) {
+      case 'worker':
+        bg = const Color(0xFFFEE2E2); fg = const Color(0xFF991B1B); label = 'عامل';
+        break;
+      case 'project':
+        bg = const Color(0xFFD1FAE5); fg = const Color(0xFF065F46); label = 'مشروع';
+        break;
+      default:
+        bg = const Color(0xFFE0E7FF); fg = const Color(0xFF3730A3); label = 'يدوي';
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+      child: Text(label, style: TextStyle(fontSize: 9, color: fg, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  Widget _summaryItem(String label, double value, Color color) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(label, style: const TextStyle(fontSize: 10, color: Colors.white70)),
+          const SizedBox(height: 2),
+          Text('${value.toStringAsFixed(0)}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+        ],
+      ),
+    );
+  }
+
+  Widget _actionBtn(IconData icon, String label, VoidCallback onTap, Color color) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 4),
+              Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+            ],
+          ),
         ),
       ),
     );
@@ -386,33 +471,18 @@ class _AccountingScreenState extends State<AccountingScreen> {
       child: GestureDetector(
         onTap: () => setState(() => _filter = value),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 5),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: active ? Theme.of(context).colorScheme.primary : Colors.grey[200],
-            borderRadius: BorderRadius.circular(6),
+            color: active ? const Color(0xFF3B82F6) : Colors.white,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: active ? const Color(0xFF3B82F6) : const Color(0xFFCBD5E1)),
           ),
           child: Text(label, textAlign: TextAlign.center, style: TextStyle(
-            fontSize: 11, fontWeight: FontWeight.w600,
-            color: active ? Colors.white : Colors.grey[700],
+            fontSize: 10, fontWeight: FontWeight.w600,
+            color: active ? Colors.white : const Color(0xFF64748B),
           )),
         ),
       ),
-    );
-  }
-
-  Widget _summaryRow(String label, double value, Color color) {
-    return Row(
-      children: [
-        Text(label, style: Theme.of(context).textTheme.bodyLarge),
-        const Spacer(),
-        Text(
-          '${value.toStringAsFixed(0)} د.ل',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ],
     );
   }
 }

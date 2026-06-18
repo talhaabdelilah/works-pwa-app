@@ -165,12 +165,25 @@ class _CustomersScreenState extends State<CustomersScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Row(
               children: [
-                Text('📂 قائمة العملاء', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                Text('📂 قائمة العملاء', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
                 const Spacer(),
-                TextButton.icon(
-                  onPressed: _addCustomer,
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('عميل جديد', style: TextStyle(fontSize: 12)),
+                GestureDetector(
+                  onTap: _addCustomer,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3B82F6),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add, size: 14, color: Colors.white),
+                        SizedBox(width: 4),
+                        Text('عميل جديد', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -181,28 +194,46 @@ class _CustomersScreenState extends State<CustomersScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.people_outline, size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        Text('لا يوجد عملاء', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey)),
+                        Icon(Icons.people_outline, size: 48, color: Colors.grey[300]),
+                        const SizedBox(height: 12),
+                        Text('لا يوجد عملاء', style: TextStyle(fontSize: 13, color: Colors.grey[400])),
                         const SizedBox(height: 8),
-                        ElevatedButton.icon(
-                          onPressed: _addCustomer,
-                          icon: const Icon(Icons.add, size: 16),
-                          label: const Text('إضافة عميل'),
+                        GestureDetector(
+                          onTap: _addCustomer,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF3B82F6),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.add, size: 14, color: Colors.white),
+                                SizedBox(width: 4),
+                                Text('إضافة عميل', style: TextStyle(fontSize: 12, color: Colors.white)),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   )
-                : RefreshIndicator(
-                    onRefresh: () async {},
-                    child: ListView.builder(
+                : ListView.builder(
                       padding: const EdgeInsets.only(top: 4, bottom: 80),
                       itemCount: widget.userData.customers.length,
                       itemBuilder: (_, i) {
                         final customer = widget.userData.customers[i];
-                        return Card(
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            border: const Border(right: BorderSide(color: Color(0xFF3B82F6), width: 3)),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 1))],
+                          ),
                           child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(14),
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -216,35 +247,33 @@ class _CustomersScreenState extends State<CustomersScreen> {
                               );
                             },
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               child: Row(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                                    child: Text(
-                                      customer.name.isNotEmpty ? customer.name[0] : '?',
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.primary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  Container(
+                                    width: 40, height: 40,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF3B82F6).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
+                                    child: const Center(child: Icon(Icons.folder, color: Color(0xFF3B82F6), size: 22)),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(customer.name, style: Theme.of(context).textTheme.titleMedium),
+                                        Text(customer.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${customer.phone}  •  ${customer.projects.length} مشاريع',
-                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                                          '${customer.projects.length} مشاريع',
+                                          style: const TextStyle(fontSize: 11, color: Color(0xFF475569)),
                                         ),
                                       ],
                                     ),
                                   ),
                                   IconButton(
-                                    icon: Icon(Icons.delete_outline, size: 18, color: Colors.red[300]),
+                                    icon: const Icon(Icons.delete_outline, size: 18, color: Color(0xFFEF4444)),
                                     onPressed: () => _deleteCustomer(customer),
                                   ),
                                 ],
@@ -254,13 +283,12 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         );
                       },
                     ),
-                  ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addCustomer,
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, size: 22),
       ),
     );
   }
