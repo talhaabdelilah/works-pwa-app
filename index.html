@@ -1749,6 +1749,51 @@ window.importBackup = function() {
         reader.onload = (ev) => {
             try {
                 const imported = JSON.parse(ev.target.result);
+                // تحويل بيانات العمال من صيغة Flutter إلى صيغة HTML
+                if (imported.workersByWeek) {
+                    const htmlWeekKey = {};
+                    for (let wk in imported.workersByWeek) {
+                        // wk = "2026-06-13" (Saturday date)
+                        const sat = new Date(wk + 'T00:00:00');
+                        if (isNaN(sat.getTime())) continue;
+                        // تحويل إلى مفتاح أسبوع بصيغة HTML: "2026-W25"
+                        const startOfYear = new Date(sat.getFullYear(), 0, 1);
+                        const dayOfYear = Math.floor((sat - startOfYear) / 864e5);
+                        const offsetDays = (6 - sat.getDay() + 7) % 7;
+                        const weekNum = Math.ceil((dayOfYear + offsetDays + 1) / 7);
+                        const htmlWk = `${sat.getFullYear()}-W${String(weekNum).padStart(2,'0')}`;
+                        // إنشاء 7 تواريخ (سبت → جمعة)
+                        const dayKeys = ['sat','sun','mon','tue','wed','thu','fri'];
+                        const dateStrs = [];
+                        for (let i = 0; i < 7; i++) {
+                            const d = new Date(sat);
+                            d.setDate(sat.getDate() + i);
+                            const mm = String(d.getMonth() + 1).padStart(2,'0');
+                            const dd = String(d.getDate()).padStart(2,'0');
+                            dateStrs.push(`${d.getFullYear()}-${mm}-${dd}`);
+                        }
+                        // تحويل كل عامل
+                        htmlWeekKey[htmlWk] = imported.workersByWeek[wk].map(w => {
+                            if (w.weekDays) {
+                                const days = {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0};
+                                for (let i = 0; i < 7; i++) {
+                                    const wd = w.weekDays[dateStrs[i]];
+                                    days[dayKeys[i]] = (wd && wd.present) ? 1 : 0;
+                                }
+                                return {
+                                    id: w.id,
+                                    name: w.name,
+                                    phone: w.phone || '',
+                                    price: w.dailyWage || w.price || 0,
+                                    expenseText: w.weeklyExpensesStr || w.expenseText || '',
+                                    days: days
+                                };
+                            }
+                            return w;
+                        });
+                    }
+                    imported.workersByWeek = htmlWeekKey;
+                }
                 userData = imported;
                 debouncedSave();
                 window.renderAll();
