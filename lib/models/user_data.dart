@@ -39,12 +39,12 @@ class UserData {
   };
 
   factory UserData.fromJson(Map<String, dynamic> json) => UserData(
-    customers: (json['customers'] as List?)?.map((c) => Customer.fromJson(c)).toList() ?? [],
-    workersByWeek: (json['workersByWeek'] as Map<String, dynamic>?)?.map(
-      (k, v) => MapEntry(k, (v as List).map((w) => Worker.fromJson(w)).toList())
-    ) ?? {},
-    accounting: AccountingData.fromJson(json['accounting'] ?? {}),
-    partnerAccounting: AccountingData.fromJson(json['partnerAccounting'] ?? {}),
+    customers: (json['customers'] as List?)?.map((c) => Customer.fromJson(Map<String, dynamic>.from(c))).toList() ?? [],
+    workersByWeek: ((json['workersByWeek'] as Map<String, dynamic>?) ?? <String, dynamic>{}).map(
+      (k, v) => MapEntry(k, (v as List).map((w) => Worker.fromJson(Map<String, dynamic>.from(w))).toList())
+    ),
+    accounting: AccountingData.fromJson(Map<String, dynamic>.from(json['accounting'] ?? {})),
+    partnerAccounting: AccountingData.fromJson(Map<String, dynamic>.from(json['partnerAccounting'] ?? {})),
     lastBackupDate: json['lastBackupDate'] as String?,
     lastDailyBackup: json['lastDailyBackup'] as String?,
     lastWeeklyBackup: json['lastWeeklyBackup'] as String?,

@@ -1,51 +1,42 @@
-class WorkerDay {
-  bool present;
-  double expenses;
-  WorkerDay({this.present = false, this.expenses = 0});
-
-  Map<String, dynamic> toJson() => {'present': present, 'expenses': expenses};
-  factory WorkerDay.fromJson(Map<String, dynamic> json) => WorkerDay(
-    present: json['present'] ?? false,
-    expenses: (json['expenses'] as num?)?.toDouble() ?? 0,
-  );
-}
-
 class Worker {
   final int id;
   String name;
-  double dailyWage;
-  Map<String, WorkerDay> weekDays;
-  double weeklyExpenses;
-  String weeklyExpensesStr;
+  String phone;
+  double price;
+  String expenseText;
+  Map<String, int> days;
+
+  static const dayKeys = ['sat','sun','mon','tue','wed','thu','fri'];
+
   Worker({
     required this.id,
     required this.name,
-    this.dailyWage = 0,
-    Map<String, WorkerDay>? weekDays,
-    this.weeklyExpenses = 0,
-    this.weeklyExpensesStr = '',
-  }) : weekDays = weekDays ?? {};
+    this.phone = '',
+    this.price = 0,
+    this.expenseText = '',
+    Map<String, int>? days,
+  }) : days = days ?? {};
 
   double get weeklyTotal {
-    final wages = weekDays.values.where((d) => d.present).length * dailyWage;
-    return wages - weeklyExpenses;
+    final present = dayKeys.fold(0, (s, d) => s + (days[d] == 1 ? 1 : 0));
+    return present * price - (double.tryParse(expenseText) ?? 0);
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id, 'name': name, 'dailyWage': dailyWage,
-    'weekDays': weekDays.map((k, v) => MapEntry(k, v.toJson())),
-    'weeklyExpenses': weeklyExpenses,
-    'weeklyExpensesStr': weeklyExpensesStr,
+    'id': id, 'name': name, 'phone': phone, 'price': price,
+    'expenseText': expenseText, 'days': days,
   };
 
   factory Worker.fromJson(Map<String, dynamic> json) => Worker(
     id: json['id'] ?? DateTime.now().millisecondsSinceEpoch,
     name: json['name'] ?? '',
-    dailyWage: (json['dailyWage'] as num?)?.toDouble() ?? 0,
-    weekDays: (json['weekDays'] as Map<String, dynamic>?)?.map(
-      (k, v) => MapEntry(k, WorkerDay.fromJson(v))
-    ) ?? {},
-    weeklyExpenses: (json['weeklyExpenses'] as num?)?.toDouble() ?? 0,
-    weeklyExpensesStr: json['weeklyExpensesStr'] as String? ?? '',
+    phone: json['phone'] ?? '',
+    price: (json['price'] ?? json['dailyWage'] ?? 0).toDouble(),
+    expenseText: json['expenseText'] ?? json['weeklyExpensesStr'] ?? '',
+    days: Map<String, int>.from(
+      (json['days'] ?? json['weekDays'] ?? {}).map(
+        (k, v) => MapEntry(k.toString(), v is int ? v : ((v is Map && v['present'] == true) ? 1 : 0))
+      )
+    ),
   );
 }

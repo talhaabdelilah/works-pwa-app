@@ -18,6 +18,6 @@ class Customer {
     id: json['id'] ?? DateTime.now().millisecondsSinceEpoch,
     name: json['name'] ?? '',
     phone: json['phone'] ?? '',
-    projects: (json['projects'] as List?)?.map((p) => Project.fromJson(p)).toList() ?? [],
+    projects: (json['projects'] as List?)?.map((p) => Project.fromJson(Map<String, dynamic>.from(p))).toList() ?? [],
   );
 }

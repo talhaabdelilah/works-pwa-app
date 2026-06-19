@@ -107,9 +107,9 @@ class Project {
     id: json['id'] ?? DateTime.now().millisecondsSinceEpoch,
     name: json['name'] ?? '',
     globalPricePerMeter: (json['globalPricePerMeter'] as num?)?.toDouble() ?? 50,
-    rooms: (json['rooms'] as List?)?.map((r) => Room.fromJson(r)).toList() ?? [],
-    payments: (json['payments'] as List?)?.map((p) => Payment.fromJson(p)).toList() ?? [],
+    rooms: (json['rooms'] as List?)?.map((r) => Room.fromJson(Map<String, dynamic>.from(r))).toList() ?? [],
+    payments: (json['payments'] as List?)?.map((p) => Payment.fromJson(Map<String, dynamic>.from(p))).toList() ?? [],
     notes: json['notes'] as String? ?? '',
-    attachments: (json['attachments'] as List?)?.map((a) => ProjectAttachment.fromJson(a)).toList() ?? [],
+    attachments: (json['attachments'] as List?)?.map((a) => ProjectAttachment.fromJson(Map<String, dynamic>.from(a))).toList() ?? [],
   );
 }

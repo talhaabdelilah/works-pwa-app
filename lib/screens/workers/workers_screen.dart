@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:works_app/models/user_data.dart';
 import 'package:works_app/models/worker.dart';
 import 'package:works_app/screens/workers/worker_detail_screen.dart';
@@ -19,9 +18,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
   final _searchCtrl = TextEditingController();
   String _searchQuery = '';
 
-  static const _dayNames = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
   static const _dayShort = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'];
-  static const _arMonths = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
   @override
   void initState() {
@@ -37,19 +34,26 @@ class _WorkersScreenState extends State<WorkersScreen> {
 
   String _getWeekKey(DateTime d) {
     final sat = d.subtract(Duration(days: (d.weekday + 1) % 7));
-    return intl.DateFormat('yyyy-MM-dd').format(sat);
-  }
-
-  List<String> _getDates(String wk) {
-    final p = DateTime.parse(wk);
-    return List.generate(7, (i) => intl.DateFormat('yyyy-MM-dd').format(p.add(Duration(days: i))));
+    final startOfYear = DateTime(sat.year, 1, 1);
+    final dayOfYear = sat.difference(startOfYear).inDays;
+    final satDow = sat.weekday == 7 ? 6 : sat.weekday - 1;
+    final offsetDays = (6 - satDow + 7) % 7;
+    final weekNum = ((dayOfYear + offsetDays) / 7).ceil();
+    return '${sat.year}-W${weekNum.toString().padLeft(2, '0')}';
   }
 
   String _formatWeek(String wk) {
     try {
-      final sat = DateTime.parse(wk);
-      final fri = sat.add(const Duration(days: 6));
-      return '${sat.day} ${_arMonths[sat.month - 1]} - ${fri.day} ${_arMonths[fri.month - 1]} ${sat.year}';
+      final parts = wk.split('-W');
+      if (parts.length != 2) return wk;
+      final year = int.tryParse(parts[0]) ?? DateTime.now().year;
+      final weekNum = int.tryParse(parts[1]) ?? 1;
+      final jan1 = DateTime(year, 1, 1);
+      final jan1Dow = jan1.weekday == 7 ? 6 : jan1.weekday - 1;
+      final daysToSat = (6 - jan1Dow + 7) % 7;
+      final firstSat = jan1.add(Duration(days: daysToSat + (weekNum - 1) * 7));
+      final fri = firstSat.add(const Duration(days: 6));
+      return '${firstSat.day}/${firstSat.month} - ${fri.day}/${fri.month} $year';
     } catch (_) {
       return wk;
     }
@@ -58,19 +62,44 @@ class _WorkersScreenState extends State<WorkersScreen> {
   bool get _isCurrentWeek => _currentWeek == _getWeekKey(DateTime.now());
 
   void _prevWeek() {
-    setState(() => _currentWeek = _getWeekKey(DateTime.parse(_currentWeek).subtract(const Duration(days: 7))));
+    final parts = _currentWeek.split('-W');
+    if (parts.length != 2) return;
+    final year = int.parse(parts[0]);
+    final week = int.parse(parts[1]);
+    final jan1 = DateTime(year, 1, 1);
+    final jan1Dow = jan1.weekday == 7 ? 6 : jan1.weekday - 1;
+    final daysToSat = (6 - jan1Dow + 7) % 7;
+    final sat = jan1.add(Duration(days: daysToSat + (week - 1) * 7 - 7));
+    setState(() => _currentWeek = _getWeekKey(sat));
   }
 
   void _nextWeek() {
-    setState(() => _currentWeek = _getWeekKey(DateTime.parse(_currentWeek).add(const Duration(days: 7))));
+    final parts = _currentWeek.split('-W');
+    if (parts.length != 2) return;
+    final year = int.parse(parts[0]);
+    final week = int.parse(parts[1]);
+    final jan1 = DateTime(year, 1, 1);
+    final jan1Dow = jan1.weekday == 7 ? 6 : jan1.weekday - 1;
+    final daysToSat = (6 - jan1Dow + 7) % 7;
+    final sat = jan1.add(Duration(days: daysToSat + (week - 1) * 7 + 7));
+    setState(() => _currentWeek = _getWeekKey(sat));
   }
 
   void _copyToNext() {
-    final nextKey = _getWeekKey(DateTime.parse(_currentWeek).add(const Duration(days: 7)));
+    final parts = _currentWeek.split('-W');
+    if (parts.length != 2) return;
+    final year = int.parse(parts[0]);
+    final week = int.parse(parts[1]);
+    final jan1 = DateTime(year, 1, 1);
+    final jan1Dow = jan1.weekday == 7 ? 6 : jan1.weekday - 1;
+    final daysToSat = (6 - jan1Dow + 7) % 7;
+    final sat = jan1.add(Duration(days: daysToSat + (week - 1) * 7 + 7));
+    final nextKey = _getWeekKey(sat);
+
     final cur = _getWorkers();
     final copied = cur.map((w) => Worker(
       id: DateTime.now().millisecondsSinceEpoch + w.id,
-      name: w.name, dailyWage: w.dailyWage,
+      name: w.name, price: w.price,
     )).toList();
 
     final up = Map<String, List<Worker>>.from(widget.userData.workersByWeek);
@@ -129,7 +158,7 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 _save([Worker(
                   id: DateTime.now().millisecondsSinceEpoch,
                   name: nc.text.trim(),
-                  dailyWage: double.tryParse(wc.text.trim()) ?? 0,
+                  price: double.tryParse(wc.text.trim()) ?? 0,
                 ), ..._getWorkers()]);
                 Navigator.pop(ctx);
               }, child: const Text('حفظ'),
@@ -140,10 +169,8 @@ class _WorkersScreenState extends State<WorkersScreen> {
     );
   }
 
-  void _toggleDay(Worker w, String date) {
-    final day = w.weekDays[date] ?? WorkerDay();
-    day.present = !day.present;
-    w.weekDays[date] = day;
+  void _toggleDay(Worker w, String dayKey) {
+    w.days[dayKey] = (w.days[dayKey] == 1) ? 0 : 1;
     _save(_getWorkers());
   }
 
@@ -151,17 +178,17 @@ class _WorkersScreenState extends State<WorkersScreen> {
   Widget build(BuildContext context) {
     final workers = _getWorkers();
     final filtered = _getFilteredWorkers();
-    final dates = _getDates(_currentWeek);
-    final todayStr = intl.DateFormat('yyyy-MM-dd').format(DateTime.now());
-    final presentToday = workers.where((w) => (w.weekDays[todayStr] ?? WorkerDay()).present).length;
-    final totalWages = workers.fold(0.0, (s, w) => s + w.weekDays.values.where((d) => d.present).length * w.dailyWage);
+    final today = DateTime.now();
+    final todayDow = today.weekday == 7 ? 6 : today.weekday - 1;
+    final todayKey = Worker.dayKeys[todayDow == 0 ? 6 : todayDow - 1];
+    final presentToday = workers.where((w) => w.days[todayKey] == 1).length;
+    final totalWages = workers.fold(0.0, (s, w) => s + w.weeklyTotal);
 
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
         body: Column(
           children: [
-            // Week navigation - like HTML card style
             Container(
               margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -218,7 +245,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 ],
               ),
             ),
-            // Stats
             if (workers.isNotEmpty)
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 12),
@@ -232,7 +258,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
                   ],
                 ),
               ),
-            // Search
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 6, 12, 4),
               child: TextField(
@@ -254,7 +279,6 @@ class _WorkersScreenState extends State<WorkersScreen> {
                 onChanged: (v) => setState(() => _searchQuery = v),
               ),
             ),
-            // Table
             Expanded(
               child: filtered.isEmpty
                   ? Center(
@@ -264,106 +288,124 @@ class _WorkersScreenState extends State<WorkersScreen> {
                         Text(_searchQuery.isNotEmpty ? 'لا توجد نتائج بحث' : 'لا يوجد عمال', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
                       ]),
                     )
-                  : Container(
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 1))],
-                      ),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          headingRowHeight: 30,
-                          dataRowMinHeight: 36,
-                          dataRowMaxHeight: 40,
-                          columnSpacing: 0,
-                          horizontalMargin: 2,
-                          headingRowColor: WidgetStateProperty.all(const Color(0xFF1E293B)),
-                          columns: [
-                            const DataColumn(label: Text('#', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
-                            DataColumn(label: Text('الاسم', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)), numeric: false),
-                            ...List.generate(7, (i) => DataColumn(
-                              label: Text(_dayShort[i], style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white)),
-                            )),
-                            const DataColumn(label: Text('الإجمالي', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white))),
-                            const DataColumn(label: Text('', style: TextStyle(fontSize: 8))),
-                          ],
-                          rows: List.generate(filtered.length, (i) {
-                            final w = filtered[i];
-                            return DataRow(cells: [
-                              DataCell(Text('${i + 1}', style: const TextStyle(fontSize: 9))),
-                              DataCell(
-                                GestureDetector(
-                                  onTap: () => Navigator.push(context, MaterialPageRoute(
-                                    builder: (_) => WorkerDetailScreen(
-                                      workerName: w.name,
-                                      userData: widget.userData,
-                                      onSave: widget.onSave,
-                                    ),
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        final totalW = constraints.maxWidth;
+                        final idxW = 24.0;
+                        final dayW = (totalW - idxW - 100) / 10;
+                        final nameW = dayW * 1.8;
+                        final totalW2 = dayW * 1.2;
+                        return Container(
+                          clipBehavior: Clip.antiAlias,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 1))],
+                          ),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              width: totalW,
+                              child: DataTable(
+                                headingRowHeight: 30,
+                                dataRowMinHeight: 36,
+                                dataRowMaxHeight: 40,
+                                columnSpacing: 0,
+                                horizontalMargin: 0,
+                                headingRowColor: WidgetStateProperty.all(const Color(0xFF1E293B)),
+                                columns: [
+                                  const DataColumn(label: Text('#', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white))),
+                                  DataColumn(label: SizedBox(width: nameW, child: const Text('الاسم', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)))),
+                                  ...List.generate(7, (i) => DataColumn(
+                                    label: SizedBox(width: dayW, child: Text(_dayShort[i], style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white), textAlign: TextAlign.center)),
                                   )),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEFF6FF),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(w.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 8, color: Color(0xFF3B82F6))),
-                                  ),
-                                ),
-                              ),
-                              ...List.generate(7, (j) {
-                                final day = w.weekDays[dates[j]] ?? WorkerDay();
-                                return DataCell(
-                                  GestureDetector(
-                                    onTap: () => _toggleDay(w, dates[j]),
-                                    child: Container(
-                                      width: 18, height: 18,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: day.present ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
+                                  DataColumn(label: SizedBox(width: totalW2, child: const Text('الإجمالي', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white), textAlign: TextAlign.center))),
+                                  const DataColumn(label: Text('', style: TextStyle(fontSize: 8))),
+                                ],
+                                rows: List.generate(filtered.length, (i) {
+                                  final w = filtered[i];
+                                  return DataRow(cells: [
+                                    const DataCell(Text('')),
+                                    DataCell(SizedBox(
+                                      width: nameW,
+                                      child: GestureDetector(
+                                        onTap: () => Navigator.push(context, MaterialPageRoute(
+                                          builder: (_) => WorkerDetailScreen(
+                                            workerName: w.name,
+                                            userData: widget.userData,
+                                            onSave: widget.onSave,
+                                          ),
+                                        )),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFEFF6FF),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(w.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 8, color: Color(0xFF3B82F6))),
+                                        ),
                                       ),
-                                      child: day.present ? const Icon(Icons.check, size: 10, color: Colors.white) : null,
+                                    )),
+                                    ...List.generate(7, (j) {
+                                      final dk = Worker.dayKeys[j];
+                                      final present = w.days[dk] == 1;
+                                      return DataCell(SizedBox(
+                                        width: dayW,
+                                        child: GestureDetector(
+                                          onTap: () => _toggleDay(w, dk),
+                                          child: Center(
+                                            child: Container(
+                                              width: 16, height: 16,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: present ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
+                                              ),
+                                              child: present ? const Icon(Icons.check, size: 10, color: Colors.white) : null,
+                                            ),
+                                          ),
+                                        ),
+                                      ));
+                                    }),
+                                    DataCell(SizedBox(
+                                      width: totalW2,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: w.weeklyTotal >= 0 ? const Color(0xFFD1FAE5) : const Color(0xFFFEE2E2),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text('${w.weeklyTotal.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 8, color: w.weeklyTotal >= 0 ? const Color(0xFF065F46) : const Color(0xFF991B1B)), textAlign: TextAlign.center),
+                                      ),
+                                    )),
+                                    DataCell(
+                                      GestureDetector(
+                                        onTap: () {
+                                          final workers = _getWorkers();
+                                          widget.onSave(UserData(
+                                            customers: widget.userData.customers,
+                                            workersByWeek: Map<String, List<Worker>>.from(widget.userData.workersByWeek)..[_currentWeek] = workers.where((x) => x.id != w.id).toList(),
+                                            accounting: widget.userData.accounting,
+                                            partnerAccounting: widget.userData.partnerAccounting,
+                                            lastBackupDate: widget.userData.lastBackupDate,
+                                          ));
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFEF4444),
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          child: const Text('حذف', style: TextStyle(fontSize: 7, color: Colors.white, fontWeight: FontWeight.bold)),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }),
-                              DataCell(
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: w.weeklyTotal >= 0 ? const Color(0xFFD1FAE5) : const Color(0xFFFEE2E2),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text('${w.weeklyTotal.toStringAsFixed(0)}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 8, color: w.weeklyTotal >= 0 ? const Color(0xFF065F46) : const Color(0xFF991B1B))),
-                                ),
+                                  ]);
+                                }),
                               ),
-                              DataCell(
-                                GestureDetector(
-                                  onTap: () {
-                                    final workers = _getWorkers();
-                                    widget.onSave(UserData(
-                                      customers: widget.userData.customers,
-                                      workersByWeek: Map<String, List<Worker>>.from(widget.userData.workersByWeek)..[_currentWeek] = workers.where((x) => x.id != w.id).toList(),
-                                      accounting: widget.userData.accounting,
-                                      partnerAccounting: widget.userData.partnerAccounting,
-                                      lastBackupDate: widget.userData.lastBackupDate,
-                                    ));
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEF4444),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: const Text('حذف', style: TextStyle(fontSize: 7, color: Colors.white, fontWeight: FontWeight.bold)),
-                                  ),
-                                ),
-                              ),
-                            ]);
-                          }),
-                        ),
-                      ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
             ),
           ],

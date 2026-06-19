@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:works_app/services/storage_service.dart';
+import 'package:works_app/services/file_picker_service.dart';
+import 'package:works_app/services/firebase_sync_service.dart';
 import 'package:works_app/models/user_data.dart';
 import 'package:works_app/models/accounting.dart';
 import 'package:works_app/screens/customers/customers_screen.dart';
-import 'package:works_app/models/worker.dart';
 import 'package:works_app/screens/workers/workers_screen.dart';
 import 'package:works_app/screens/accounting/accounting_screen.dart';
 
@@ -19,6 +21,9 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   late UserData _data;
   int _currentIndex = 0;
+  final _firebase = FirebaseSyncService();
+
+  bool _isSyncing = false;
 
   final _titles = ['العملاء', 'العمال', 'المحاسبة', 'تسوية'];
 
@@ -26,6 +31,16 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _data = widget.userData;
+    _tryLoginFromPrefs();
+  }
+
+  Future<void> _tryLoginFromPrefs() async {
+    final email = await StorageService().getFirebaseEmail();
+    final password = await StorageService().getFirebasePassword();
+    if (email != null && password != null) {
+      await _firebase.signIn(email, password);
+      if (mounted) setState(() {});
+    }
   }
 
   void _saveData(UserData updatedData) {
@@ -36,16 +51,18 @@ class _MainScreenState extends State<MainScreen> {
       _data.partnerAccounting = updatedData.partnerAccounting;
     });
     StorageService().saveUserData(_data);
+    if (_firebase.isSignedIn) {
+      _firebase.saveToFirebase(_data);
+    }
   }
 
   Future<void> _exportJson() async {
     try {
       final path = await StorageService().exportToJson(_data);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم التصدير إلى: $path')),
-        );
-      }
+      final file = XFile(path);
+      await SharePlus.instance.share(
+        ShareParams(files: [file], text: 'نسخة احتياطية - نظام إدارة المشاريع'),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -56,45 +73,80 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Future<void> _importJson() async {
-    final ctrl = TextEditingController();
-    final imported = await showDialog<UserData>(
+    final method = await showDialog<String>(
       context: context,
       builder: (ctx) => Directionality(
         textDirection: TextDirection.rtl,
         child: AlertDialog(
-          title: const Text('استيراد JSON'),
-          content: TextField(
-            controller: ctrl,
-            maxLines: 10,
-            decoration: const InputDecoration(
-              labelText: 'الصق محتوى JSON هنا',
-              border: OutlineInputBorder(),
-            ),
-          ),
+          title: const Text('استيراد بيانات'),
+          content: const Text('اختر طريقة الاستيراد:'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, 'paste'),
+              child: const Text('📋 لصق نص'),
+            ),
             ElevatedButton(
-              onPressed: () {
-                try {
-                  final data = StorageService().importFromJson(ctrl.text.trim());
-                  Navigator.pop(ctx, data);
-                } catch (e) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
-                  );
-                }
-              },
-              child: const Text('استيراد'),
+              onPressed: () => Navigator.pop(ctx, 'file'),
+              child: const Text('📂 اختيار ملف'),
             ),
           ],
         ),
       ),
     );
-    if (imported != null) {
-      _saveData(imported);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم استيراد البيانات بنجاح')),
+    if (method == null) return;
+
+    if (method == 'paste') {
+      final ctrl = TextEditingController();
+      final imported = await showDialog<UserData>(
+        context: context,
+        builder: (ctx) => Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            title: const Text('لصق JSON'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: TextField(
+                controller: ctrl,
+                maxLines: 12,
+                decoration: const InputDecoration(
+                  labelText: 'الصق محتوى JSON هنا',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+              ElevatedButton(
+                onPressed: () {
+                  try {
+                    final data = StorageService().importFromJson(ctrl.text.trim());
+                    Navigator.pop(ctx, data);
+                  } catch (e) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
+                    );
+                  }
+                },
+                child: const Text('استيراد'),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (imported != null) {
+        _saveData(imported);
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم استيراد البيانات بنجاح')));
+      }
+    } else {
+      try {
+        final content = await FilePickerService.pickJsonFile();
+        if (content == null || content.isEmpty) return;
+        final data = StorageService().importFromJson(content);
+        _saveData(data);
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم استيراد البيانات بنجاح')));
+      } catch (e) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -169,14 +221,118 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  Future<void> _showFirebaseLoginDialog() async {
+    final emailC = TextEditingController();
+    final passC = TextEditingController();
+    final registerC = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          title: const Text('تسجيل دخول السحابة'),
+          content: StatefulBuilder(
+            builder: (ctx, setDialogState) => SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('سجل الدخول بنفس حساب HTML لمزامنة البيانات', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  const SizedBox(height: 12),
+                  TextField(controller: emailC, decoration: const InputDecoration(labelText: 'البريد الإلكتروني', border: OutlineInputBorder()), keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 8),
+                  TextField(controller: passC, decoration: const InputDecoration(labelText: 'كلمة المرور', border: OutlineInputBorder()), obscureText: true),
+                  if (registerC.text.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    TextField(controller: registerC, decoration: const InputDecoration(labelText: 'تأكيد كلمة المرور', border: OutlineInputBorder()), obscureText: true),
+                  ],
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          registerC.text = registerC.text.isEmpty ? ' ' : '';
+                          setDialogState(() {});
+                        },
+                        child: Text(registerC.text.isEmpty ? 'مستخدم جديد؟' : 'لدي حساب', style: TextStyle(fontSize: 12)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
+            ElevatedButton(
+              onPressed: () async {
+                if (emailC.text.isEmpty || passC.text.isEmpty) return;
+                final isRegister = registerC.text.isNotEmpty;
+                String? error;
+                if (isRegister) {
+                  if (passC.text != registerC.text) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('كلمة المرور غير متطابقة')));
+                    return;
+                  }
+                  error = await _firebase.register(emailC.text, passC.text);
+                } else {
+                  error = await _firebase.signIn(emailC.text, passC.text);
+                }
+                if (error != null) {
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error!)));
+                  }
+                  return;
+                }
+                await StorageService().saveFirebaseCredentials(emailC.text, passC.text);
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(isRegister ? 'تم إنشاء الحساب وتخزين البيانات محلياً - اضغط استيراد من السحابة لنقل البيانات' : 'تم تسجيل الدخول'), duration: Duration(seconds: 2)),
+                  );
+                }
+              },
+              child: const Text('تسجيل الدخول'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _syncFromFirebase() async {
+    setState(() => _isSyncing = true);
+    final cloudData = await _firebase.loadFromFirebase();
+    if (cloudData != null) {
+      _data = cloudData;
+      StorageService().saveUserData(_data);
+      if (mounted) {
+        setState(() => _isSyncing = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم استيراد البيانات من السحابة'), duration: Duration(seconds: 2)),
+        );
+      }
+    } else {
+      if (mounted) {
+        setState(() => _isSyncing = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('لا توجد بيانات في السحابة أو فشل الاتصال'), duration: Duration(seconds: 2)),
+        );
+      }
+    }
+  }
+
   void _syncToAccounting() {
     final accRows = <AccountingRow>[];
     int projCount = 0, workerCount = 0;
 
     for (final weekWorkers in _data.workersByWeek.values) {
       for (final w in weekWorkers) {
-        if (w.weeklyExpenses > 0) {
-          accRows.add(AccountingRow(expense: w.weeklyExpenses, note: 'عامل ${w.name}', source: 'worker'));
+        final exp = double.tryParse(w.expenseText) ?? 0;
+        if (exp > 0) {
+          accRows.add(AccountingRow(expense: exp, note: 'عامل ${w.name}', source: 'worker'));
           workerCount++;
         }
       }
@@ -242,6 +398,20 @@ class _MainScreenState extends State<MainScreen> {
                   case 'partners':
                     _editPartnerNames();
                     break;
+                  case 'firebaseLogin':
+                    _showFirebaseLoginDialog();
+                    break;
+                  case 'firebaseLogout':
+                    _firebase.signOut();
+                    StorageService().clearFirebaseCredentials();
+                    setState(() {});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('تم تسجيل الخروج من السحابة'), duration: Duration(seconds: 1)),
+                    );
+                    break;
+                  case 'syncFromCloud':
+                    _syncFromFirebase();
+                    break;
                   case 'reset':
                     _resetAllData();
                     break;
@@ -259,6 +429,21 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
                 PopupMenuItem(value: 'sync', child: _menuItem(Icons.sync, 'مزامنة يدوية', const Color(0xFF3B82F6))),
+                if (_firebase.isSignedIn)
+                  PopupMenuItem(
+                    value: 'syncFromCloud',
+                    child: _isSyncing
+                        ? Row(children: [SizedBox(width:16,height:16,child: CircularProgressIndicator(strokeWidth:2)), SizedBox(width:8), Text('جارٍ التحميل...', style: TextStyle(fontSize:12))])
+                        : _menuItem(Icons.cloud_download, 'استيراد من السحابة', const Color(0xFF3B82F6)),
+                  ),
+                PopupMenuItem(
+                  value: _firebase.isSignedIn ? 'firebaseLogout' : 'firebaseLogin',
+                  child: _menuItem(
+                    _firebase.isSignedIn ? Icons.cloud_off : Icons.cloud,
+                    _firebase.isSignedIn ? 'تسجيل خروج السحابة (${_firebase.email})' : 'تسجيل دخول السحابة',
+                    const Color(0xFF3B82F6),
+                  ),
+                ),
                 PopupMenuItem(value: 'partners', child: _menuItem(Icons.people, 'تعديل أسماء الشركاء', const Color(0xFF8B5CF6))),
                 PopupMenuItem(value: 'export', child: _menuItem(Icons.download, 'تصدير JSON', const Color(0xFF10B981))),
                 PopupMenuItem(value: 'import', child: _menuItem(Icons.upload, 'استيراد JSON', const Color(0xFFF59E0B))),

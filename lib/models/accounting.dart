@@ -40,10 +40,10 @@ class ArchiveEntry {
   factory ArchiveEntry.fromJson(Map<String, dynamic> json) => ArchiveEntry(
     id: json['id'] ?? DateTime.now().millisecondsSinceEpoch,
     date: json['date'] ?? '', time: json['time'] ?? '',
-    rows: (json['rows'] as List?)?.map((r) => AccountingRow.fromJson(r)).toList() ?? [],
-    summary: (json['summary'] as Map<String, dynamic>?)?.map(
-      (k, v) => MapEntry(k, (v as num).toDouble())
-    ) ?? {},
+    rows: (json['rows'] as List?)?.map((r) => AccountingRow.fromJson(Map<String, dynamic>.from(r))).toList() ?? [],
+    summary: Map<String, double>.from((json['summary'] as Map?)?.map(
+      (k, v) => MapEntry(k.toString(), (v as num).toDouble())
+    ) ?? {}),
     rowCount: json['rowCount'] ?? 0,
   );
 }
@@ -67,8 +67,8 @@ class AccountingData {
   };
 
   factory AccountingData.fromJson(Map<String, dynamic> json) => AccountingData(
-    rows: (json['rows'] as List?)?.map((r) => AccountingRow.fromJson(r)).toList() ?? [],
-    history: (json['history'] as List?)?.map((h) => ArchiveEntry.fromJson(h)).toList() ?? [],
+    rows: (json['rows'] as List?)?.map((r) => AccountingRow.fromJson(Map<String, dynamic>.from(r))).toList() ?? [],
+    history: (json['history'] as List?)?.map((h) => ArchiveEntry.fromJson(Map<String, dynamic>.from(h))).toList() ?? [],
     partnerName: json['partnerName'] ?? 'الشريك',
   );
 }

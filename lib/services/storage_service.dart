@@ -57,7 +57,7 @@ class StorageService {
   }
 
   Future<String> exportToJson(UserData data) async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getTemporaryDirectory();
     final date = DateTime.now().toString().substring(0, 10);
     final file = File('${directory.path}/works_backup_$date.json');
     await file.writeAsString(jsonEncode(data.toJson()));
@@ -65,11 +65,33 @@ class StorageService {
   }
 
   UserData importFromJson(String jsonString) {
-    final map = jsonDecode(jsonString) as Map<String, dynamic>;
+    final map = Map<String, dynamic>.from(jsonDecode(jsonString));
     return UserData.fromJson(map);
   }
 
 
+
+  Future<void> saveFirebaseCredentials(String email, String password) async {
+    _prefs ??= await SharedPreferences.getInstance();
+    await _prefs!.setString('firebase_email', email);
+    await _prefs!.setString('firebase_password', password);
+  }
+
+  Future<String?> getFirebaseEmail() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!.getString('firebase_email');
+  }
+
+  Future<String?> getFirebasePassword() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    return _prefs!.getString('firebase_password');
+  }
+
+  Future<void> clearFirebaseCredentials() async {
+    _prefs ??= await SharedPreferences.getInstance();
+    await _prefs!.remove('firebase_email');
+    await _prefs!.remove('firebase_password');
+  }
 
   String _isoWeekKey(DateTime d) {
     final weekday = d.weekday;

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:works_app/models/user_data.dart';
 import 'package:works_app/models/worker.dart';
 import 'package:works_app/models/accounting.dart';
-
 
 class WorkerDetailScreen extends StatefulWidget {
   final String workerName;
@@ -17,20 +15,25 @@ class WorkerDetailScreen extends StatefulWidget {
 }
 
 class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
-  static const _arMonths = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-
   String _fmtWeek(String wk) {
     try {
-      final sat = DateTime.parse(wk);
-      final fri = sat.add(const Duration(days: 6));
-      return '${sat.day} ${_arMonths[sat.month - 1]} - ${fri.day} ${_arMonths[fri.month - 1]}';
+      final parts = wk.split('-W');
+      if (parts.length != 2) return wk;
+      final year = int.tryParse(parts[0]) ?? 0;
+      final weekNum = int.tryParse(parts[1]) ?? 1;
+      final jan1 = DateTime(year, 1, 1);
+      final jan1Dow = jan1.weekday == 7 ? 6 : jan1.weekday - 1;
+      final daysToSat = (6 - jan1Dow + 7) % 7;
+      final firstSat = jan1.add(Duration(days: daysToSat + (weekNum - 1) * 7));
+      final fri = firstSat.add(const Duration(days: 6));
+      return '${firstSat.day}/${firstSat.month} - ${fri.day}/${fri.month}';
     } catch (_) {
       return wk;
     }
   }
 
   void _editExpenses(String weekKey, Worker worker) {
-    final ctrl = TextEditingController(text: worker.weeklyExpenses > 0 ? worker.weeklyExpenses.toStringAsFixed(0) : '');
+    final ctrl = TextEditingController(text: worker.expenseText.isNotEmpty ? worker.expenseText : '');
     showDialog(
       context: context,
       builder: (ctx) => Directionality(
@@ -46,7 +49,7 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
             ElevatedButton(
               onPressed: () {
-                worker.weeklyExpenses = double.tryParse(ctrl.text.trim()) ?? 0;
+                worker.expenseText = ctrl.text.trim();
                 _updateWorker(weekKey, worker);
                 Navigator.pop(ctx);
               },
@@ -59,7 +62,7 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
   }
 
   void _editWage(String weekKey, Worker worker) {
-    final ctrl = TextEditingController(text: worker.dailyWage.toStringAsFixed(0));
+    final ctrl = TextEditingController(text: worker.price.toStringAsFixed(0));
     showDialog(
       context: context,
       builder: (ctx) => Directionality(
@@ -75,7 +78,7 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('إلغاء')),
             ElevatedButton(
               onPressed: () {
-                worker.dailyWage = double.tryParse(ctrl.text.trim()) ?? 0;
+                worker.price = double.tryParse(ctrl.text.trim()) ?? 0;
                 _updateWorker(weekKey, worker);
                 Navigator.pop(ctx);
               },
@@ -100,12 +103,15 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
       final accRows = widget.userData.accounting.rows.where((r) => r.source != 'worker').toList();
       for (final ws in up.values) {
         for (final w in ws) {
-          if (w.name == widget.workerName && w.weeklyExpenses > 0) {
-            accRows.add(AccountingRow(
-              expense: w.weeklyExpenses,
-              note: 'عامل ${w.name}',
-              source: 'worker',
-            ));
+          if (w.name == widget.workerName) {
+            final exp = double.tryParse(w.expenseText) ?? 0;
+            if (exp > 0) {
+              accRows.add(AccountingRow(
+                expense: exp,
+                note: 'عامل ${w.name}',
+                source: 'worker',
+              ));
+            }
           }
         }
       }
@@ -145,10 +151,11 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
 
     for (final e in sortedWeeks) {
       final w = e.value;
-      final days = w.weekDays.values.where((d) => d.present).length;
+      final days = Worker.dayKeys.fold(0, (s, d) => s + (w.days[d] == 1 ? 1 : 0));
       totalDays += days;
-      totalDues += days * w.dailyWage;
-      totalExpenses += w.weeklyExpenses;
+      totalDues += days * w.price;
+      final exp = double.tryParse(w.expenseText) ?? 0;
+      totalExpenses += exp;
     }
     totalNet = totalDues - totalExpenses;
 
@@ -195,9 +202,10 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
                   ...sortedWeeks.map((e) {
                     final w = e.value;
                     final wk = e.key;
-                    final days = w.weekDays.values.where((d) => d.present).length;
-                    final wages = days * w.dailyWage;
-                    final net = wages - w.weeklyExpenses;
+                    final days = Worker.dayKeys.fold(0, (s, d) => s + (w.days[d] == 1 ? 1 : 0));
+                    final wages = days * w.price;
+                    final exp = double.tryParse(w.expenseText) ?? 0;
+                    final net = wages - exp;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 6),
@@ -229,11 +237,11 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                _detailChip('الأجر', '${w.dailyWage.toStringAsFixed(0)}', const Color(0xFF3B82F6), () => _editWage(wk, w)),
+                                _detailChip('الأجر', '${w.price.toStringAsFixed(0)}', const Color(0xFF3B82F6), () => _editWage(wk, w)),
                                 const SizedBox(width: 4),
                                 _detailChip('المستحق', '${wages.toStringAsFixed(0)}', const Color(0xFF10B981), null),
                                 const SizedBox(width: 4),
-                                _detailChip('مصروفات', '${w.weeklyExpenses.toStringAsFixed(0)}', const Color(0xFFEF4444), () => _editExpenses(wk, w)),
+                                _detailChip('مصروفات', '${exp.toStringAsFixed(0)}', const Color(0xFFEF4444), () => _editExpenses(wk, w)),
                                 const SizedBox(width: 4),
                                 _detailChip('الصافي', '${net.toStringAsFixed(0)}', const Color(0xFF0D9488), null),
                               ],

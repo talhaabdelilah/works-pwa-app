@@ -152,77 +152,140 @@ class _CustomerProjectsScreenState extends State<CustomerProjectsScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_customer.name),
+          title: Text(_customer.name, style: const TextStyle(fontSize: 13)),
           actions: [
-            TextButton.icon(
-              onPressed: _addProject,
-              icon: const Icon(Icons.add, size: 16),
-              label: const Text('مشروع', style: TextStyle(color: Colors.white, fontSize: 12)),
+            GestureDetector(
+              onTap: _addProject,
+              child: Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, size: 14, color: Colors.white),
+                    SizedBox(width: 4),
+                    Text('مشروع', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
-        body: _customer.projects.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.folder_open, size: 64, color: Colors.grey[400]),
-                    const SizedBox(height: 16),
-                    Text('لا يوجد مشاريع', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey)),
-                    const SizedBox(height: 8),
-                    ElevatedButton.icon(
-                      onPressed: _addProject,
-                      icon: const Icon(Icons.add, size: 16),
-                      label: const Text('إضافة مشروع'),
+        body: Column(
+          children: [
+            // Breadcrumb
+            Container(
+              margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: const Color(0xFFCBD5E1)),
+                      ),
+                      child: const Text('رجوع', style: TextStyle(fontSize: 10, color: Color(0xFF475569))),
                     ),
-                  ],
-                ),
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.only(top: 8, bottom: 80),
-                itemCount: _customer.projects.length,
-                itemBuilder: (_, i) {
-                  final project = _customer.projects[i];
-                  final remaining = project.remaining;
-                  return Dismissible(
-                    key: ValueKey(project.id),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
-                      color: Colors.red,
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    confirmDismiss: (_) async {
-                      _deleteProject(project);
-                      return false;
-                    },
-                    child: Card(
-                      child: ListTile(
-                        title: Text(project.name),
-                        subtitle: Text(
-                          'التكلفة: ${project.totalCost.toStringAsFixed(0)}  •  المتبقي: ${remaining.toStringAsFixed(0)}',
-                        ),
-                        trailing: const Icon(Icons.chevron_left),
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProjectDetailScreen(
-                                project: project,
-                                onUpdate: (updated) => _updateProject(updated),
+                  ),
+                  const Spacer(),
+                  Text(_customer.name, style: const TextStyle(fontSize: 10, color: Color(0xFF64748B))),
+                  const Text(' / ', style: TextStyle(fontSize: 10, color: Color(0xFFCBD5E1))),
+                  Text('${_customer.projects.length} مشاريع', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                ],
+              ),
+            ),
+            Expanded(
+              child: _customer.projects.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.folder_open, size: 48, color: Colors.grey[300]),
+                          const SizedBox(height: 12),
+                          Text('لا يوجد مشاريع', style: TextStyle(fontSize: 13, color: Colors.grey[400])),
+                          const SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: _addProject,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF3B82F6),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: const Text('إضافة مشروع', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.only(top: 8, bottom: 80),
+                      itemCount: _customer.projects.length,
+                      itemBuilder: (_, i) {
+                        final project = _customer.projects[i];
+                        final remaining = project.remaining;
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            border: const Border(right: BorderSide(color: Color(0xFF3B82F6), width: 3)),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 1))],
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ProjectDetailScreen(
+                                    project: project,
+                                    onUpdate: (updated) => _updateProject(updated),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(project.name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                                        const SizedBox(height: 4),
+                                        Text('التكلفة: ${project.totalCost.toStringAsFixed(0)}  •  المتبقي: ${remaining.toStringAsFixed(0)}',
+                                            style: const TextStyle(fontSize: 10, color: Color(0xFF475569))),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(Icons.chevron_left, size: 18, color: Color(0xFFCBD5E1)),
+                                ],
                               ),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
+            ),
+          ],
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: _addProject,
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.add, size: 22),
         ),
       ),
     );
