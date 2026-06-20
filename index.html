@@ -377,8 +377,13 @@
                                 <span>📏 المحيط: <strong id="totalPerimeter">0.00</strong> م</span>
                                 <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost">0.00</strong> دينار</span>
                             </div>
-                            <div style="border-top:2px solid #3b82f6;margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;font-weight:bold;">
-                                <span>🏗️ المجموع الكلي: <strong id="totalRoomsCost" style="color:#065f46;">0.00</strong> دينار</span>
+                            <div style="border-top:2px solid #3b82f6;margin-top:6px;padding-top:6px;">
+                                <div style="display:flex;justify-content:space-between;font-weight:bold;">
+                                    <span>🏗️ المجموع الكلي (مساحة + محيط): <strong id="totalMeters" style="color:#065f46;">0.00</strong> م</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;font-weight:bold;margin-top:2px;">
+                                    <span>💰 إجمالي التكلفة: <strong id="totalRoomsCost" style="color:#065f46;">0.00</strong> دينار</span>
+                                </div>
                             </div>
                             <div style="margin-top:4px;font-weight:bold;">
                                 <span>💵 إجمالي المدفوعات: <span id="totalPayments">0.00</span> دينار</span>
@@ -1057,6 +1062,7 @@ window.deleteCustomer = function(custId) {
 };
 
 window.openCustomerProjects = function(custId) {
+    window.saveCurrentProject();
     currentCustomerId=custId;
     const cust=userData.customers.find(c=>c.id===custId);
     if(!cust) return;
@@ -1072,6 +1078,13 @@ window.openCustomerProjects = function(custId) {
         });
     } else grid.innerHTML='<div class="empty-message">📭 لا توجد مشاريع</div>';
     window.showProjectScreen('projects');
+};
+
+window.saveCurrentProject=function(){
+    if(!currentProjectId) return;
+    const cust=userData.customers.find(c=>c.id===currentCustomerId);
+    const proj=cust?.projects.find(p=>p.id===currentProjectId);
+    if(proj){syncRoomsFromDOM(proj); updateProjectTotal(proj); debouncedSave();}
 };
 
 window.openProjectDetail = function(custId, projId) {
@@ -1191,6 +1204,7 @@ function updateProjectTotal(proj) {
     document.getElementById("totalPerimeter").innerText=totalPerimeter.toFixed(2);
     document.getElementById("totalAreaCost").innerText=totalAreaCost.toFixed(2);
     document.getElementById("totalPerimeterCost").innerText=totalPerimeterCost.toFixed(2);
+    document.getElementById("totalMeters").innerText=(totalArea+totalPerimeter).toFixed(2);
     document.getElementById("totalRoomsCost").innerText=gt.toFixed(2);
     renderCustomersScreen();
 }
@@ -1613,6 +1627,7 @@ window.logout=async function(){
 };
 
 window.showMainTab=function(tab){
+    window.saveCurrentProject();
     document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     const tabMap={projects:'projectsTab',workers:'workersTab',accounting:'accountingTab'};
