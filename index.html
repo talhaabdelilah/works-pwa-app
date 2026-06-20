@@ -1191,7 +1191,7 @@ function attachRoomEvents(proj) {
         el.oninput=()=>{syncRoomsFromDOM(proj); updateProjectTotal(proj); debouncedSave();};
     });
     document.querySelectorAll('.delete-room-btn').forEach(btn=>{
-        btn.onclick=()=>{proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); debouncedSave();};
+        btn.onclick=()=>{syncRoomsFromDOM(proj); proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); debouncedSave();};
     });
 }
 
@@ -1293,7 +1293,11 @@ window.addProject=function(){
 window.addRoom=function(){
     const cust=userData.customers.find(c=>c.id===currentCustomerId);
     const proj=cust?.projects.find(p=>p.id===currentProjectId);
-    if(proj){proj.rooms.push({id:Date.now(),lengthVal:null,widthVal:null,calcMode:'area',totalCost:0}); window.openProjectDetail(currentCustomerId,currentProjectId); debouncedSave();}
+    if(!proj) return;
+    syncRoomsFromDOM(proj);
+    proj.rooms.push({id:Date.now(),lengthVal:null,widthVal:null,calcMode:'area',totalCost:0});
+    window.openProjectDetail(currentCustomerId,currentProjectId);
+    debouncedSave();
 };
 window.deleteProject=function(){
     const cust=userData.customers.find(c=>c.id===currentCustomerId);
