@@ -253,6 +253,7 @@ class _CustomerProjectsScreenState extends State<CustomerProjectsScreen> {
                                   builder: (_) => ProjectDetailScreen(
                                     project: project,
                                     onUpdate: (updated) => _updateProject(updated),
+                                    onDelete: () => _deleteProject(project),
                                   ),
                                 ),
                               );

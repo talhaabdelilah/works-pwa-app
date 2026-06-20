@@ -8,8 +8,9 @@ import 'package:works_app/models/project.dart';
 class ProjectDetailScreen extends StatefulWidget {
   final Project project;
   final Function(Project) onUpdate;
+  final VoidCallback? onDelete;
 
-  const ProjectDetailScreen({super.key, required this.project, required this.onUpdate});
+  const ProjectDetailScreen({super.key, required this.project, required this.onUpdate, this.onDelete});
 
   @override
   State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
@@ -248,6 +249,16 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(_project.name, style: const TextStyle(fontSize: 13)),
+          actions: [
+            if (widget.onDelete != null)
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444), size: 20),
+                tooltip: 'حذف المشروع',
+                onPressed: () {
+                  widget.onDelete!();
+                },
+              ),
+          ],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(12),
@@ -417,7 +428,15 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          Text('🏗️ المجموع الكلي:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+                          Text('🏗️ المجموع الكلي (مساحة + محيط):', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                          const Spacer(),
+                          Text('${(totalArea + totalPerimeter).toStringAsFixed(2)} م', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text('💰 إجمالي التكلفة:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
                           const Spacer(),
                           Text('${_project.totalCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
                         ],
