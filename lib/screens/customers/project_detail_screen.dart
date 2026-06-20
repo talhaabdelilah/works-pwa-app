@@ -382,6 +382,46 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                           Text('${remaining.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: remaining > 0 ? const Color(0xFFEF4444) : const Color(0xFF065F46))),
                         ],
                       ),
+                      const Divider(),
+                      Row(
+                        children: [
+                          Text('📐 المساحة:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                          const Spacer(),
+                          Text('${totalArea.toStringAsFixed(2)} م²', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text('💰 تكلفة المساحة:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                          const Spacer(),
+                          Text('${areaCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text('📏 المحيط:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                          const Spacer(),
+                          Text('${totalPerimeter.toStringAsFixed(2)} م', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text('💰 تكلفة المحيط:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                          const Spacer(),
+                          Text('${perimeterCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Text('🏗️ المجموع الكلي:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+                          const Spacer(),
+                          Text('${_project.totalCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+                        ],
+                      ),
                     ],
                   ],
                 ),
@@ -404,27 +444,6 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                       Text('➕ إضافة غرفة', style: TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold)),
                     ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              // Rooms summary
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 4,
-                  children: [
-                    _summarySpan('📐 مساحة', '${totalArea.toStringAsFixed(0)}', const Color(0xFF6366F1)),
-                    _summarySpan('📏 محيط', '${totalPerimeter.toStringAsFixed(0)}', const Color(0xFF6366F1)),
-                    _summarySpan('💰 تكلفة المساحة', '${areaCost.toStringAsFixed(0)}', const Color(0xFF6366F1)),
-                    _summarySpan('💰 تكلفة المحيط', '${perimeterCost.toStringAsFixed(0)}', const Color(0xFF6366F1)),
-                    _summarySpan('💰 المجموع', '${_project.totalCost.toStringAsFixed(0)}', const Color(0xFF6366F1)),
-                  ],
                 ),
               ),
               const SizedBox(height: 8),
@@ -547,16 +566,6 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     );
   }
 
-  Widget _summarySpan(String label, String value, Color color) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text('$label: ', style: const TextStyle(fontSize: 10, color: Color(0xFF475569))),
-        Text(value, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color)),
-      ],
-    );
-  }
-
   Widget _roomHeaderCell(String label, double? width) {
     return SizedBox(
       width: width,
@@ -578,20 +587,17 @@ class _RoomDialog extends StatefulWidget {
 class _RoomDialogState extends State<_RoomDialog> {
   final _lengthCtrl = TextEditingController();
   final _widthCtrl = TextEditingController();
-  final _priceCtrl = TextEditingController();
   String _calcMode = 'area';
 
   @override
   void dispose() {
     _lengthCtrl.dispose();
     _widthCtrl.dispose();
-    _priceCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _priceCtrl.text = widget.pricePerMeter.toString();
     return Directionality(
       textDirection: TextDirection.rtl,
       child: AlertDialog(
@@ -602,19 +608,13 @@ class _RoomDialogState extends State<_RoomDialog> {
             TextField(
               controller: _lengthCtrl,
               decoration: const InputDecoration(labelText: 'الطول'),
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _widthCtrl,
               decoration: const InputDecoration(labelText: 'العرض'),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _priceCtrl,
-              decoration: const InputDecoration(labelText: 'سعر المتر'),
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 12),
             SegmentedButton<String>(
@@ -634,13 +634,12 @@ class _RoomDialogState extends State<_RoomDialog> {
               final l = double.tryParse(_lengthCtrl.text.trim());
               final w = double.tryParse(_widthCtrl.text.trim());
               if (l == null || w == null) return;
-              final price = double.tryParse(_priceCtrl.text.trim()) ?? widget.pricePerMeter;
               final room = Room(
                 id: DateTime.now().millisecondsSinceEpoch,
                 lengthVal: l,
                 widthVal: w,
                 calcMode: _calcMode,
-                pricePerMeter: price,
+                pricePerMeter: widget.pricePerMeter,
               );
               widget.onSave(room);
               Navigator.pop(context);
@@ -672,8 +671,8 @@ class _RoomTableRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final lCtrl = TextEditingController(text: room.lengthVal?.toStringAsFixed(1) ?? '');
-    final wCtrl = TextEditingController(text: room.widthVal?.toStringAsFixed(1) ?? '');
+    final lCtrl = TextEditingController(text: room.lengthVal?.toStringAsFixed(2) ?? '');
+    final wCtrl = TextEditingController(text: room.widthVal?.toStringAsFixed(2) ?? '');
     return StatefulBuilder(
       builder: (context, setLocalState) {
         return Container(
@@ -744,7 +743,7 @@ class _RoomTableRow extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                   onTap: onCalc,
-                  child: Text('${room.meterValue.toStringAsFixed(1)}', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                  child: Text('${room.meterValue.toStringAsFixed(2)}', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
                 ),
               ),
               Expanded(
