@@ -1,0 +1,15 @@
+{
+  "customers": [],
+  "workersByWeek": {
+    "2026-W21": []
+  },
+  "accounting": {
+    "rows": [],
+    "history": []
+  },
+  "partnerAccounting": {
+    "rows": [],
+    "history": [],
+    "partnerName": "الشريك"
+  }
+}
