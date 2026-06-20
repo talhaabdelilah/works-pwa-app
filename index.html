@@ -391,6 +391,14 @@
                             </div>
                         </div>
                     </div>
+                    <div class="rooms-summary" id="roomsSummary" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;padding:8px;background:#f1f5f9;border-radius:8px;font-size:0.65rem;">
+                        <span>📐 المساحة: <strong id="totalArea2">0.00</strong> م²</span>
+                        <span>📏 المحيط: <strong id="totalPerimeter2">0.00</strong> م</span>
+                        <span>💰 تكلفة المساحة: <strong id="totalAreaCost2">0.00</strong> دينار</span>
+                        <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost2">0.00</strong> دينار</span>
+                        <span>🏗️ المجموع (مساحة+محيط): <strong id="totalMeters2">0.00</strong> م</span>
+                        <span>💰 الإجمالي: <strong id="totalRoomsCost2">0.00</strong> دينار</span>
+                    </div>
                     <button id="addRoomBtn" class="btn-primary" style="width:100%;margin-bottom:8px;">➕ إضافة غرفة</button>
                     <table class="rooms-table">
                         <thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></tr></thead>
@@ -1138,6 +1146,11 @@ function renderRoomsTable(proj) {
         document.getElementById("totalAreaCost").innerText='0.00';
         document.getElementById("totalPerimeterCost").innerText='0.00';
         document.getElementById("totalRoomsCost").innerText='0.00';
+        document.getElementById("totalMeters").innerText='0.00';
+        ['Area','Perimeter','AreaCost','PerimeterCost','RoomsCost','Meters'].forEach(s=>{
+            const el=document.getElementById('total'+s+'2');
+            if(el) el.innerText='0.00';
+        });
         return;
     }
     const price=proj.globalPricePerMeter||50;
@@ -1162,6 +1175,13 @@ function renderRoomsTable(proj) {
     document.getElementById("totalAreaCost").innerText=totalAreaCost.toFixed(2);
     document.getElementById("totalPerimeterCost").innerText=totalPerimeterCost.toFixed(2);
     document.getElementById("totalRoomsCost").innerText=(totalAreaCost+totalPerimeterCost).toFixed(2);
+    const upd2=(id,val)=>{const el=document.getElementById(id);if(el)el.innerText=val;};
+    upd2('totalArea2',totalArea.toFixed(2));
+    upd2('totalPerimeter2',totalPerimeter.toFixed(2));
+    upd2('totalAreaCost2',totalAreaCost.toFixed(2));
+    upd2('totalPerimeterCost2',totalPerimeterCost.toFixed(2));
+    upd2('totalMeters2',(totalArea+totalPerimeter).toFixed(2));
+    upd2('totalRoomsCost2',(totalAreaCost+totalPerimeterCost).toFixed(2));
     attachRoomEvents(proj);
     updateProjectTotal(proj);
 }
@@ -1206,6 +1226,13 @@ function updateProjectTotal(proj) {
     document.getElementById("totalPerimeterCost").innerText=totalPerimeterCost.toFixed(2);
     document.getElementById("totalMeters").innerText=(totalArea+totalPerimeter).toFixed(2);
     document.getElementById("totalRoomsCost").innerText=gt.toFixed(2);
+    const upd2=(id,val)=>{const el=document.getElementById(id);if(el)el.innerText=val;};
+    upd2('totalArea2',totalArea.toFixed(2));
+    upd2('totalPerimeter2',totalPerimeter.toFixed(2));
+    upd2('totalAreaCost2',totalAreaCost.toFixed(2));
+    upd2('totalPerimeterCost2',totalPerimeterCost.toFixed(2));
+    upd2('totalMeters2',(totalArea+totalPerimeter).toFixed(2));
+    upd2('totalRoomsCost2',gt.toFixed(2));
     renderCustomersScreen();
 }
 
