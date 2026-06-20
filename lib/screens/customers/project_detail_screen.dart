@@ -244,10 +244,16 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     final areaCost = _project.rooms.where((r) => r.calcMode == 'area').fold(0.0, (s, r) => s + r.totalCost);
     final perimeterCost = _project.rooms.where((r) => r.calcMode == 'perimeter').fold(0.0, (s, r) => s + r.totalCost);
 
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        appBar: AppBar(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) return;
+        _save();
+      },
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          appBar: AppBar(
           title: Text(_project.name, style: const TextStyle(fontSize: 13)),
           actions: [
             if (widget.onDelete != null)
@@ -581,6 +587,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
