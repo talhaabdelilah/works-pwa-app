@@ -399,55 +399,55 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                           Text('${remaining.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: remaining > 0 ? const Color(0xFFEF4444) : const Color(0xFF065F46))),
                         ],
                       ),
-                      const Divider(),
-                      Row(
-                        children: [
-                          Text('📐 المساحة:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
-                          const Spacer(),
-                          Text('${totalArea.toStringAsFixed(2)} م²', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text('💰 تكلفة المساحة:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
-                          const Spacer(),
-                          Text('${areaCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text('📏 المحيط:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
-                          const Spacer(),
-                          Text('${totalPerimeter.toStringAsFixed(2)} م', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text('💰 تكلفة المحيط:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
-                          const Spacer(),
-                          Text('${perimeterCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text('🏗️ المجموع الكلي (مساحة + محيط):', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
-                          const Spacer(),
-                          Text('${(totalArea + totalPerimeter).toStringAsFixed(2)} م', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Text('💰 إجمالي التكلفة:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
-                          const Spacer(),
-                          Text('${_project.totalCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
-                        ],
-                      ),
                     ],
+                    const Divider(),
+                    Row(
+                      children: [
+                        Text('📐 المساحة:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                        const Spacer(),
+                        Text('${totalArea.toStringAsFixed(2)} م²', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text('💰 تكلفة المساحة:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                        const Spacer(),
+                        Text('${areaCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text('📏 المحيط:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                        const Spacer(),
+                        Text('${totalPerimeter.toStringAsFixed(2)} م', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text('💰 تكلفة المحيط:', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                        const Spacer(),
+                        Text('${perimeterCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text('🏗️ المجموع الكلي (مساحة + محيط):', style: TextStyle(fontSize: 10, color: const Color(0xFF1E293B))),
+                        const Spacer(),
+                        Text('${(totalArea + totalPerimeter).toStringAsFixed(2)} م', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFF065F46))),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text('💰 إجمالي التكلفة:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+                        const Spacer(),
+                        Text('${_project.totalCost.toStringAsFixed(0)} د.ل', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+                      ],
+                    ),
                   ],
                 ),
               ),
