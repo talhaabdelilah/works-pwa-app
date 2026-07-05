@@ -21,9 +21,21 @@
         .main-header { background:#1e293b; color:white; padding:8px 12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px; position:sticky; top:0; z-index:100; }
         .main-header h1 { font-size:0.8rem; }
         .header-buttons { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
-        .calc-btn-header { background:#f59e0b; border:none; padding:4px 10px; border-radius:30px; color:white; font-size:0.7rem; cursor:pointer; font-weight:bold; }
         .user-info { font-size:0.6rem; background:#334155; padding:4px 10px; border-radius:20px; white-space:nowrap; }
-        .logout-btn { background:#ef4444; border:none; padding:4px 10px; border-radius:30px; color:white; font-size:0.6rem; cursor:pointer; }
+        .menu-btn { background:#f59e0b; border:none; padding:5px 12px; border-radius:30px; color:white; font-size:0.75rem; cursor:pointer; font-weight:bold; position:relative; }
+        .header-dropdown { position:absolute; top:calc(100% + 8px); left:0; background:white; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.18); min-width:190px; z-index:500; overflow:hidden; display:none; }
+        .header-dropdown.open { display:block; }
+        .dropdown-item { display:flex; align-items:center; gap:10px; padding:11px 16px; font-size:0.75rem; cursor:pointer; color:#1e293b; border:none; background:none; width:100%; text-align:right; transition:background 0.15s; }
+        .dropdown-item:hover { background:#f1f5f9; }
+        .dropdown-item.danger { color:#ef4444; }
+        .dropdown-item.danger:hover { background:#fee2e2; }
+        .dropdown-divider { border:none; border-top:1px solid #e2e8f0; margin:4px 0; }
+        .dropdown-toggle-item { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; font-size:0.75rem; cursor:pointer; color:#1e293b; border:none; background:none; width:100%; transition:background 0.15s; }
+        .dropdown-toggle-item:hover { background:#f1f5f9; }
+        .toggle-switch { width:34px; height:18px; background:#cbd5e1; border-radius:20px; position:relative; transition:background 0.2s; flex-shrink:0; }
+        .toggle-switch.on { background:#10b981; }
+        .toggle-switch::after { content:''; position:absolute; width:14px; height:14px; background:white; border-radius:50%; top:2px; right:2px; transition:right 0.2s; }
+        .toggle-switch.on::after { right:18px; }
 
         /* Tabs */
         .tabs { display:flex; gap:4px; margin-bottom:12px; background:#f1f5f9; padding:6px; border-radius:40px; position:sticky; top:60px; z-index:99; overflow-x:auto; }
@@ -63,16 +75,46 @@
 
         /* Workers Table */
         .workers-table-wrapper { background:white; border-radius:16px; box-shadow:0 1px 3px rgba(0,0,0,0.1); overflow:hidden; }
-        .workers-table { border-collapse:collapse; font-size:0.6rem; width:100%; }
-        .workers-table th { background:#1e293b; color:white; padding:6px 1px; font-size:0.5rem; font-weight:bold; text-align:center; white-space:nowrap; }
-        .workers-table td { padding:5px 1px; text-align:center; border-bottom:1px solid #e2e8f0; font-size:0.5rem; }
+        .workers-table { border-collapse:collapse; font-size:0.65rem; width:100%; }
+        .workers-table th { background:#1e293b; color:white; padding:7px 2px; font-size:0.6rem; font-weight:bold; text-align:center; white-space:nowrap; }
+        .workers-table td { padding:6px 2px; text-align:center; border-bottom:1px solid #e2e8f0; font-size:0.6rem; }
         .workers-table th:nth-child(1), .workers-table td:nth-child(1) { width:22px; }
         .workers-table th:nth-child(2), .workers-table td:nth-child(2) { text-align:right; white-space:nowrap; }
         .attendance-check { width:20px; height:20px; cursor:pointer; accent-color:#10b981; }
-        .total-cell { background:#d1fae5; font-weight:bold; color:#065f46; font-size:0.5rem; padding:4px 2px; border-radius:8px; white-space:nowrap; }
+        .total-cell { background:#d1fae5; font-weight:bold; color:#065f46; font-size:0.6rem; padding:4px 2px; border-radius:8px; white-space:nowrap; }
         .total-cell.negative { background:#fee2e2; color:#991b1b; }
-        .delete-btn { background:#ef4444; color:white; border:none; padding:4px 6px; border-radius:16px; cursor:pointer; font-size:0.5rem; font-weight:bold; }
-        .worker-name-clickable { cursor:pointer; color:#3b82f6; font-weight:bold; background:#eff6ff; padding:4px 6px; border-radius:12px; display:inline-block; font-size:0.5rem; }
+        .delete-btn { background:#ef4444; color:white; border:none; padding:4px 6px; border-radius:16px; cursor:pointer; font-size:0.55rem; font-weight:bold; }
+        .worker-name-clickable { cursor:pointer; color:#3b82f6; font-weight:bold; background:#eff6ff; padding:4px 6px; border-radius:12px; display:inline-block; font-size:0.6rem; }
+        .worker-row-absent { background:#fafafa; opacity:0.7; }
+
+        /* Save Status Indicator */
+        .save-status { font-size:0.6rem; padding:3px 8px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; transition:all 0.3s; }
+        .save-status.saving { background:#fef3c7; color:#92400e; }
+        .save-status.saved { background:#d1fae5; color:#065f46; }
+        .save-status.error { background:#fee2e2; color:#991b1b; }
+
+        /* Week Note */
+        .week-note-row { margin-top:8px; }
+        .week-note-input { width:100%; padding:5px 10px; border:1px dashed #cbd5e1; border-radius:20px; font-size:0.65rem; background:#fafafa; color:#475569; direction:rtl; outline:none; }
+        .week-note-input:focus { border-color:#3b82f6; background:white; }
+
+        /* Workers Table Footer */
+        .workers-table-footer { background:#f8fafc; padding:8px 12px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:6px; border-top:2px solid #e2e8f0; font-size:0.65rem; }
+        .footer-stat { text-align:center; }
+        .footer-stat .fs-label { color:#64748b; font-size:0.55rem; }
+        .footer-stat .fs-val { font-weight:bold; color:#1e293b; font-size:0.75rem; }
+
+        /* Worker Profile Tabs */
+        .wp-tabs { display:flex; gap:0; margin-bottom:0; border-bottom:2px solid #e2e8f0; }
+        .wp-tab-btn { flex:1; padding:9px 4px; border:none; background:none; font-size:0.72rem; font-weight:bold; cursor:pointer; color:#64748b; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+        .wp-tab-btn.active { color:#3b82f6; border-bottom-color:#3b82f6; }
+        .wp-tab-panel { display:none; padding-top:14px; }
+        .wp-tab-panel.active { display:block; }
+
+        /* Current week expense editor */
+        .expense-editor { background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:10px; }
+        .expense-editor-title { font-size:0.68rem; font-weight:bold; color:#92400e; }
+        .expense-week-total { font-size:0.65rem; font-weight:bold; color:#065f46; background:#d1fae5; padding:3px 8px; border-radius:10px; }
 
         /* Customers/Projects */
         .customers-grid, .projects-grid { display:flex; flex-direction:column; gap:8px; }
@@ -96,9 +138,6 @@
         .rooms-table { width:100%; border-collapse:collapse; font-size:0.65rem; }
         .rooms-table th, .rooms-table td { border:1px solid #e2e8f0; padding:6px 4px; text-align:center; }
         .rooms-table input { width:70px; padding:4px; border-radius:6px; border:1px solid #cbd5e1; text-align:center; }
-.rooms-summary { display:flex; gap:12px; flex-wrap:wrap; padding:8px 10px; margin-bottom:8px; background:#f1f5f9; border-radius:10px; font-size:0.7rem; }
-.rooms-summary span { display:inline-flex; align-items:center; gap:4px; }
-.rooms-summary strong { color:#6366f1; }
 
         /* ========== المحاسبة ========== */
         .accounting-summary { background:linear-gradient(135deg,#1e293b,#0f172a); color:white; padding:10px 12px; border-radius:20px; margin-bottom:16px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:10px; }
@@ -315,13 +354,23 @@
     <div class="app-container">
         <div class="main-header">
             <h1>📁 تطبيق المقاول</h1>
-            <div class="header-buttons">
-                <button class="calc-btn-header" onclick="window.exportBackup()">💾 نسخ احتياطي</button>
-                <button class="calc-btn-header" onclick="window.importBackup()" style="background:#8b5cf6;">📥 استيراد</button>
-                <button class="calc-btn-header" onclick="window.openSettings()" style="background:#3b82f6;">⚙️</button>
-                <button class="calc-btn-header" onclick="window.openCalculator()">🧮</button>
+            <div class="header-buttons" style="position:relative;">
                 <span class="user-info" id="userNameDisplay"></span>
-                <button class="logout-btn" onclick="window.logout()">🚪</button>
+                <span class="save-status saved" id="saveStatus">🟢 محفوظ</span>
+                <button class="menu-btn" id="headerMenuBtn" onclick="window.toggleHeaderMenu()">☰ القائمة</button>
+                <div class="header-dropdown" id="headerDropdown">
+                    <button class="dropdown-item" onclick="window.openCalculator();window.closeHeaderMenu()">🧮 الآلة الحاسبة</button>
+                    <button class="dropdown-item" onclick="window.exportBackup();window.closeHeaderMenu()">💾 نسخ احتياطي</button>
+                    <button class="dropdown-item" onclick="window.importBackup();window.closeHeaderMenu()">📥 استيراد البيانات</button>
+                    <button class="dropdown-item" onclick="window.openSettings();window.closeHeaderMenu()">⚙️ الإعدادات</button>
+                    <hr class="dropdown-divider">
+                    <button class="dropdown-toggle-item" id="autoAccountingToggleBtn" onclick="window.toggleAutoAccounting()">
+                        <span>📊 التسجيل التلقائي</span>
+                        <span class="toggle-switch on" id="autoAccountingSwitch"></span>
+                    </button>
+                    <hr class="dropdown-divider">
+                    <button class="dropdown-item danger" onclick="window.logout()">🚪 تسجيل الخروج</button>
+                </div>
             </div>
         </div>
         <div id="verificationWarning" class="verification-warning" style="display:none;">
@@ -391,14 +440,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="rooms-summary" id="roomsSummary" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;padding:8px;background:#f1f5f9;border-radius:8px;font-size:0.65rem;">
-                        <span>📐 المساحة: <strong id="totalArea2">0.00</strong> م²</span>
-                        <span>📏 المحيط: <strong id="totalPerimeter2">0.00</strong> م</span>
-                        <span>💰 تكلفة المساحة: <strong id="totalAreaCost2">0.00</strong> دينار</span>
-                        <span>💰 تكلفة المحيط: <strong id="totalPerimeterCost2">0.00</strong> دينار</span>
-                        <span>🏗️ المجموع (مساحة+محيط): <strong id="totalMeters2">0.00</strong> م</span>
-                        <span>💰 الإجمالي: <strong id="totalRoomsCost2">0.00</strong> دينار</span>
-                    </div>
                     <button id="addRoomBtn" class="btn-primary" style="width:100%;margin-bottom:8px;">➕ إضافة غرفة</button>
                     <table class="rooms-table">
                         <thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القيمة</th><th>الإجمالي</th><th></th></tr></thead>
@@ -438,12 +479,16 @@
                     <button class="btn-warning" onclick="window.toggleArchivePanel()">📂 الأسبوع</button>
                 </div>
             </div>
+            <div class="week-note-row">
+                <input type="text" class="week-note-input" id="weekNoteInput" placeholder="📝 ملاحظة على هذا الأسبوع..." oninput="window.saveWeekNote()">
+            </div>
             <div id="archivePanel" class="archive-panel" style="display:none;"><div id="archiveList" class="archive-list"></div></div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
                     <thead><tr><th>#</th><th>الاسم</th><th>س</th><th>ح</th><th>ن</th><th>ث</th><th>ر</th><th>خ</th><th>ج</th><th>المجموع</th><th></th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
+                <div class="workers-table-footer" id="workersTableFooter" style="display:none;"></div>
             </div>
         </div>
 
@@ -591,6 +636,7 @@ const COUNTRY_CODE = '218';
 let userData = {
     customers: [],
     workersByWeek: {},
+    weekNotes: {},
     accounting: { rows: [], history: [] },
     partnerAccounting: { rows: [], history: [], partnerName: 'الشريك' }
 };
@@ -600,8 +646,41 @@ function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+// ===== Header Dropdown Menu =====
+let autoAccountingEnabled = true;
+
+window.toggleHeaderMenu = function() {
+    const d = document.getElementById('headerDropdown');
+    d.classList.toggle('open');
+};
+window.closeHeaderMenu = function() {
+    document.getElementById('headerDropdown')?.classList.remove('open');
+};
+document.addEventListener('click', e => {
+    if(!document.getElementById('headerMenuBtn')?.contains(e.target) &&
+       !document.getElementById('headerDropdown')?.contains(e.target)) {
+        window.closeHeaderMenu();
+    }
+});
+
+window.toggleAutoAccounting = function() {
+    autoAccountingEnabled = !autoAccountingEnabled;
+    const sw = document.getElementById('autoAccountingSwitch');
+    if(sw) { sw.classList.toggle('on', autoAccountingEnabled); }
+    showToast(autoAccountingEnabled ? '✅ التسجيل التلقائي مفعّل' : '⛔ التسجيل التلقائي موقف');
+};
+
+function setSaveStatus(state) {
+    const el = document.getElementById('saveStatus');
+    if(!el) return;
+    if(state==='saving') { el.className='save-status saving'; el.innerText='🟡 يحفظ...'; }
+    else if(state==='saved') { el.className='save-status saved'; el.innerText='🟢 محفوظ'; }
+    else { el.className='save-status error'; el.innerText='🔴 خطأ'; }
+}
+
 // ===== Debounced Save =====
 function debouncedSave() {
+    setSaveStatus('saving');
     clearTimeout(saveDebounceTimer);
     saveDebounceTimer = setTimeout(() => saveUserDataToFirebase(), 1200);
 }
@@ -625,11 +704,13 @@ async function saveUserDataToFirebase() {
         await db.ref(path).set({
             customers: userData.customers || [],
             workersByWeek: userData.workersByWeek || {},
+            weekNotes: userData.weekNotes || {},
             accounting: userData.accounting || { rows:[], history:[] },
             partnerAccounting: userData.partnerAccounting || { rows:[], history:[], partnerName:'الشريك' },
             lastUpdated: Date.now()
         });
-    } catch(e) { console.error("Save error:", e); }
+        setSaveStatus('saved');
+    } catch(e) { console.error("Save error:", e); setSaveStatus('error'); }
 }
 
 async function loadUserDataFromFirebase() {
@@ -642,6 +723,7 @@ async function loadUserDataFromFirebase() {
         if(data) {
             userData.customers = data.customers || [];
             userData.workersByWeek = data.workersByWeek || {};
+            userData.weekNotes = data.weekNotes || {};
             userData.accounting = data.accounting || { rows:[], history:[] };
             userData.partnerAccounting = data.partnerAccounting || { rows:[], history:[], partnerName:'الشريك' };
         } else {
@@ -748,6 +830,7 @@ function calculateWorkerTotal(worker) {
 }
 
 function addWorkerExpenseToAccounting(workerName, amount, weekKey) {
+    if(!autoAccountingEnabled) return;
     if(!userData.accounting.rows) userData.accounting.rows=[];
     userData.accounting.rows.unshift({
         expense:amount, revenue:null,
@@ -759,6 +842,7 @@ function addWorkerExpenseToAccounting(workerName, amount, weekKey) {
 }
 
 function addProjectPaymentToAccounting(customerName, projectName, amount, note) {
+    if(!autoAccountingEnabled) return;
     if(!userData.accounting.rows) userData.accounting.rows=[];
     let fullNote = `دفعة من ${customerName} - مشروع ${projectName}`;
     if(note?.trim()) fullNote += ` | ${note}`;
@@ -771,20 +855,48 @@ function addProjectPaymentToAccounting(customerName, projectName, amount, note) 
     showToast(`✅ دفعة "${customerName}" (${amount.toFixed(2)}) أضيفت للإيرادات`);
 }
 
+// ===== Week Note =====
+window.saveWeekNote = function() {
+    const wk = getWeekKeyFromOffset(currentWeekOffset);
+    if(!userData.workersByWeek[wk]) return;
+    if(!Array.isArray(userData.workersByWeek[wk])) return;
+    // store note as a property on the week key meta object
+    if(!userData.weekNotes) userData.weekNotes = {};
+    userData.weekNotes[wk] = document.getElementById('weekNoteInput')?.value || '';
+    debouncedSave();
+};
+
+function loadWeekNote() {
+    const wk = getWeekKeyFromOffset(currentWeekOffset);
+    const inp = document.getElementById('weekNoteInput');
+    if(inp) inp.value = (userData.weekNotes && userData.weekNotes[wk]) || '';
+}
+
+// Warn before closing with unsaved changes
+let hasPendingSave = false;
+const _origDebounced = debouncedSave;
+window.addEventListener('beforeunload', e => {
+    if(saveDebounceTimer) { e.preventDefault(); e.returnValue = ''; }
+});
+
 function renderWorkersTable() {
     const tbody = document.getElementById("workersTableBody");
     if(!tbody) return;
     const workers = getCurrentWorkers();
     const search = document.getElementById("searchInput")?.value.toLowerCase()||'';
     const filtered = workers.filter(w=>w.name.toLowerCase().includes(search));
+    loadWeekNote();
     if(!filtered.length) {
         tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;">📭 لا يوجد عمال<br>اضغط ➕ للإضافة</td></tr>';
+        document.getElementById('workersTableFooter').innerHTML = '';
         updateWorkersStats(); return;
     }
     tbody.innerHTML = filtered.map((w,idx) => {
         const total = calculateWorkerTotal(w);
-        return `<tr data-worker-id="${w.id}">
-            <td style="font-size:0.5rem;">${idx+1}</td>
+        const totalDays = dayKeys.reduce((s,k)=>s+(w.days[k]||0),0);
+        const isAbsent = totalDays === 0;
+        return `<tr data-worker-id="${w.id}" class="${isAbsent?'worker-row-absent':''}">
+            <td style="font-size:0.6rem;">${idx+1}</td>
             <td><span class="worker-name-clickable" data-id="${w.id}" data-name="${escapeHtml(w.name)}">${escapeHtml(w.name)}</span></td>
             ${dayKeys.map(d=>`<td><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days[d]?'checked':''}></td>`).join('')}
             <td class="total-cell ${total<0?'negative':''}">${total.toFixed(2)}</td>
@@ -839,6 +951,7 @@ function updateWorkersStats() {
 // Worker Profile
 window.showWorkerProfile = function(workerId, workerName) {
     let weeksData=[], totalDays=0, totalEarnings=0, totalExpenses=0, phone='';
+
     for(let wk in userData.workersByWeek) {
         const w = userData.workersByWeek[wk].find(w=>w.id==workerId);
         if(w?.phone) { phone=w.phone; break; }
@@ -846,26 +959,97 @@ window.showWorkerProfile = function(workerId, workerName) {
     for(let wk in userData.workersByWeek) {
         const w = userData.workersByWeek[wk].find(w=>w.id==workerId);
         if(w) {
-            const d=dayKeys.reduce((s,k)=>s+(w.days[k]||0),0);
-            const e=d*(w.price||0), x=parseExpensesText(w.expenseText||'').total;
-            weeksData.push({wk,d,price:w.price||0,e,x,net:e-x});
+            const d = dayKeys.reduce((s,k)=>s+(w.days[k]||0),0);
+            const items = w.expenseItems?.length
+                ? w.expenseItems
+                : parseExpensesText(w.expenseText||'').numbers.map(n=>({amount:n,label:''}));
+            const x = items.reduce((s,i)=>s+(parseFloat(i.amount)||0),0);
+            const e = d*(w.price||0);
+            weeksData.push({wk, d, price:w.price||0, e, x, net:e-x, items:[...items]});
             totalDays+=d; totalEarnings+=e; totalExpenses+=x;
         }
     }
     weeksData.sort((a,b)=>b.wk.localeCompare(a.wk));
-    const rem=totalEarnings-totalExpenses;
-    let wpNum=phone.replace(/[^0-9]/g,'');
+
+    const currentWk = getWeekKeyFromOffset(currentWeekOffset);
+    const currentWkData = weeksData.find(w=>w.wk===currentWk);
+    const rem = totalEarnings - totalExpenses;
+
+    let wpNum = phone.replace(/[^0-9]/g,'');
     if(wpNum.startsWith('0')) wpNum=wpNum.substring(1);
     if(!wpNum.startsWith(COUNTRY_CODE)&&wpNum) wpNum=COUNTRY_CODE+wpNum;
-    const hasPhone=phone.trim()!=='';
+    const hasPhone = phone.trim()!=='';
 
-    const modal=document.createElement('div');
-    modal.className='worker-profile-modal';
-    modal.innerHTML=`<div class="worker-profile-content">
+    // Build current week expense editor
+    function buildExpenseEditor() {
+        const items = currentWkData?.items?.length ? currentWkData.items : [{amount:'',label:''}];
+        const rows = items.map((item,ii)=>`
+            <tr data-ii="${ii}">
+                <td style="padding:3px 2px;"><input type="number" class="exp-amount" value="${item.amount||''}" placeholder="0" step="0.01" min="0" style="width:90px;padding:5px;border:1px solid #fcd34d;border-radius:8px;font-size:0.7rem;text-align:center;"></td>
+                <td style="padding:3px 2px;"><input type="text" class="exp-label" value="${escapeHtml(item.label||'')}" placeholder="وصف المصروف" style="width:100%;padding:5px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.7rem;direction:rtl;"></td>
+                <td style="padding:3px 2px;width:30px;"><button class="exp-del-btn" style="background:#ef4444;color:white;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:0.6rem;">✕</button></td>
+            </tr>`).join('');
+        const total = (currentWkData?.x||0).toFixed(2);
+        return `<div class="expense-editor">
+            <div class="expense-editor-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span>📉 مصروفات الأسبوع الحالي</span>
+                <span class="expense-week-total" id="expEditorTotal" style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:10px;font-size:0.7rem;font-weight:bold;">الإجمالي: ${total}</span>
+            </div>
+            <table style="width:100%;border-collapse:collapse;">
+                <thead><tr style="background:#fef3c7;font-size:0.6rem;">
+                    <th style="padding:4px;text-align:center;">المبلغ</th>
+                    <th style="padding:4px;text-align:center;">البيان</th>
+                    <th style="padding:4px;width:30px;"></th>
+                </tr></thead>
+                <tbody id="expEditorList">${rows}</tbody>
+            </table>
+            <div style="margin-top:6px;display:flex;gap:6px;">
+                <button class="exp-add-btn" id="expAddBtn" style="background:#f59e0b;color:white;border:none;padding:6px 14px;border-radius:20px;font-size:0.65rem;cursor:pointer;">➕ إضافة مصروف</button>
+            </div>
+        </div>
+        <button id="saveExpensesBtn" style="width:100%;margin-top:10px;padding:8px;background:#10b981;color:white;border:none;border-radius:20px;font-weight:bold;cursor:pointer;font-size:0.75rem;">💾 حفظ المصروفات</button>`;
+    }
+
+    // Build history view (all weeks) with cards
+    function buildHistoryCards() {
+        if(!weeksData.length) return '<div style="text-align:center;color:#94a3b8;padding:20px;">لا توجد بيانات</div>';
+        return weeksData.map(wd=>{
+            const isCur = wd.wk===currentWk;
+            const expTags = wd.items.length
+                ? wd.items.filter(i=>parseFloat(i.amount)>0).map(i=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 6px;border-bottom:1px solid #fef3c7;font-size:0.6rem;">
+                    <span style="color:#92400e;">${escapeHtml(i.label||'مصروف')}</span>
+                    <span style="color:#991b1b;font-weight:bold;">${parseFloat(i.amount).toFixed(2)}</span>
+                </div>`).join('')
+                : '';
+            const expTotal = wd.x ? `<div style="display:flex;justify-content:space-between;padding:4px 6px;font-weight:bold;font-size:0.6rem;color:#991b1b;background:#fef3c7;border-radius:0 0 10px 10px;">
+                <span>💰 إجمالي المصاريف</span>
+                <span>${wd.x.toFixed(2)} دينار</span>
+            </div>` : '';
+            return `<div style="background:${isCur?'#f0fdf4':'#f8fafc'};border-radius:12px;padding:10px 12px;margin-bottom:8px;border-right:3px solid ${isCur?'#10b981':'#cbd5e1'};">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+                    <span style="font-size:0.68rem;font-weight:bold;color:#1e293b;">${isCur?'📍':'📅'} ${wd.wk}${isCur?' (الحالي)':''}</span>
+                    <span style="font-size:0.72rem;font-weight:bold;padding:2px 8px;border-radius:10px;${wd.net>=0?'background:#d1fae5;color:#065f46':'background:#fee2e2;color:#991b1b'}">صافي: ${wd.net.toFixed(2)}</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:0.62rem;color:#475569;">
+                    <span style="background:white;padding:2px 6px;border-radius:8px;border:1px solid #e2e8f0;">📅 ${wd.d} يوم</span>
+                    <span style="background:white;padding:2px 6px;border-radius:8px;border:1px solid #e2e8f0;">💰 ${wd.price.toFixed(0)}/يوم</span>
+                    <span style="background:white;padding:2px 6px;border-radius:8px;border:1px solid #e2e8f0;">🧾 أجر: ${wd.e.toFixed(2)}</span>
+                    <span style="background:white;padding:2px 6px;border-radius:8px;border:1px solid #e2e8f0;">📉 مصاريف: ${wd.x.toFixed(2)}</span>
+                </div>
+                ${expTags?`<div style="margin-top:6px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;overflow:hidden;">${expTags}${expTotal}</div>`:''}
+            </div>`;
+        }).join('');
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'worker-profile-modal';
+    modal.innerHTML = `<div class="worker-profile-content">
         <div class="worker-profile-header">
             <h2>👤 ${escapeHtml(workerName)}</h2>
             <button class="close-profile-btn" onclick="this.closest('.worker-profile-modal').remove()">✖</button>
         </div>
+
+        <!-- Phone -->
         <div class="phone-section">
             <div class="phone-input-group">
                 <span>📱</span>
@@ -876,61 +1060,130 @@ window.showWorkerProfile = function(workerId, workerName) {
                 <button class="btn-primary whatsapp-btn ${!hasPhone?'disabled':''}" ${!hasPhone?'disabled':''}>💬 واتساب</button>
             </a>
         </div>
+
+        <!-- Summary Cards (Current Week) -->
         <div class="worker-stats-grid">
-            <div class="worker-stat-card"><div class="stat-icon">📅</div><div class="stat-value">${totalDays}</div><div class="stat-label">أيام العمل</div></div>
-            <div class="worker-stat-card"><div class="stat-icon">💰</div><div class="stat-value">${totalEarnings.toFixed(2)}</div><div class="stat-label">المستحقات</div></div>
-            <div class="worker-stat-card"><div class="stat-icon">📉</div><div class="stat-value">${totalExpenses.toFixed(2)}</div><div class="stat-label">المصاريف</div></div>
-            <div class="worker-stat-card ${rem>=0?'profit':'loss'}"><div class="stat-icon">💵</div><div class="stat-value">${rem.toFixed(2)}</div><div class="stat-label">المتبقي</div></div>
+            <div class="worker-stat-card"><div class="stat-icon">📅</div><div class="stat-value">${currentWkData?.d||0}</div><div class="stat-label">أيام هدا الأسبوع</div></div>
+            <div class="worker-stat-card"><div class="stat-icon">🧾</div><div class="stat-value">${(currentWkData?.e||0).toFixed(2)}</div><div class="stat-label">مستحق الأسبوع</div></div>
+            <div class="worker-stat-card"><div class="stat-icon">📉</div><div class="stat-value">${(currentWkData?.x||0).toFixed(2)}</div><div class="stat-label">مصاريف الأسبوع</div></div>
+            <div class="worker-stat-card ${(currentWkData?.net||0)>=0?'profit':'loss'}"><div class="stat-icon">💵</div><div class="stat-value">${(currentWkData?.net||0).toFixed(2)}</div><div class="stat-label">باقي الأسبوع</div></div>
         </div>
-        <div style="background:#f8fafc;padding:12px;border-radius:14px;margin-bottom:14px;">
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <div style="flex:1;min-width:120px;">
-                    <label style="font-size:0.65rem;color:#64748b;display:block;margin-bottom:4px;">💰 السعر اليومي</label>
-                    <input type="number" id="wpPrice" value="${weeksData[0]?.price||0}" step="0.01" min="0" style="width:100%;padding:8px;border:2px solid #3b82f6;border-radius:10px;font-size:0.8rem;text-align:center;">
+
+        <!-- Tabs -->
+        <div class="wp-tabs">
+            <button class="wp-tab-btn active" data-panel="wpPanelCurrent">📍 الأسبوع الحالي</button>
+            <button class="wp-tab-btn" data-panel="wpPanelHistory">📋 كل الأسابيع (${weeksData.length})</button>
+        </div>
+
+        <!-- Tab: Current Week -->
+        <div class="wp-tab-panel active" id="wpPanelCurrent">
+            <div style="background:#f8fafc;padding:10px;border-radius:12px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:110px;">
+                    <label style="font-size:0.62rem;color:#64748b;display:block;margin-bottom:4px;">💰 السعر اليومي</label>
+                    <input type="number" id="wpPrice" value="${currentWkData?.price||weeksData[0]?.price||0}" step="0.01" min="0" style="width:100%;padding:7px;border:2px solid #3b82f6;border-radius:10px;font-size:0.8rem;text-align:center;">
                 </div>
-                <div style="flex:2;min-width:180px;">
-                    <label style="font-size:0.65rem;color:#64748b;display:block;margin-bottom:4px;">📉 المصروفات (أرقام مفصولة بمسافات)</label>
-                    <input type="text" id="wpExpenses" value="${escapeHtml(weeksData[0]?.expenseText||'')}" placeholder="40 30 10" style="width:100%;padding:8px;border:2px solid #f59e0b;border-radius:10px;font-size:0.8rem;background:#fff9c4;">
+                <div style="display:flex;flex-direction:column;gap:4px;font-size:0.65rem;color:#475569;align-self:flex-end;padding-bottom:2px;">
+                    <span>📅 حضور: <strong>${currentWkData?.d||0} يوم</strong></span>
+                    <span>🧾 مستحق: <strong>${(currentWkData?.e||0).toFixed(2)}</strong></span>
                 </div>
+                <button id="savePriceBtn" style="padding:8px 12px;background:#3b82f6;color:white;border:none;border-radius:20px;font-weight:bold;cursor:pointer;font-size:0.68rem;align-self:flex-end;">💾 حفظ السعر</button>
             </div>
-            <button id="saveWorkerDetailsBtn" style="width:100%;margin-top:10px;padding:8px;background:#10b981;color:white;border:none;border-radius:20px;font-weight:bold;cursor:pointer;">💾 حفظ السعر والمصروفات</button>
+            ${buildExpenseEditor()}
         </div>
-        <div class="worker-weeks-title">📋 سجل الأسابيع</div>
-        <div class="worker-weeks-table-wrapper">
-            <table class="worker-weeks-table">
-                <thead><tr><th>الأسبوع</th><th>أيام</th><th>السعر</th><th>مستحق</th><th>مصروف</th><th>صافي</th></tr></thead>
-                <tbody>${weeksData.length?weeksData.map(w=>`<tr><td>${w.wk}</td><td>${w.d}</td><td>${w.price.toFixed(2)}</td><td>${w.e.toFixed(2)}</td><td>${w.x.toFixed(2)}</td><td style="color:${w.net>=0?'#10b981':'#ef4444'}">${w.net.toFixed(2)}</td></tr>`).join(''):'<tr><td colspan="6">لا توجد بيانات</td></tr>'}</tbody>
-            </table>
+
+        <!-- Tab: All Weeks History -->
+        <div class="wp-tab-panel" id="wpPanelHistory">
+            <div style="max-height:380px;overflow-y:auto;padding-right:2px;">
+                ${buildHistoryCards()}
+            </div>
         </div>
+
         <button class="close-profile-footer" onclick="this.closest('.worker-profile-modal').remove()">🔙 إغلاق</button>
     </div>`;
     document.body.appendChild(modal);
 
+    // ---- Tab switching ----
+    modal.querySelectorAll('.wp-tab-btn').forEach(btn=>{
+        btn.onclick = () => {
+            modal.querySelectorAll('.wp-tab-btn').forEach(b=>b.classList.remove('active'));
+            modal.querySelectorAll('.wp-tab-panel').forEach(p=>p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.panel)?.classList.add('active');
+        };
+    });
+
+    // ---- Phone save ----
     document.getElementById('savePhoneBtn').onclick = () => {
         const newPhone = document.getElementById('wpInput').value.trim();
-        let count=0;
         for(let wk in userData.workersByWeek) {
             const w=userData.workersByWeek[wk].find(w=>w.id==workerId);
-            if(w) { w.phone=newPhone; count++; }
+            if(w) w.phone=newPhone;
         }
-        if(count) { debouncedSave(); showToast(`✅ تم تحديث رقم "${workerName}"`); }
+        debouncedSave(); showToast(`✅ تم تحديث رقم "${workerName}"`);
         let n=newPhone.replace(/[^0-9]/g,'');
         if(n.startsWith('0')) n=n.substring(1);
         if(!n.startsWith(COUNTRY_CODE)&&n) n=COUNTRY_CODE+n;
-        const link=document.getElementById('wpLink'), btn=link?.querySelector('button');
-        if(link) { link.href=newPhone?`https://wa.me/${n}`:'#'; }
-            if(btn) { btn.disabled=!newPhone; btn.classList.toggle('disabled',!newPhone); }
+        const link=document.getElementById('wpLink'), btn2=link?.querySelector('button');
+        if(link) link.href=newPhone?`https://wa.me/${n}`:'#';
+        if(btn2) { btn2.disabled=!newPhone; btn2.classList.toggle('disabled',!newPhone); }
     };
 
-    document.getElementById('saveWorkerDetailsBtn').onclick = () => {
-        const newPrice = parseFloat(document.getElementById('wpPrice').value) || 0;
-        const newExpenseText = document.getElementById('wpExpenses').value.trim();
-        let count = 0;
-        for(let wk in userData.workersByWeek) {
-            const w = userData.workersByWeek[wk].find(w=>w.id==workerId);
-            if(w) { w.price = newPrice; w.expenseText = newExpenseText; count++; }
+    // ---- Price save (current week) ----
+    document.getElementById('savePriceBtn').onclick = () => {
+        const newPrice = parseFloat(document.getElementById('wpPrice').value)||0;
+        const w = getCurrentWorkers().find(w=>w.id==workerId);
+        if(w) { w.price=newPrice; debouncedSave(); renderWorkersTable(); showToast(`✅ تم تحديث السعر`); }
+    };
+
+    // ---- Expense editor helpers ----
+    function readExpItems() {
+        return [...document.querySelectorAll('#expEditorList tr')].map(row=>({
+            amount: parseFloat(row.querySelector('.exp-amount')?.value)||0,
+            label: row.querySelector('.exp-label')?.value.trim()||''
+        })).filter(i=>i.amount>0||i.label);
+    }
+
+    function refreshExpTotal() {
+        const total = readExpItems().reduce((s,i)=>s+(i.amount||0),0);
+        const el = document.getElementById('expEditorTotal');
+        if(el) el.innerText = `الإجمالي: ${total.toFixed(2)}`;
+    }
+
+    function addExpRow(amount='', label='') {
+        const list = document.getElementById('expEditorList');
+        if(!list) return;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="padding:3px 2px;"><input type="number" class="exp-amount" value="${amount}" placeholder="0" step="0.01" min="0" style="width:90px;padding:5px;border:1px solid #fcd34d;border-radius:8px;font-size:0.7rem;text-align:center;"></td>
+            <td style="padding:3px 2px;"><input type="text" class="exp-label" value="${escapeHtml(label)}" placeholder="وصف المصروف" style="width:100%;padding:5px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.7rem;direction:rtl;"></td>
+            <td style="padding:3px 2px;width:30px;"><button class="exp-del-btn" style="background:#ef4444;color:white;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:0.6rem;">✕</button></td>`;
+        list.appendChild(tr);
+        tr.querySelector('.exp-amount').focus();
+    }
+
+    document.getElementById('expAddBtn').onclick = () => addExpRow();
+
+    document.getElementById('expEditorList').addEventListener('input', refreshExpTotal);
+    document.getElementById('expEditorList').addEventListener('click', e=>{
+        if(e.target.classList.contains('exp-del-btn')) {
+            e.target.closest('tr')?.remove();
+            refreshExpTotal();
         }
-        if(count) { debouncedSave(); renderWorkersTable(); showToast(`✅ تم تحديث بيانات "${workerName}"`); }
+    });
+
+    // ---- Save expenses (current week only) ----
+    document.getElementById('saveExpensesBtn').onclick = () => {
+        const items = readExpItems();
+        const wArr = userData.workersByWeek[currentWk];
+        if(wArr) {
+            const w = wArr.find(w=>w.id==workerId);
+            if(w) {
+                w.expenseItems = items;
+                w.expenseText = items.map(i=>i.amount).filter(Boolean).join(' ');
+            }
+        }
+        debouncedSave();
+        renderWorkersTable();
+        showToast(`✅ تم حفظ مصروفات "${workerName}"`);
     };
 };
 
@@ -941,6 +1194,7 @@ window.addNewWorker = function() {
         <h3>👷 إضافة عامل جديد</h3>
         <input type="text" id="nwName" placeholder="اسم العامل" autofocus>
         <input type="tel" id="nwPhone" placeholder="رقم الهاتف (اختياري)" dir="ltr">
+        <input type="number" id="nwPrice" placeholder="السعر اليومي" step="0.01" min="0">
         <div class="dialog-buttons">
             <button class="btn-confirm" id="cwConfirm">✅ إضافة</button>
             <button class="btn-cancel-red" id="cwCancel">❌ إلغاء</button>
@@ -952,10 +1206,11 @@ window.addNewWorker = function() {
         const name=nameInp.value.trim();
         if(!name) { showToast('⚠️ الرجاء إدخال اسم'); return; }
         const phone=document.getElementById('nwPhone').value.trim()||'';
+        const price=parseFloat(document.getElementById('nwPrice')?.value)||0;
         const workers=getCurrentWorkers();
         const newId=workers.length?Math.max(...workers.map(w=>w.id))+1:1;
         const wk=getWeekKeyFromOffset(currentWeekOffset);
-        workers.unshift({id:newId,name,phone,price:0,expenseText:'',days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}});
+        workers.unshift({id:newId,name,phone,price,expenseText:'',expenseItems:[],days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}});
         userData.workersByWeek[wk]=workers;
         renderWorkersTable(); debouncedSave();
         showToast(`✅ تم إضافة "${name}"`);
@@ -1145,12 +1400,8 @@ function renderRoomsTable(proj) {
         document.getElementById("totalPerimeter").innerText='0';
         document.getElementById("totalAreaCost").innerText='0.00';
         document.getElementById("totalPerimeterCost").innerText='0.00';
-        document.getElementById("totalRoomsCost").innerText='0.00';
         document.getElementById("totalMeters").innerText='0.00';
-        ['Area','Perimeter','AreaCost','PerimeterCost','RoomsCost','Meters'].forEach(s=>{
-            const el=document.getElementById('total'+s+'2');
-            if(el) el.innerText='0.00';
-        });
+        document.getElementById("totalRoomsCost").innerText='0.00';
         return;
     }
     const price=proj.globalPricePerMeter||50;
@@ -1174,16 +1425,9 @@ function renderRoomsTable(proj) {
     document.getElementById("totalPerimeter").innerText=totalPerimeter.toFixed(2);
     document.getElementById("totalAreaCost").innerText=totalAreaCost.toFixed(2);
     document.getElementById("totalPerimeterCost").innerText=totalPerimeterCost.toFixed(2);
+    document.getElementById("totalMeters").innerText=(totalArea+totalPerimeter).toFixed(2);
     document.getElementById("totalRoomsCost").innerText=(totalAreaCost+totalPerimeterCost).toFixed(2);
-    const upd2=(id,val)=>{const el=document.getElementById(id);if(el)el.innerText=val;};
-    upd2('totalArea2',totalArea.toFixed(2));
-    upd2('totalPerimeter2',totalPerimeter.toFixed(2));
-    upd2('totalAreaCost2',totalAreaCost.toFixed(2));
-    upd2('totalPerimeterCost2',totalPerimeterCost.toFixed(2));
-    upd2('totalMeters2',(totalArea+totalPerimeter).toFixed(2));
-    upd2('totalRoomsCost2',(totalAreaCost+totalPerimeterCost).toFixed(2));
     attachRoomEvents(proj);
-    updateProjectTotal(proj);
 }
 
 function attachRoomEvents(proj) {
@@ -1226,13 +1470,6 @@ function updateProjectTotal(proj) {
     document.getElementById("totalPerimeterCost").innerText=totalPerimeterCost.toFixed(2);
     document.getElementById("totalMeters").innerText=(totalArea+totalPerimeter).toFixed(2);
     document.getElementById("totalRoomsCost").innerText=gt.toFixed(2);
-    const upd2=(id,val)=>{const el=document.getElementById(id);if(el)el.innerText=val;};
-    upd2('totalArea2',totalArea.toFixed(2));
-    upd2('totalPerimeter2',totalPerimeter.toFixed(2));
-    upd2('totalAreaCost2',totalAreaCost.toFixed(2));
-    upd2('totalPerimeterCost2',totalPerimeterCost.toFixed(2));
-    upd2('totalMeters2',(totalArea+totalPerimeter).toFixed(2));
-    upd2('totalRoomsCost2',gt.toFixed(2));
     renderCustomersScreen();
 }
 
@@ -1653,7 +1890,7 @@ window.logout=async function(){
         document.getElementById("mainApp").style.display="none";
         document.getElementById("loginScreen").style.display="flex";
         document.getElementById("loginEmail").value=''; document.getElementById("loginPassword").value='';
-        userData={customers:[],workersByWeek:{},accounting:{rows:[],history:[]},partnerAccounting:{rows:[],history:[],partnerName:'الشريك'}};
+        userData={customers:[],workersByWeek:{},weekNotes:{},accounting:{rows:[],history:[]},partnerAccounting:{rows:[],history:[],partnerName:'الشريك'}};
     });
 };
 
