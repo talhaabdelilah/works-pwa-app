@@ -30,12 +30,6 @@
         .dropdown-item.danger { color:#ef4444; }
         .dropdown-item.danger:hover { background:#fee2e2; }
         .dropdown-divider { border:none; border-top:1px solid #e2e8f0; margin:4px 0; }
-        .dropdown-toggle-item { display:flex; align-items:center; justify-content:space-between; padding:11px 16px; font-size:0.75rem; cursor:pointer; color:#1e293b; border:none; background:none; width:100%; transition:background 0.15s; }
-        .dropdown-toggle-item:hover { background:#f1f5f9; }
-        .toggle-switch { width:34px; height:18px; background:#cbd5e1; border-radius:20px; position:relative; transition:background 0.2s; flex-shrink:0; }
-        .toggle-switch.on { background:#10b981; }
-        .toggle-switch::after { content:''; position:absolute; width:14px; height:14px; background:white; border-radius:50%; top:2px; right:2px; transition:right 0.2s; }
-        .toggle-switch.on::after { right:18px; }
 
         /* Tabs */
         .tabs { display:flex; gap:4px; margin-bottom:12px; background:#f1f5f9; padding:6px; border-radius:40px; position:sticky; top:60px; z-index:99; overflow-x:auto; }
@@ -152,13 +146,6 @@
         .accounting-table td { padding:6px 4px; text-align:center; border-bottom:1px solid #e2e8f0; }
         .accounting-table input { width:100%; padding:5px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.65rem; text-align:center; }
         .delete-acc-btn { background:#ef4444; color:white; border:none; padding:3px 8px; border-radius:20px; cursor:pointer; font-size:0.55rem; }
-        .filter-buttons { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
-        .filter-btn { font-size:0.6rem; padding:4px 10px; border-radius:15px; border:1px solid #cbd5e1; background:white; cursor:pointer; }
-        .filter-btn.active { background:#3b82f6; color:white; border-color:#3b82f6; }
-        .row-badge { display:inline-block; padding:2px 6px; border-radius:10px; font-size:0.55rem; margin-right:4px; }
-        .badge-worker { background:#fee2e2; color:#991b1b; }
-        .badge-project { background:#d1fae5; color:#065f46; }
-        .badge-manual { background:#e0e7ff; color:#3730a3; }
 
         /* ========== نظام الشريك ========== */
         .partner-header-box {
@@ -364,11 +351,6 @@
                     <button class="dropdown-item" onclick="window.importBackup();window.closeHeaderMenu()">📥 استيراد البيانات</button>
                     <button class="dropdown-item" onclick="window.openSettings();window.closeHeaderMenu()">⚙️ الإعدادات</button>
                     <hr class="dropdown-divider">
-                    <button class="dropdown-toggle-item" id="autoAccountingToggleBtn" onclick="window.toggleAutoAccounting()">
-                        <span>📊 التسجيل التلقائي</span>
-                        <span class="toggle-switch on" id="autoAccountingSwitch"></span>
-                    </button>
-                    <hr class="dropdown-divider">
                     <button class="dropdown-item danger" onclick="window.logout()">🚪 تسجيل الخروج</button>
                 </div>
             </div>
@@ -508,12 +490,6 @@
                     <button class="btn-danger" onclick="window.archiveAndClearAccounting('my')">📦 حذف وحفظ</button>
                     <button class="btn-info" onclick="window.showAccountingHistory('my')">📋 السجل</button>
                 </div>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-tab="my" data-filter="all" onclick="window.filterAccounting('my','all',this)">📊 الكل</button>
-                    <button class="filter-btn" data-tab="my" data-filter="workers" onclick="window.filterAccounting('my','workers',this)">👷 العمال</button>
-                    <button class="filter-btn" data-tab="my" data-filter="projects" onclick="window.filterAccounting('my','projects',this)">🏢 المشاريع</button>
-                    <button class="filter-btn" data-tab="my" data-filter="manual" onclick="window.filterAccounting('my','manual',this)">✍️ يدوي</button>
-                </div>
                 <div class="accounting-summary">
                     <div class="summary-item"><div class="label">📈 الإيرادات</div><div class="value" id="myTotalRevenue">0.00</div></div>
                     <div class="summary-item"><div class="label">📉 المصاريف</div><div class="value" id="myTotalExpense">0.00</div></div>
@@ -540,10 +516,6 @@
                     <button class="btn-primary" onclick="window.addAccountingRow('partner')">➕ إضافة صف</button>
                     <button class="btn-danger" onclick="window.archiveAndClearAccounting('partner')">📦 حذف وحفظ</button>
                     <button class="btn-info" onclick="window.showAccountingHistory('partner')">📋 السجل</button>
-                </div>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-tab="partner" data-filter="all" onclick="window.filterAccounting('partner','all',this)">📊 الكل</button>
-                    <button class="filter-btn" data-tab="partner" data-filter="manual" onclick="window.filterAccounting('partner','manual',this)">✍️ يدوي</button>
                 </div>
                 <div class="accounting-summary" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
                     <div class="summary-item"><div class="label">📈 إيرادات الشريك</div><div class="value" id="partnerTotalRevenue">0.00</div></div>
@@ -626,7 +598,6 @@ const firebaseConfig = {
 
 let auth = null, db = null, currentUser = null, realtimeDbRef = null;
 let currentCustomerId = null, currentProjectId = null, currentWeekOffset = 0;
-let currentMyFilter = 'all', currentPartnerFilter = 'all';
 let isInitialLoad = true;
 let saveDebounceTimer = null;
 
@@ -647,8 +618,6 @@ function escapeHtml(s) {
 }
 
 // ===== Header Dropdown Menu =====
-let autoAccountingEnabled = true;
-
 window.toggleHeaderMenu = function() {
     const d = document.getElementById('headerDropdown');
     d.classList.toggle('open');
@@ -662,13 +631,6 @@ document.addEventListener('click', e => {
         window.closeHeaderMenu();
     }
 });
-
-window.toggleAutoAccounting = function() {
-    autoAccountingEnabled = !autoAccountingEnabled;
-    const sw = document.getElementById('autoAccountingSwitch');
-    if(sw) { sw.classList.toggle('on', autoAccountingEnabled); }
-    showToast(autoAccountingEnabled ? '✅ التسجيل التلقائي مفعّل' : '⛔ التسجيل التلقائي موقف');
-};
 
 function setSaveStatus(state) {
     const el = document.getElementById('saveStatus');
@@ -828,33 +790,6 @@ function calculateWorkerTotal(worker) {
     const expTotal = parseExpensesText(worker.expenseText||'').total;
     return (days*(worker.price||0)) - expTotal;
 }
-
-function addWorkerExpenseToAccounting(workerName, amount, weekKey) {
-    if(!autoAccountingEnabled) return;
-    if(!userData.accounting.rows) userData.accounting.rows=[];
-    userData.accounting.rows.unshift({
-        expense:amount, revenue:null,
-        note:`مصروف ${workerName} - الأسبوع ${weekKey}`,
-        timestamp:Date.now(), autoGenerated:true, source:'worker_expense', workerName, weekKey
-    });
-    debouncedSave();
-    if(document.getElementById('accountingTab').classList.contains('active')) renderAccountingTable('my');
-}
-
-function addProjectPaymentToAccounting(customerName, projectName, amount, note) {
-    if(!autoAccountingEnabled) return;
-    if(!userData.accounting.rows) userData.accounting.rows=[];
-    let fullNote = `دفعة من ${customerName} - مشروع ${projectName}`;
-    if(note?.trim()) fullNote += ` | ${note}`;
-    userData.accounting.rows.unshift({
-        expense:null, revenue:amount, note:fullNote,
-        timestamp:Date.now(), autoGenerated:true, source:'project_payment', customerName, projectName
-    });
-    debouncedSave();
-    if(document.getElementById('accountingTab').classList.contains('active')) renderAccountingTable('my');
-    showToast(`✅ دفعة "${customerName}" (${amount.toFixed(2)}) أضيفت للإيرادات`);
-}
-
 // ===== Week Note =====
 window.saveWeekNote = function() {
     const wk = getWeekKeyFromOffset(currentWeekOffset);
@@ -1568,7 +1503,6 @@ window.addPayment=function(){
         const note=document.getElementById('payNote').value.trim();
         if(!proj.payments) proj.payments=[];
         proj.payments.push({date:new Date().toLocaleDateString('ar-EG'),amount:amt,note});
-        addProjectPaymentToAccounting(cust.name,proj.name,amt,note);
         renderPaymentsTable(proj,cust); updateProjectTotal(proj); debouncedSave();
         overlay.remove();
     };
@@ -1595,12 +1529,8 @@ function renderAccountingTable(tab) {
     if(!tbody) return;
     const data = getAccountingData(tab);
     if(!data.rows) data.rows=[];
-    const filter = tab==='partner' ? currentPartnerFilter : currentMyFilter;
 
     let rows = data.rows;
-    if(filter==='workers') rows=rows.filter(r=>r.source==='worker_expense');
-    else if(filter==='projects') rows=rows.filter(r=>r.source==='project_payment');
-    else if(filter==='manual') rows=rows.filter(r=>!r.autoGenerated);
 
     if(!rows.length) {
         tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#999;padding:16px;">لا توجد بيانات</td></tr>';
@@ -1609,13 +1539,10 @@ function renderAccountingTable(tab) {
 
     tbody.innerHTML=rows.map(r=>{
         const oi=data.rows.indexOf(r);
-        let badge='';
-        if(r.autoGenerated) badge=r.source==='worker_expense'?'<span class="row-badge badge-worker">👷 عامل</span>':'<span class="row-badge badge-project">🏢 مشروع</span>';
-        else badge='<span class="row-badge badge-manual">✍️ يدوي</span>';
         return `<tr data-row-idx="${oi}">
             <td><input type="number" class="acc-expense" data-idx="${oi}" data-tab="${tab}" value="${r.expense!==null?r.expense:''}" step="0.01" style="width:95px;"></td>
             <td><input type="number" class="acc-revenue" data-idx="${oi}" data-tab="${tab}" value="${r.revenue!==null?r.revenue:''}" step="0.01" style="width:95px;"></td>
-            <td><div style="display:flex;flex-direction:column;gap:3px;"><input type="text" class="acc-note" data-idx="${oi}" data-tab="${tab}" value="${escapeHtml(r.note||'')}" style="font-size:0.6rem;">${badge}</div></td>
+            <td><div style="display:flex;flex-direction:column;gap:3px;"><input type="text" class="acc-note" data-idx="${oi}" data-tab="${tab}" value="${escapeHtml(r.note||'')}" style="font-size:0.6rem;"></div></td>
             <td><button class="delete-acc-btn" data-idx="${oi}" data-tab="${tab}">✖</button></td>
         </tr>`;
     }).join('');
@@ -1669,13 +1596,6 @@ function updateAccountingSummary(tab) {
         el.innerText=net.toFixed(2); el.className='value profit '+(net>=0?'positive':'negative');
     }
 }
-
-window.filterAccounting=function(tab, filter, btn) {
-    if(tab==='partner') currentPartnerFilter=filter; else currentMyFilter=filter;
-    document.querySelectorAll(`.filter-btn[data-tab="${tab}"]`).forEach(b=>b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    renderAccountingTable(tab);
-};
 
 window.addAccountingRow=function(tab){
     const d=getAccountingData(tab);
