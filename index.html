@@ -726,11 +726,24 @@
         let weekNum = Math.ceil((days+1)/7);
         return `${year}-W${weekNum.toString().padStart(2,'0')}`;
     }
+    function getWeekDateRange(offset) {
+        let d = new Date();
+        d.setDate(d.getDate() + (offset * 7));
+        let dayOfWeek = d.getDay();
+        let saturday = new Date(d);
+        if(dayOfWeek === 6) saturday = d; else saturday.setDate(d.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+        let friday = new Date(saturday);
+        friday.setDate(saturday.getDate() + 6);
+        let m = saturday.getMonth() + 1;
+        let y = saturday.getFullYear();
+        return saturday.getDate() + '-' + friday.getDate() + '/' + m + '/' + y;
+    }
     function updateWeekLabel() {
         let label = document.getElementById('currentWeekLabel');
         if(!label) return;
-        if(weekOffset === 0) { label.textContent = 'الأسبوع الحالي'; label.style.color = '#10b981'; }
-        else { label.textContent = `أسبوع ${weekOffset > 0 ? '+' : ''}${weekOffset}`; label.style.color = weekOffset < 0 ? '#f59e0b' : '#3b82f6'; }
+        let dateRange = getWeekDateRange(weekOffset);
+        if(weekOffset === 0) { label.textContent = dateRange + ' (الأسبوع الحالي)'; label.style.color = '#10b981'; }
+        else { label.textContent = dateRange; label.style.color = weekOffset < 0 ? '#f59e0b' : '#3b82f6'; }
     }
     function saveWeekToArchive(weekKey) {
         if(!userData.workers || userData.workers.length === 0) return;
@@ -794,7 +807,7 @@
     function getClassIcon(cls) { const icons = { good: '😊', hard: '😤', bad: '🚫' }; return icons[cls] || '👤'; }
     window.renderCustomersScreen = function() { let grid=document.getElementById("customersGrid"); if(!grid) return; if(!userData.customers.length){ grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء</div>'; return; } grid.innerHTML = userData.customers.map(c=>`<div class="customer-folder class-${c.classification||'none'}" data-id="${c.id}"><div class="folder-icon">📂</div><div style="flex:1; cursor:pointer;" class="customer-name-click" data-id="${c.id}"><div class="customer-name">${escapeHtml(c.name)}</div><div class="customer-stats">📁 ${c.projects?.length||0} مشروع</div></div><span class="customer-class-badge ${c.classification||'none'}">${getClassIcon(c.classification)} ${getClassLabel(c.classification)}</span></div>`).join(''); document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>window.openCustomerProjects(parseInt(el.dataset.id)))); };
     window.openCustomerProjects = function(custId) { currentCustomerId=custId; let cust=userData.customers.find(c=>c.id===custId); if(!cust) return; document.getElementById("currentCustomerNameSpan").innerText=cust.name; let grid=document.getElementById("projectsGrid"); if(cust.projects?.length){ grid.innerHTML=cust.projects.map(p=>`<div class="project-card" data-id="${p.id}"><div class="project-info"><div class="project-name">🏢 ${escapeHtml(p.name)}</div><div class="project-total">💰 ${(p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2)}</div></div></div>`).join(''); document.querySelectorAll('.project-card').forEach(el=>el.addEventListener('click',()=>window.openProjectDetail(custId,parseInt(el.dataset.id)))); } else grid.innerHTML='<div class="empty-message">لا توجد مشاريع</div>'; window.showProjectScreen('projects'); };
-    window.openProjectDetail = function(custId,projId) { currentCustomerId=custId; currentProjectId=projId; let cust=userData.customers.find(c=>c.id===custId); let proj=cust?.projects.find(p=>p.id===projId); if(!proj) return; document.getElementById("navCustomerName").innerText=cust.name; document.getElementById("navProjectName").innerText=proj.name; document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50; renderPaymentsTable(proj); renderRoomsTable(proj); updateProjectTotal(proj); window.renderProjectWorkers(); window.renderGoodsTable(); let card = document.getElementById('projectDetailCard'); let btn = document.getElementById('completeProjectBtn'); if(proj.completed) { card.classList.add('project-completed'); btn.textContent = '↩️ إلغاء الإنهاء'; } else { card.classList.remove('project-completed'); btn.textContent = '✅ إنهاء المشروع'; } window.showProjectScreen('detail'); };
+    window.openProjectDetail = function(custId,projId) { try { currentCustomerId=custId; currentProjectId=projId; let cust=userData.customers.find(c=>c.id===custId); let proj=cust?.projects.find(p=>p.id===projId); if(!proj) return; document.getElementById("navCustomerName").innerText=cust.name; document.getElementById("navProjectName").innerText=proj.name; document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50; renderPaymentsTable(proj); renderRoomsTable(proj); updateProjectTotal(proj); window.renderProjectWorkers(); window.renderGoodsTable(); let card = document.getElementById('projectDetailCard'); let btn = document.getElementById('completeProjectBtn'); if(proj.completed) { card.classList.add('project-completed'); btn.textContent = '↩️ إلغاء الإنهاء'; } else { card.classList.remove('project-completed'); btn.textContent = '✅ إنهاء المشروع'; } window.showProjectScreen('detail'); } catch(e) { console.error('openProjectDetail error:', e); alert('خطأ في فتح المشروع: ' + e.message); } };
     window.showCustomerDetail = function(custId) {
         let cust = userData.customers.find(c=>c.id===custId);
         if(!cust) return;
