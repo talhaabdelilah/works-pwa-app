@@ -510,17 +510,17 @@
                 <span class="label">💰 الأجر اليومي</span>
                 <input type="number" id="workerDetailPriceInput" step="0.01">
             </div>
-            <div class="worker-detail-row"><span class="label">📅 أيام الحضور هذا الأسبوع</span><span class="value" id="workerDetailDays"></span></div>
             <div class="worker-detail-row">
                 <span class="label">💵 المصروفات</span>
                 <input type="text" id="workerDetailExpenseInput" placeholder="30+40" style="background:#fef3c7; border-color:#fde68a;">
             </div>
-            <div style="border-top:1px solid #e2e8f0; margin-top:8px; padding-top:8px;">
+            <div class="worker-detail-row"><span class="label">📅 أيام الحضور هذا الأسبوع</span><span class="value" id="workerDetailDays"></span></div>
+            <div style="border-top:2px solid #e2e8f0; margin:10px 0; padding-top:10px;">
                 <div class="worker-detail-row"><span class="label">📦 مجموع المصروفات الأسبوع</span><span class="value" id="workerWeekExpenses" style="color:#f59e0b;"></span></div>
-                <div class="worker-detail-row"><span class="label">📊 مستحق الأسبوع</span><span class="value" id="workerWeekDue" style="color:#3b82f6;"></span></div>
+                <div class="worker-detail-row"><span class="label">📊 مستحق الأسبوع (أيام × أجر)</span><span class="value" id="workerWeekDue" style="color:#3b82f6;"></span></div>
                 <div class="worker-detail-row" style="background:#ecfdf5; border-radius:12px; padding:6px 8px;"><span class="label" style="font-weight:bold;">💰 الباقي</span><span class="value" id="workerWeekRemaining" style="font-weight:bold; font-size:1rem;"></span></div>
             </div>
-            <div style="border-top:1px solid #e2e8f0; margin-top:8px; padding-top:8px;">
+            <div style="border-top:2px solid #e2e8f0; margin:10px 0; padding-top:10px;">
                 <div class="worker-detail-row"><span class="label">📦 مجموع المصروفات كل الأسابيع</span><span class="value" id="workerAllExpenses" style="color:#f59e0b;"></span></div>
                 <div class="worker-detail-row"><span class="label">📊 مجموع المستحقات كل الأسابيع</span><span class="value" id="workerAllDue" style="color:#3b82f6;"></span></div>
                 <div class="worker-detail-row" style="background:#eff6ff; border-radius:12px; padding:6px 8px;"><span class="label" style="font-weight:bold;">📈 الناتج</span><span class="value" id="workerAllNet" style="font-weight:bold; font-size:1rem;"></span></div>
