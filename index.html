@@ -137,17 +137,15 @@
         .stat-card .label { font-size: 0.6rem; color: #64748b; }
         .search-box input { width: 200px; padding: 6px 16px; border: 1px solid #e2e8f0; border-radius: 30px; font-size: 0.75rem; background: white; }
 
-        /* Workers Table - Improved like previous version */
-        .workers-table-wrapper { overflow-x: auto; margin: 8px 0; max-height: 55vh; overflow-y: auto; border-radius: 20px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .workers-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; background: white; border-radius: 20px; min-width: 900px; }
-        .workers-table th { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; font-size: 0.7rem; white-space: nowrap; position: sticky; top: 0; z-index: 10; padding: 10px 6px; }
-        .workers-table td { padding: 8px 6px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        /* Workers Table - Compact */
+        .workers-table-wrapper { margin: 8px 0; max-height: 65vh; overflow-y: auto; border-radius: 20px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .workers-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; background: white; border-radius: 20px; }
+        .workers-table th { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; font-size: 0.65rem; white-space: nowrap; position: sticky; top: 0; z-index: 10; padding: 8px 4px; }
+        .workers-table td { padding: 6px 4px; text-align: center; border-bottom: 1px solid #e2e8f0; }
         .workers-table tr:hover { background: #f8fafc; }
-        .attendance-check { width: 20px; height: 20px; cursor: pointer; accent-color: #10b981; }
-        .editable { width: 70px; padding: 6px; text-align: center; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 0.7rem; transition: all 0.2s; }
-        .name-input { width: 100px; font-weight: 500; }
-        .expense-input { width: 110px; background: #fef3c7; direction: ltr; text-align: left; }
-        .total-cell { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); font-weight: bold; color: #065f46; border-radius: 12px; }
+        .attendance-check { width: 22px; height: 22px; cursor: pointer; accent-color: #10b981; }
+        .name-cell { font-weight: 600; font-size: 0.75rem; text-align: right !important; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .week-total-cell { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); font-weight: bold; color: #065f46; border-radius: 12px; font-size: 0.7rem; }
 
         /* Archive Panel */
         .archive-panel { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 20px; padding: 12px; margin-bottom: 16px; display: none; }
@@ -220,10 +218,8 @@
         @media (max-width: 700px) {
             .workers-header { flex-direction: column; align-items: stretch; }
             .search-box input { width: 100%; }
-            .workers-table-wrapper { overflow-x: auto; }
-            .workers-table { min-width: 800px; }
-            .editable { width: 55px; }
-            .expense-input { width: 90px; }
+            .workers-table { font-size: 0.7rem; }
+            .workers-table th, .workers-table td { padding: 5px 3px; }
         }
     </style>
 </head>
@@ -378,7 +374,7 @@
             <div id="archivePanel" class="archive-panel"><div id="archiveList" class="archive-list"></div></div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
-                    <thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المصروف</th><th>السعر</th><th>المجموع</th><th>المشروع</th></tr></thead>
+                    <thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
             </div>
@@ -441,12 +437,19 @@
         <h3>👤 تفاصيل العامل</h3>
         <div class="worker-detail-name" id="workerDetailName"></div>
         <div class="worker-detail-stats">
-            <div class="worker-detail-row"><span class="label">💰 الأجر اليومي</span><span class="value" id="workerDetailPrice"></span></div>
+            <div class="worker-detail-row">
+                <span class="label">💰 الأجر اليومي</span>
+                <input type="number" id="workerDetailPriceInput" style="width:80px; padding:4px 8px; border:1px solid #cbd5e1; border-radius:10px; text-align:center; font-weight:bold;" step="0.01">
+            </div>
             <div class="worker-detail-row"><span class="label">📅 أيام الحضور</span><span class="value" id="workerDetailDays"></span></div>
-            <div class="worker-detail-row"><span class="label">💵 المصروفات</span><span class="value" id="workerDetailExpense"></span></div>
+            <div class="worker-detail-row">
+                <span class="label">💵 المصروفات</span>
+                <input type="text" id="workerDetailExpenseInput" style="width:100px; padding:4px 8px; border:1px solid #fde68a; border-radius:10px; text-align:center; background:#fef3c7;" placeholder="30+40">
+            </div>
             <div class="worker-detail-row"><span class="label">📊 المجموع الكلي</span><span class="value" id="workerDetailTotal" style="color:#10b981; font-size:1.1rem;"></span></div>
         </div>
         <div class="worker-detail-actions">
+            <button class="btn-primary" onclick="window.saveWorkerDetail()">💾 حفظ</button>
             <button class="btn-info" onclick="window.showWorkerInvoice()">📋 كشف حساب</button>
             <button class="btn-danger" id="workerDetailDeleteBtn">🗑️ حذف العامل</button>
             <button class="btn-outline" onclick="window.closeWorkerDetail()">✖ إغلاق</button>
@@ -520,23 +523,21 @@
         }
         return null;
     }
-    window.renderWorkersTable = function() { let tbody = document.getElementById("workersTableBody"); if(!tbody) return; let search = document.getElementById("searchInput")?.value.toLowerCase()||''; let filtered = userData.workers.filter(w=>w.name.toLowerCase().includes(search)); if(filtered.length===0){ tbody.innerHTML='<tr><td colspan="14" class="empty-message">لا يوجد عمال</td></tr>'; updateWorkersStats(); return; }
-    tbody.innerHTML = filtered.map((w,idx)=>{ let projInfo = getWorkerProject(w.id); let projCell = projInfo ? `<span style="font-size:0.6rem; color:#10b981; font-weight:bold;">📂 ${escapeHtml(projInfo.projectName)}</span>` : `<span style="font-size:0.6rem; color:#ef4444;">❌ غير مسجل</span>`; return `<tr class="worker-row" data-id="${w.id}" style="cursor:pointer;"><td>${idx+1}</td><td><input class="editable name-input" value="${escapeHtml(w.name)}" data-field="name" data-id="${w.id}" onclick="event.stopPropagation();"></td>${dayKeys.map(d=>`<td><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days?.[d]?'checked':''} onclick="event.stopPropagation();"></td>`).join('')}<td><input class="editable expense-input" value="${w.expenseRaw||''}" data-field="expense" data-id="${w.id}" placeholder="30+40" onclick="event.stopPropagation();"></td><td><input class="editable" value="${w.price||0}" data-field="price" data-id="${w.id}" step="0.01" onclick="event.stopPropagation();"></td><td class="total-cell">${calculateWorkerTotal(w).toFixed(2)}</td><td>${projCell}</td></tr>`; }).join('');
+    window.renderWorkersTable = function() { let tbody = document.getElementById("workersTableBody"); if(!tbody) return; let search = document.getElementById("searchInput")?.value.toLowerCase()||''; let filtered = userData.workers.filter(w=>w.name.toLowerCase().includes(search)); if(filtered.length===0){ tbody.innerHTML='<tr><td colspan="10" class="empty-message">لا يوجد عمال</td></tr>'; updateWorkersStats(); return; }
+    tbody.innerHTML = filtered.map((w,idx)=>{ return `<tr class="worker-row" data-id="${w.id}" style="cursor:pointer;"><td>${idx+1}</td><td class="name-cell">${escapeHtml(w.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days?.[d]?'checked':''} onclick="event.stopPropagation();"></td>`).join('')}<td class="week-total-cell">${calculateWorkerTotal(w).toFixed(2)}</td></tr>`; }).join('');
     document.querySelectorAll('.attendance-check').forEach(cb=>{ cb.onchange=()=>{ let w=userData.workers.find(w=>w.id==parseInt(cb.dataset.id)); if(w){ if(!w.days) w.days={}; w.days[cb.dataset.day]=cb.checked?1:0; window.linkWorkerAttendance(parseInt(cb.dataset.id), cb.dataset.day, cb.checked); window.renderWorkersTable(); autoSave(); } }; });
-    document.querySelectorAll('.name-input').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ w.name=inp.value; autoSave(); } }; });
-    document.querySelectorAll('[data-field="price"]').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ w.price=parseFloat(inp.value)||0; window.renderWorkersTable(); autoSave(); } }; });
-    document.querySelectorAll('.expense-input').forEach(inp=>{ inp.onblur=()=>{ let w=userData.workers.find(w=>w.id==parseInt(inp.dataset.id)); if(w){ let total = parseExpenseString(inp.value); w.expense = total; w.expenseRaw = inp.value; window.renderWorkersTable(); autoSave(); } }; });
     document.querySelectorAll('.worker-row').forEach(row=>{ row.onclick=()=>{ let w=userData.workers.find(w=>w.id==parseInt(row.dataset.id)); if(w) window.showWorkerDetail(w.id); }; });
     updateWorkersStats(); };
     window.addNewWorker = function() { let newId = userData.workers.length ? Math.max(...userData.workers.map(w=>w.id))+1 : 1; userData.workers.push({ id:newId, name:'عامل جديد', price:0, expense:0, expenseRaw:'', days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} }); window.renderWorkersTable(); autoSave(); };
     window.showWorkerDetail = function(workerId) {
         let w = userData.workers.find(w=>w.id===workerId);
         if(!w) return;
+        window._currentDetailWorkerId = workerId;
         document.getElementById('workerDetailName').textContent = w.name;
-        document.getElementById('workerDetailPrice').textContent = (w.price||0) + ' دينار';
+        document.getElementById('workerDetailPriceInput').value = w.price || 0;
         let daysCount = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
         document.getElementById('workerDetailDays').textContent = daysCount + ' يوم';
-        document.getElementById('workerDetailExpense').textContent = (w.expense||0) + ' دينار';
+        document.getElementById('workerDetailExpenseInput').value = w.expenseRaw || '';
         document.getElementById('workerDetailTotal').textContent = calculateWorkerTotal(w).toFixed(2) + ' دينار';
         document.getElementById('workerDetailDeleteBtn').setAttribute('data-worker-id', workerId);
         document.getElementById('workerDetailDeleteBtn').onclick = function() {
@@ -551,6 +552,18 @@
     };
     window.closeWorkerDetail = function() {
         document.getElementById('workerDetailModal').style.display = 'none';
+    };
+    window.saveWorkerDetail = function() {
+        let workerId = window._currentDetailWorkerId;
+        let w = userData.workers.find(w=>w.id===workerId);
+        if(!w) return;
+        w.price = parseFloat(document.getElementById('workerDetailPriceInput').value) || 0;
+        let rawExpense = document.getElementById('workerDetailExpenseInput').value;
+        w.expense = parseExpenseString(rawExpense);
+        w.expenseRaw = rawExpense;
+        window.renderWorkersTable();
+        window.closeWorkerDetail();
+        autoSave();
     };
     window.showWorkerInvoice = function() {
         let workerId = parseInt(document.getElementById('workerDetailDeleteBtn').getAttribute('data-worker-id'));
