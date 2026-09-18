@@ -58,12 +58,10 @@
         /* Project Workers */
         .project-workers-section { background: #f0fdf4; padding: 12px; border-radius: 16px; margin: 12px 0; border: 1px solid #bbf7d0; }
         .project-workers-section h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: #166534; }
-        .project-workers-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-        .project-workers-table th { background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white; padding: 6px 4px; font-size: 0.65rem; }
-        .project-workers-table td { padding: 5px 4px; text-align: center; border-bottom: 1px solid #e2e8f0; }
-        .project-workers-table input { width: 60px; padding: 4px; text-align: center; border: 1px solid #bbf7d0; border-radius: 8px; font-size: 0.65rem; }
-        .project-workers-table .pw-attend { width: 18px; height: 18px; accent-color: #10b981; }
-        .project-workers-table .pw-delete { background: #ef4444; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 0.6rem; }
+        .project-workers-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .project-workers-table th { background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white; padding: 8px 4px; font-size: 0.65rem; }
+        .project-workers-table td { padding: 6px 4px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        .project-workers-table .pw-attend { width: 22px; height: 22px; accent-color: #10b981; }
         .project-workers-summary { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
         .project-workers-summary .pw-sum-item { background: white; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
         .project-profit { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 16px; margin-top: 12px; text-align: center; }
@@ -183,14 +181,26 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; }
         .modal-content { background: white; border-radius: 24px; padding: 20px; width: 90%; max-width: 500px; max-height: 80%; overflow-y: auto; }
 
-        /* Worker Detail Modal */
-        .worker-detail-modal .modal-content { max-width: 400px; text-align: center; }
-        .worker-detail-name { font-size: 1.2rem; font-weight: bold; margin: 12px 0; color: #1e293b; }
-        .worker-detail-stats { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
-        .worker-detail-row { background: #f1f5f9; padding: 10px 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .worker-detail-row .label { color: #64748b; font-size: 0.8rem; }
-        .worker-detail-row .value { font-weight: bold; color: #1e293b; }
-        .worker-detail-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; flex-wrap: wrap; }
+        /* Worker Detail Page */
+        .worker-detail-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); z-index: 500; overflow-y: auto; padding: 12px; }
+        .worker-detail-card { background: white; border-radius: 24px; padding: 16px; max-width: 600px; margin: 0 auto; }
+        .worker-detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .worker-detail-back { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; padding: 8px 16px; border-radius: 30px; color: white; font-size: 0.8rem; cursor: pointer; }
+        .worker-detail-title { font-size: 1.1rem; font-weight: bold; color: #1e293b; flex: 1; }
+        .worker-detail-stats { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+        .worker-detail-row { background: #f8fafc; padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .worker-detail-row .label { color: #64748b; font-size: 0.75rem; }
+        .worker-detail-row .value { font-weight: bold; color: #1e293b; font-size: 0.85rem; }
+        .worker-detail-row input { width: 90px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 10px; text-align: center; font-size: 0.8rem; }
+        .worker-detail-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: center; flex-wrap: wrap; }
+        .worker-weeks-section { margin-top: 16px; }
+        .worker-weeks-section h4 { font-size: 0.85rem; color: #1e293b; margin-bottom: 8px; }
+        .worker-week-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; }
+        .worker-week-header { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 4px; }
+        .worker-week-header .week-key { font-weight: bold; color: #1e293b; }
+        .worker-week-header .week-date { color: #94a3b8; }
+        .worker-week-days { font-size: 0.7rem; color: #64748b; margin: 4px 0; }
+        .worker-week-total { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 4px 12px; border-radius: 20px; font-weight: bold; color: #065f46; font-size: 0.75rem; text-align: center; }
 
         /* Worker Invoice */
         .invoice-modal .modal-content { max-width: 600px; max-height: 90vh; padding: 0; overflow: hidden; }
@@ -326,7 +336,7 @@
                             <select id="addWorkerToProjectSelect" class="add-worker-select"><option value="">اختر عامل...</option></select>
                             <button class="btn-primary" onclick="window.addWorkerToProject()">➕ إضافة</button>
                         </div>
-                        <div class="table-wrapper"><table class="project-workers-table" id="projectWorkersTable"><thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>الأجر/يوم</th><th>المجموع</th><th></th></tr></thead><tbody id="projectWorkersBody"></tbody></table></div>
+                        <div class="table-wrapper"><table class="project-workers-table" id="projectWorkersTable"><thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th></tr></thead><tbody id="projectWorkersBody"></tbody></table></div>
                         <div class="project-workers-summary">
                             <div class="pw-sum-item">👷 عدد العمال: <span id="pwWorkersCount">0</span></div>
                             <div class="pw-sum-item">📅 إجمالي الأيام: <span id="pwTotalDays">0</span></div>
@@ -431,28 +441,32 @@
     </div>
 </div>
 
-<!-- نافذة تفاصيل العامل -->
-<div id="workerDetailModal" class="modal worker-detail-modal" style="display:none;">
-    <div class="modal-content">
-        <h3>👤 تفاصيل العامل</h3>
-        <div class="worker-detail-name" id="workerDetailName"></div>
+<!-- صفحة تفاصيل العامل -->
+<div id="workerDetailPage" class="worker-detail-page" style="display:none;">
+    <div class="worker-detail-card">
+        <div class="worker-detail-header">
+            <button class="worker-detail-back" onclick="window.closeWorkerDetail()">🔙 رجوع</button>
+            <div class="worker-detail-title" id="workerDetailName"></div>
+        </div>
         <div class="worker-detail-stats">
             <div class="worker-detail-row">
                 <span class="label">💰 الأجر اليومي</span>
-                <input type="number" id="workerDetailPriceInput" style="width:80px; padding:4px 8px; border:1px solid #cbd5e1; border-radius:10px; text-align:center; font-weight:bold;" step="0.01">
+                <input type="number" id="workerDetailPriceInput" step="0.01">
             </div>
-            <div class="worker-detail-row"><span class="label">📅 أيام الحضور</span><span class="value" id="workerDetailDays"></span></div>
+            <div class="worker-detail-row"><span class="label">📅 أيام الحضور هذا الأسبوع</span><span class="value" id="workerDetailDays"></span></div>
             <div class="worker-detail-row">
                 <span class="label">💵 المصروفات</span>
-                <input type="text" id="workerDetailExpenseInput" style="width:100px; padding:4px 8px; border:1px solid #fde68a; border-radius:10px; text-align:center; background:#fef3c7;" placeholder="30+40">
+                <input type="text" id="workerDetailExpenseInput" placeholder="30+40" style="background:#fef3c7; border-color:#fde68a;">
             </div>
-            <div class="worker-detail-row"><span class="label">📊 المجموع الكلي</span><span class="value" id="workerDetailTotal" style="color:#10b981; font-size:1.1rem;"></span></div>
+            <div class="worker-detail-row"><span class="label">📊 مجموع الأسبوع الحالي</span><span class="value" id="workerDetailTotal" style="color:#10b981; font-size:1rem;"></span></div>
         </div>
         <div class="worker-detail-actions">
             <button class="btn-primary" onclick="window.saveWorkerDetail()">💾 حفظ</button>
-            <button class="btn-info" onclick="window.showWorkerInvoice()">📋 كشف حساب</button>
-            <button class="btn-danger" id="workerDetailDeleteBtn">🗑️ حذف العامل</button>
-            <button class="btn-outline" onclick="window.closeWorkerDetail()">✖ إغلاق</button>
+            <button class="btn-danger" id="workerDetailDeleteBtn">🗑️ حذف</button>
+        </div>
+        <div class="worker-weeks-section">
+            <h4>📅 الأسابيع السابقة</h4>
+            <div id="workerWeeksList"></div>
         </div>
     </div>
 </div>
@@ -539,7 +553,6 @@
         document.getElementById('workerDetailDays').textContent = daysCount + ' يوم';
         document.getElementById('workerDetailExpenseInput').value = w.expenseRaw || '';
         document.getElementById('workerDetailTotal').textContent = calculateWorkerTotal(w).toFixed(2) + ' دينار';
-        document.getElementById('workerDetailDeleteBtn').setAttribute('data-worker-id', workerId);
         document.getElementById('workerDetailDeleteBtn').onclick = function() {
             if(confirm("حذف العامل '" + w.name + "'؟")) {
                 userData.workers = userData.workers.filter(x=>x.id !== workerId);
@@ -548,10 +561,11 @@
                 autoSave();
             }
         };
-        document.getElementById('workerDetailModal').style.display = 'flex';
+        renderWorkerWeeks(workerId);
+        document.getElementById('workerDetailPage').style.display = 'block';
     };
     window.closeWorkerDetail = function() {
-        document.getElementById('workerDetailModal').style.display = 'none';
+        document.getElementById('workerDetailPage').style.display = 'none';
     };
     window.saveWorkerDetail = function() {
         let workerId = window._currentDetailWorkerId;
@@ -565,6 +579,28 @@
         window.closeWorkerDetail();
         autoSave();
     };
+    function renderWorkerWeeks(workerId) {
+        let container = document.getElementById('workerWeeksList');
+        if(!container) return;
+        let archives = userData.workersArchives || [];
+        let weeksHtml = '';
+        archives.forEach(a => {
+            let wk = a.workers?.find(x=>x.id === workerId);
+            if(wk) {
+                let daysCount = dayKeys.reduce((s,k)=>s+(wk.days?.[k]||0),0);
+                let weekTotal = (daysCount * (wk.price||0)) - (wk.expense||0);
+                let savedDate = a.savedAt ? new Date(a.savedAt).toLocaleDateString('ar-EG') : '';
+                let daysList = dayNames.filter((_,i)=>wk.days[dayKeys[i]]===1).join('، ') || 'بدون حضور';
+                weeksHtml += `<div class="worker-week-card">
+                    <div class="worker-week-header"><span class="week-key">📅 ${a.weekKey}</span><span class="week-date">${savedDate}</span></div>
+                    <div class="worker-week-days">الحضور: ${daysList} (${daysCount} يوم) | الأجر: ${wk.price||0} | المصروف: ${wk.expense||0}</div>
+                    <div class="worker-week-total">الصافي: ${weekTotal.toFixed(2)} دينار</div>
+                </div>`;
+            }
+        });
+        if(!weeksHtml) weeksHtml = '<div style="text-align:center; color:#94a3b8; padding:12px; font-size:0.8rem;">لا توجد أسابيع محفوظة</div>';
+        container.innerHTML = weeksHtml;
+    }
     window.showWorkerInvoice = function() {
         let workerId = parseInt(document.getElementById('workerDetailDeleteBtn').getAttribute('data-worker-id'));
         let w = userData.workers.find(x=>x.id===workerId);
@@ -783,13 +819,12 @@
         let tbody = document.getElementById('projectWorkersBody');
         if(!tbody) return;
         populateWorkerSelect();
-        if(proj.workers.length === 0) { tbody.innerHTML = '<tr><td colspan="12" style="color:#94a3b8; padding:12px;">لا يوجد عمال في هذا المشروع</td></tr>'; updateProjectWorkersSummary(proj); return; }
+        if(proj.workers.length === 0) { tbody.innerHTML = '<tr><td colspan="10" style="color:#94a3b8; padding:12px;">لا يوجد عمال في هذا المشروع</td></tr>'; updateProjectWorkersSummary(proj); return; }
         tbody.innerHTML = proj.workers.map((pw, idx) => {
             let total = calculateProjectWorkerTotal(pw);
-            return `<tr><td>${idx+1}</td><td style="font-weight:bold; font-size:0.7rem;">${escapeHtml(pw.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="pw-attend" data-pw-idx="${idx}" data-day="${d}" ${pw.days?.[d]?'checked':''}></td>`).join('')}<td>${pw.price}</td><td style="color:#10b981; font-weight:bold;">${total.toFixed(2)}</td><td><button class="pw-delete" data-pw-idx="${idx}">✖</button></td></tr>`;
+            return `<tr><td>${idx+1}</td><td class="name-cell">${escapeHtml(pw.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="pw-attend" data-pw-idx="${idx}" data-day="${d}" ${pw.days?.[d]?'checked':''}></td>`).join('')}<td class="week-total-cell">${total.toFixed(2)}</td></tr>`;
         }).join('');
         tbody.querySelectorAll('.pw-attend').forEach(cb => { cb.onchange = () => { let idx = parseInt(cb.dataset.pwIdx); proj.workers[idx].days = proj.workers[idx].days || {}; proj.workers[idx].days[cb.dataset.day] = cb.checked ? 1 : 0; window.renderProjectWorkers(); autoSave(); }; });
-        tbody.querySelectorAll('.pw-delete').forEach(btn => { btn.onclick = () => { proj.workers.splice(parseInt(btn.dataset.pwIdx), 1); window.renderProjectWorkers(); autoSave(); }; });
         updateProjectWorkersSummary(proj);
     };
     function updateProjectWorkersSummary(proj) {
@@ -909,7 +944,7 @@
     window.logout = async function(){ if(currentAccountingPerson) saveToLocal(); currentUser=null; currentAccountingPerson=null; document.getElementById("mainSystem").style.display="none"; document.getElementById("usersSelectScreen").style.display="none"; document.getElementById("loginScreen").style.display="flex"; updateHeaderSync('offline'); };
 
     // Event Listeners
-    document.addEventListener("DOMContentLoaded",()=>{ document.getElementById("addCustomerBtn")?.addEventListener("click",window.addNewCustomer); document.getElementById("addProjectFromProjects")?.addEventListener("click",window.addProject); document.getElementById("addRoomInProject")?.addEventListener("click",window.addRoom); document.getElementById("saveProjectData")?.addEventListener("click",window.saveProject); document.getElementById("deleteProjectBtn")?.addEventListener("click",window.deleteProject); document.getElementById("addPaymentBtn")?.addEventListener("click",window.addPayment); document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{ if(currentProjectId){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust) updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId)); } }); document.getElementById("workerDetailModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerDetailModal') window.closeWorkerDetail(); }); document.getElementById("workerInvoiceModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerInvoiceModal') window.closeWorkerInvoice(); }); document.getElementById("customerDetailModal")?.addEventListener("click",(e)=>{ if(e.target.id==='customerDetailModal') window.closeCustomerDetail(); }); });
+    document.addEventListener("DOMContentLoaded",()=>{ document.getElementById("addCustomerBtn")?.addEventListener("click",window.addNewCustomer); document.getElementById("addProjectFromProjects")?.addEventListener("click",window.addProject); document.getElementById("addRoomInProject")?.addEventListener("click",window.addRoom); document.getElementById("saveProjectData")?.addEventListener("click",window.saveProject); document.getElementById("deleteProjectBtn")?.addEventListener("click",window.deleteProject); document.getElementById("addPaymentBtn")?.addEventListener("click",window.addPayment); document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{ if(currentProjectId){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust) updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId)); } }); document.getElementById("workerInvoiceModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerInvoiceModal') window.closeWorkerInvoice(); }); document.getElementById("customerDetailModal")?.addEventListener("click",(e)=>{ if(e.target.id==='customerDetailModal') window.closeCustomerDetail(); }); });
     window.addEventListener('online',()=>{ isOnline=true; if(useCloudSync && currentUser && !currentUser.isLocalOnly && currentAccountingPerson) loadFromLocal(); updateHeaderSync('online'); });
     window.addEventListener('offline',()=>{ isOnline=false; updateHeaderSync('offline'); });
     (function init(){ document.getElementById("loginScreen").style.display="flex"; if(auth) auth.onAuthStateChanged(async(user)=>{ if(user && user.emailVerified){ currentUser={ uid: user.uid, email: user.email, name: user.displayName||user.email.split('@')[0], isLocalOnly:false }; useCloudSync=true; loadAccountingUsersList(); document.getElementById("loginScreen").style.display="none"; document.getElementById("usersSelectScreen").style.display="flex"; renderUsersSelectScreen(); updateHeaderSync('online'); } }); })();
