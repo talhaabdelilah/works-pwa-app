@@ -461,6 +461,26 @@
 </div>
 <div id="backNotice" class="back-notice">🔙 تم الرجوع</div>
 
+<!-- نافذة دفعات العامل -->
+<div id="workerPaymentsModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:350px; margin:auto; padding:16px;">
+        <h3 style="text-align:center; margin-bottom:8px;">💰 دفعات العامل</h3>
+        <div style="text-align:center; font-weight:bold; margin-bottom:12px; color:#1e293b;" id="payWorkerName"></div>
+        <div style="text-align:center; font-size:0.75rem; color:#64748b; margin-bottom:12px;" id="payWorkerTotal"></div>
+        <div style="display:flex; gap:6px; margin-bottom:12px;">
+            <input type="number" id="payWorkerAmount" placeholder="المبلغ" step="0.01" style="flex:1; padding:6px 10px; border-radius:20px; border:1px solid #cbd5e1; font-size:0.75rem;">
+            <button class="btn-primary" onclick="window.addWorkerPayment()">💰 إضافة</button>
+        </div>
+        <div style="max-height:200px; overflow-y:auto;">
+            <table class="accounting-table" style="font-size:0.7rem;">
+                <thead><tr><th>المبلغ</th><th>التاريخ</th><th></th></tr></thead>
+                <tbody id="workerPaymentsBody"></tbody>
+            </table>
+        </div>
+        <button class="btn-secondary" onclick="window.closeWorkerPayments()" style="width:100%; margin-top:12px;">إغلاق</button>
+    </div>
+</div>
+
 <!-- نافذة تفاصيل العميل -->
 <div id="customerDetailModal" class="modal customer-detail-modal" style="display:none;">
     <div class="modal-content" style="max-width:350px; margin:auto; padding:20px;">
@@ -872,7 +892,7 @@
     function updateProjectSummary(proj) {
         let grand = (proj.rooms||[]).reduce((s,r)=>s+(r.totalCost||0),0);
         let totalGoods = (proj.goods||[]).reduce((s,g) => s + calculateGoodsTotal(g), 0);
-        let totalPaid = (proj.workers||[]).reduce((s,pw)=>s+(pw.paid||0),0);
+        let totalPaid = (proj.workers||[]).reduce((s,pw)=>s+((pw.payments||[]).reduce((a,p)=>a+p.amount,0)),0);
         let totalDiscount = (proj.payments||[]).filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0);
         let profit = grand - totalPaid - totalGoods - totalDiscount;
         let profitEl = document.getElementById('projectProfitSum');
@@ -954,7 +974,7 @@
         if(proj.workers.length === 0) { tbody.innerHTML = '<tr><td colspan="11" style="color:#94a3b8; padding:12px;">لا يوجد عمال في هذا المشروع</td></tr>'; updateProjectWorkersSummary(proj); return; }
         tbody.innerHTML = proj.workers.map((pw, idx) => {
             let total = calculateProjectWorkerTotal(pw);
-            let paid = pw.paid || 0;
+            let paid = (pw.payments||[]).reduce((s,p)=>s+p.amount,0);
             return `<tr><td>${idx+1}</td><td class="name-cell">${escapeHtml(pw.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="pw-attend" data-pw-idx="${idx}" data-day="${d}" ${pw.days?.[d]?'checked':''}></td>`).join('')}<td class="week-total-cell">${total.toFixed(2)}</td><td style="color:#10b981; font-weight:bold;">${paid.toFixed(2)}</td><td><button class="btn-success pw-pay-btn" data-idx="${idx}" style="padding:2px 6px; font-size:0.55rem;">💰 دفع</button></td></tr>`;
         }).join('');
         tbody.querySelectorAll('.pw-attend').forEach(cb => { cb.onchange = () => { let idx = parseInt(cb.dataset.pwIdx); proj.workers[idx].days = proj.workers[idx].days || {}; proj.workers[idx].days[cb.dataset.day] = cb.checked ? 1 : 0; window.renderProjectWorkers(); autoSave(); }; });
@@ -963,7 +983,7 @@
     };
     function updateProjectWorkersSummary(proj) {
         let totalDays = 0, totalEarned = 0, totalPaid = 0;
-        proj.workers.forEach(pw => { let d = dayKeys.reduce((s,k)=>s+(pw.days?.[k]||0),0); totalDays += d; totalEarned += d * (pw.price||0); totalPaid += (pw.paid||0); });
+        proj.workers.forEach(pw => { let d = dayKeys.reduce((s,k)=>s+(pw.days?.[k]||0),0); totalDays += d; totalEarned += d * (pw.price||0); totalPaid += (pw.payments||[]).reduce((a,p)=>a+p.amount,0); });
         document.getElementById('pwWorkersCount').textContent = proj.workers.length;
         document.getElementById('pwTotalDays').textContent = totalDays;
         document.getElementById('pwTotalCost').textContent = totalPaid.toFixed(2) + ' / ' + totalEarned.toFixed(2);
@@ -979,7 +999,7 @@
         let proj = cust?.projects.find(p=>p.id===currentProjectId);
         if(!proj) return;
         if(!proj.workers) proj.workers = [];
-        proj.workers.push({ sourceId: sourceWorker.id, name: sourceWorker.name, price: sourceWorker.price||0, days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}, paid:0 });
+        proj.workers.push({ sourceId: sourceWorker.id, name: sourceWorker.name, price: sourceWorker.price||0, days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}, payments:[] });
         window.renderProjectWorkers();
         autoSave();
     };
@@ -987,14 +1007,44 @@
         let cust = userData.customers.find(c=>c.id===currentCustomerId);
         let proj = cust?.projects.find(p=>p.id===currentProjectId);
         if(!proj || !proj.workers[idx]) return;
+        window._payWorkerIdx = idx;
         let pw = proj.workers[idx];
-        let amount = prompt('💰 مبلغ الدفع لـ ' + pw.name + ':\nالمستحق: ' + calculateProjectWorkerTotal(pw).toFixed(2) + ' دينار');
-        if(!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) return;
-        pw.paid = (pw.paid || 0) + parseFloat(amount);
-        logToAccounting('expense', pw.name, parseFloat(amount), 'دفعة لعامل في مشروع ' + proj.name);
+        if(!pw.payments) pw.payments = [];
+        document.getElementById('payWorkerName').textContent = pw.name;
+        let total = calculateProjectWorkerTotal(pw);
+        let paid = pw.payments.reduce((s,p)=>s+p.amount,0);
+        document.getElementById('payWorkerTotal').textContent = 'المستحق: ' + total.toFixed(2) + ' | المدفوع: ' + paid.toFixed(2);
+        window.renderWorkerPaymentsList(pw);
+        document.getElementById('workerPaymentsModal').style.display = 'flex';
+    };
+    window.renderWorkerPaymentsList = function(pw) {
+        let tbody = document.getElementById('workerPaymentsBody');
+        if(!pw.payments || pw.payments.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="color:#94a3b8; text-align:center; padding:12px;">لا توجد دفعات</td></tr>'; return; }
+        tbody.innerHTML = pw.payments.map((p,i) => `<tr><td>${p.amount.toFixed(2)}</td><td>${p.date}</td><td><button class="btn-danger delete-pw-pay" data-i="${i}" style="padding:2px 6px; font-size:0.55rem;">✖</button></td></tr>`).join('');
+        tbody.querySelectorAll('.delete-pw-pay').forEach(btn => { btn.onclick = () => { pw.payments.splice(parseInt(btn.dataset.i), 1); window.renderWorkerPaymentsList(pw); window.updateProjectSummary(proj); window.renderProjectWorkers(); autoSave(); }; });
+    };
+    window.addWorkerPayment = function() {
+        let cust = userData.customers.find(c=>c.id===currentCustomerId);
+        let proj = cust?.projects.find(p=>p.id===currentProjectId);
+        let pw = proj?.workers[window._payWorkerIdx];
+        if(!pw) return;
+        let amount = parseFloat(document.getElementById('payWorkerAmount').value);
+        if(!amount || amount <= 0) return;
+        let today = new Date().toLocaleDateString('ar-EG');
+        if(!pw.payments) pw.payments = [];
+        pw.payments.push({ amount: amount, date: today });
+        document.getElementById('payWorkerAmount').value = '';
+        logToAccounting('expense', pw.name, amount, 'دفعة لعامل في مشروع ' + proj.name);
+        let total = calculateProjectWorkerTotal(pw);
+        let paid = pw.payments.reduce((s,p)=>s+p.amount,0);
+        document.getElementById('payWorkerTotal').textContent = 'المستحق: ' + total.toFixed(2) + ' | المدفوع: ' + paid.toFixed(2);
+        window.renderWorkerPaymentsList(pw);
+        window.updateProjectSummary(proj);
         window.renderProjectWorkers();
-        updateProjectSummary(proj);
         autoSave();
+    };
+    window.closeWorkerPayments = function() {
+        document.getElementById('workerPaymentsModal').style.display = 'none';
     };
 
     // Goods Functions
@@ -1088,7 +1138,7 @@
     window.logout = async function(){ if(currentAccountingPerson) saveToLocal(); currentUser=null; currentAccountingPerson=null; document.getElementById("mainSystem").style.display="none"; document.getElementById("usersSelectScreen").style.display="none"; document.getElementById("loginScreen").style.display="flex"; updateHeaderSync('offline'); };
 
     // Event Listeners
-    document.addEventListener("DOMContentLoaded",()=>{ document.getElementById("addCustomerBtn")?.addEventListener("click",window.addNewCustomer); document.getElementById("addProjectFromProjects")?.addEventListener("click",window.addProject); document.getElementById("addRoomInProject")?.addEventListener("click",window.addRoom); document.getElementById("saveProjectData")?.addEventListener("click",window.saveProject); document.getElementById("deleteProjectBtn")?.addEventListener("click",window.deleteProject); document.getElementById("addPaymentBtn")?.addEventListener("click",window.addPayment); document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{ if(currentProjectId){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust) updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId)); } }); document.getElementById("workerInvoiceModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerInvoiceModal') window.closeWorkerInvoice(); }); document.getElementById("customerDetailModal")?.addEventListener("click",(e)=>{ if(e.target.id==='customerDetailModal') window.closeCustomerDetail(); }); });
+    document.addEventListener("DOMContentLoaded",()=>{ document.getElementById("addCustomerBtn")?.addEventListener("click",window.addNewCustomer); document.getElementById("addProjectFromProjects")?.addEventListener("click",window.addProject); document.getElementById("addRoomInProject")?.addEventListener("click",window.addRoom); document.getElementById("saveProjectData")?.addEventListener("click",window.saveProject); document.getElementById("deleteProjectBtn")?.addEventListener("click",window.deleteProject); document.getElementById("addPaymentBtn")?.addEventListener("click",window.addPayment); document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{ if(currentProjectId){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust) updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId)); } }); document.getElementById("workerInvoiceModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerInvoiceModal') window.closeWorkerInvoice(); }); document.getElementById("customerDetailModal")?.addEventListener("click",(e)=>{ if(e.target.id==='customerDetailModal') window.closeCustomerDetail(); }); document.getElementById("workerPaymentsModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerPaymentsModal') window.closeWorkerPayments(); }); });
     window.addEventListener('online',()=>{ isOnline=true; if(useCloudSync && currentUser && !currentUser.isLocalOnly && currentAccountingPerson) loadFromLocal(); updateHeaderSync('online'); });
     window.addEventListener('offline',()=>{ isOnline=false; updateHeaderSync('offline'); });
     (function init(){ document.getElementById("loginScreen").style.display="flex"; if(auth) auth.onAuthStateChanged(async(user)=>{ if(user && user.emailVerified){ currentUser={ uid: user.uid, email: user.email, name: user.displayName||user.email.split('@')[0], isLocalOnly:false }; useCloudSync=true; loadAccountingUsersList(); document.getElementById("loginScreen").style.display="none"; document.getElementById("usersSelectScreen").style.display="flex"; renderUsersSelectScreen(); updateHeaderSync('online'); } }); })();
