@@ -757,6 +757,12 @@
             return d > 0 || (w.expense||0) > 0;
         });
         if(!hasData) return;
+        userData.workers.forEach(w => {
+            let total = calculateWorkerTotal(w);
+            if(total !== 0) {
+                logToAccounting(total < 0 ? 'revenue' : 'expense', w.name, Math.abs(total), 'أجر عامل - ' + weekKey);
+            }
+        });
         let record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) } };
         userData.workersArchives = userData.workersArchives.filter(a=>a.weekKey!==weekKey);
         userData.workersArchives.unshift(record);
