@@ -579,7 +579,7 @@
     document.querySelectorAll('.attendance-check').forEach(cb=>{ cb.onchange=()=>{ let w=userData.workers.find(w=>w.id==parseInt(cb.dataset.id)); if(w){ if(!w.days) w.days={}; w.days[cb.dataset.day]=cb.checked?1:0; window.linkWorkerAttendance(parseInt(cb.dataset.id), cb.dataset.day, cb.checked); window.renderWorkersTable(); autoSave(); } }; });
     document.querySelectorAll('.worker-row').forEach(row=>{ row.onclick=()=>{ let w=userData.workers.find(w=>w.id==parseInt(row.dataset.id)); if(w) window.showWorkerDetail(w.id); }; });
     updateWorkersStats(); };
-    window.addNewWorker = function() { let newId = userData.workers.length ? Math.max(...userData.workers.map(w=>w.id))+1 : 1; userData.workers.push({ id:newId, name:'عامل جديد', price:0, expense:0, expenseRaw:'', days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} }); window.renderWorkersTable(); autoSave(); };
+    window.addNewWorker = function() { let name = prompt("👤 اسم العامل:"); if(!name || !name.trim()) return; let newId = userData.workers.length ? Math.max(...userData.workers.map(w=>w.id))+1 : 1; userData.workers.push({ id:newId, name:name.trim(), price:0, expense:0, expenseRaw:'', days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} }); window.renderWorkersTable(); autoSave(); };
     window.showWorkerDetail = function(workerId) {
         let w = userData.workers.find(w=>w.id===workerId);
         if(!w) return;
@@ -758,16 +758,20 @@
             return d > 0 || (w.expense||0) > 0;
         });
         if(!hasData) return;
-        userData.workers.forEach(w => {
-            let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
-            let wages = days * (w.price||0);
-            let exp = w.expense||0;
-            if(wages > 0) logToAccounting('expense', w.name, wages, 'أجر عامل - ' + weekKey);
-            if(exp > 0) logToAccounting('expense', w.name, exp, 'مصروف عامل - ' + weekKey);
-        });
-        let record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) } };
+        let alreadyLoggedKey = userData.workersArchives.find(a => a.weekKey === weekKey && a.loggedToAccounting);
+        if(!alreadyLoggedKey) {
+            userData.workers.forEach(w => {
+                let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
+                let wages = days * (w.price||0);
+                let exp = w.expense||0;
+                if(wages > 0) logToAccounting('expense', w.name, wages, 'أجر عامل - ' + weekKey);
+                if(exp > 0) logToAccounting('expense', w.name, exp, 'مصروف عامل - ' + weekKey);
+            });
+        }
+        let record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) }, loggedToAccounting: true };
         userData.workersArchives = userData.workersArchives.filter(a=>a.weekKey!==weekKey);
         userData.workersArchives.unshift(record);
+        saveToLocal();
     }
     window.prevWeek = function() {
         saveWeekToArchive(getCurrentWeekKey());
@@ -1061,7 +1065,7 @@
     window.showProjectScreen = function(screen){ document.getElementById("customersScreen").style.display=screen==='customers'?'block':'none'; document.getElementById("projectsScreen").style.display=screen==='projects'?'block':'none'; document.getElementById("projectDetailScreen").style.display=screen==='detail'?'block':'none'; if(screen==='customers') window.renderCustomersScreen(); };
     window.toggleHamburgerMenu = function(){ let dd=document.getElementById('hamburgerDropdown'); dd.classList.toggle('show'); };
     document.addEventListener('click',function(e){ let hm=document.querySelector('.hamburger-menu'); if(hm && !hm.contains(e.target)){ let dd=document.getElementById('hamburgerDropdown'); if(dd) dd.classList.remove('show'); } });
-    window.showMainTab = function(tab){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); if(tab==='projects'){ document.getElementById('projectsTab').classList.add('active'); document.querySelector('.tab-btn:first-child').classList.add('active'); window.showProjectScreen('customers'); } else if(tab==='workers'){ document.getElementById('workersTab').classList.add('active'); document.querySelector('.tab-btn:nth-child(2)').classList.add('active'); window.renderWorkersTable(); } else{ document.getElementById('accountingTab').classList.add('active'); document.querySelector('.tab-btn:nth-child(3)').classList.add('active'); window.renderAccountingTable(); } };
+    window.showMainTab = function(tab){ saveWeekToArchive(getCurrentWeekKey()); document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); if(tab==='projects'){ document.getElementById('projectsTab').classList.add('active'); document.querySelector('.tab-btn:first-child').classList.add('active'); window.showProjectScreen('customers'); } else if(tab==='workers'){ document.getElementById('workersTab').classList.add('active'); document.querySelector('.tab-btn:nth-child(2)').classList.add('active'); window.renderWorkersTable(); } else{ document.getElementById('accountingTab').classList.add('active'); document.querySelector('.tab-btn:nth-child(3)').classList.add('active'); window.renderAccountingTable(); } };
     window.initNavigationStack = function(){ navigationStack=['customers']; history.pushState({},'','#customers'); window.addEventListener('popstate',()=>{ if(navigationStack.length>1){ navigationStack.pop(); let prev = navigationStack[navigationStack.length-1]; if(prev.startsWith('projects_')) window.openCustomerProjects(parseInt(prev.split('_')[1])); else if(prev.startsWith('project_')){ let parts=prev.split('_'); window.openProjectDetail(parseInt(parts[1]),parseInt(parts[2])); } else window.showProjectScreen('customers'); document.getElementById('backNotice').classList.add('show'); setTimeout(()=>document.getElementById('backNotice').classList.remove('show'),1000); } else { if(confirm('الخروج؟')) window.close(); } }); };
     window.renderAll = function(){ window.renderCustomersScreen(); window.renderWorkersTable(); window.renderAccountingTable(); loadWorkersArchivesList(); };
     window.backToUsersList = function(){ saveToLocal(); document.getElementById("mainSystem").style.display="none"; document.getElementById("usersSelectScreen").style.display="flex"; renderUsersSelectScreen(); currentAccountingPerson=null; };
