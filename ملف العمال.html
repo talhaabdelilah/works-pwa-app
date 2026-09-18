@@ -61,10 +61,11 @@
         /* Project Workers */
         .project-workers-section { background: #f0fdf4; padding: 12px; border-radius: 16px; margin: 12px 0; border: 1px solid #bbf7d0; }
         .project-workers-section h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: #166534; }
-        .project-workers-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        .project-workers-table th { background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white; padding: 8px 4px; font-size: 0.65rem; }
-        .project-workers-table td { padding: 6px 4px; text-align: center; border-bottom: 1px solid #e2e8f0; }
-        .project-workers-table .pw-attend { width: 22px; height: 22px; accent-color: #10b981; }
+        .project-workers-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.75rem; }
+        .project-workers-table th { background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white; padding: 8px 2px; font-size: 0.65rem; overflow: hidden; text-overflow: ellipsis; }
+        .project-workers-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .project-workers-table .pw-attend { width: 20px; height: 20px; accent-color: #10b981; }
+        .project-workers-table .name-cell { text-align: right; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .project-workers-summary { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
         .project-workers-summary .pw-sum-item { background: white; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
         .project-profit { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border-radius: 16px; margin-top: 12px; text-align: center; }
@@ -91,6 +92,9 @@
         .rooms-table input { width: 50px; padding: 2px; text-align: center; border: 1px solid #c7d2fe; border-radius: 6px; font-size: 0.6rem; }
         .rooms-table .calc-val { color: #4f46e5; font-weight: bold; font-size: 0.58rem; }
         .rooms-table .delete-room-btn { background: #ef4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 0.5rem; }
+
+        /* Table Wrapper */
+        .table-wrapper { overflow-x: auto; margin: 8px 0; max-width: 100%; }
 
         /* Section Box */
         .section-box { background: #f8fafc; padding: 10px; border-radius: 16px; margin: 10px 0; border: 1px solid #e2e8f0; }
@@ -879,7 +883,7 @@
     window.deleteProject = function(){ if(confirm("حذف المشروع؟")){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust){ cust.projects=cust.projects.filter(p=>p.id!==currentProjectId); window.openCustomerProjects(currentCustomerId); autoSave(); } } };
     window.saveProject = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ syncRoomsFromDOM(proj); updateProjectTotal(proj); autoSave(); alert("تم الحفظ"); } };
     window.addPayment = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ let amount=prompt("💰 المبلغ المدفوع:"); if(amount && !isNaN(parseFloat(amount))){ proj.payments.push({ date: new Date().toLocaleDateString('ar-EG'), amount: parseFloat(amount), type:'payment', note: prompt("ملاحظة:","")||"" }); logToAccounting('revenue', cust.name, parseFloat(amount), 'دفعة من عميل'); renderPaymentsTable(proj); updateCustomerPaymentStatus(cust); autoSave(); } } };
-    window.addDiscount = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ let amount=prompt("🏷️ مبلغ التخفيض (الرقم البسيط الذي لن يُدفع):"); if(amount && !isNaN(parseFloat(amount))){ proj.payments.push({ date: new Date().toLocaleDateString('ar-EG'), amount: parseFloat(amount), type:'discount', note: prompt("ملاحظة (مثلاً: باقي مبلغ بسيط):","")||"" }); renderPaymentsTable(proj); updateCustomerPaymentStatus(cust); autoSave(); } } };
+    window.addDiscount = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ let amount=prompt("🏷️ مبلغ التخفيض (الرقم البسيط الذي لن يُدفع):"); if(amount && !isNaN(parseFloat(amount))){ proj.payments.push({ date: new Date().toLocaleDateString('ar-EG'), amount: parseFloat(amount), type:'discount', note: prompt("ملاحظة (مثلاً: باقي مبلغ بسيط):","")||"" }); logToAccounting('expense', cust.name, parseFloat(amount), 'تخفيض على مشروع'); renderPaymentsTable(proj); updateCustomerPaymentStatus(cust); autoSave(); } } };
     window.toggleProjectComplete = function() {
         let cust = userData.customers.find(c => c.id === currentCustomerId);
         let proj = cust?.projects.find(p => p.id === currentProjectId);
