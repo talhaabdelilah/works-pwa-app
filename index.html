@@ -604,7 +604,7 @@
     document.querySelectorAll('.attendance-check').forEach(cb=>{ cb.onchange=()=>{ let w=userData.workers.find(w=>w.id==parseInt(cb.dataset.id)); if(w){ if(!w.days) w.days={}; w.days[cb.dataset.day]=cb.checked?1:0; window.linkWorkerAttendance(parseInt(cb.dataset.id), cb.dataset.day, cb.checked); window.renderWorkersTable(); autoSave(); } }; });
     document.querySelectorAll('.worker-row').forEach(row=>{ row.onclick=()=>{ let w=userData.workers.find(w=>w.id==parseInt(row.dataset.id)); if(w) window.showWorkerDetail(w.id); }; });
     updateWorkersStats(); };
-    window.addNewWorker = function() { let name = prompt("👤 اسم العامل:"); if(!name || !name.trim()) return; let newId = userData.workers.length ? Math.max(...userData.workers.map(w=>w.id))+1 : 1; userData.workers.push({ id:newId, name:name.trim(), price:0, expense:0, expenseRaw:'', days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} }); window.renderWorkersTable(); autoSave(); };
+    window.addNewWorker = function() { let name = prompt("👤 اسم العامل:"); if(!name || !name.trim()) return; let allIds = []; userData.workers.forEach(w=>allIds.push(w.id)); (userData.customers||[]).forEach(c=>(c.projects||[]).forEach(p=>(p.workers||[]).forEach(pw=>{ if(pw.sourceId) allIds.push(pw.sourceId); }))); let newId = allIds.length ? Math.max(...allIds)+1 : 1; userData.workers.push({ id:newId, name:name.trim(), price:0, expense:0, expenseRaw:'', days:{sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} }); window.renderWorkersTable(); autoSave(); };
     window.showWorkerDetail = function(workerId) {
         let w = userData.workers.find(w=>w.id===workerId);
         if(!w) return;
