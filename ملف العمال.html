@@ -398,7 +398,7 @@
                             <select id="addWorkerToProjectSelect" class="add-worker-select" style="flex:1; min-width:120px;"><option value="">اختر عامل...</option></select>
                             <button class="btn-primary" onclick="window.addWorkerToProject()">➕ إضافة</button>
                         </div>
-                        <div class="table-wrapper"><table class="project-workers-table" id="projectWorkersTable"><thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th></tr></thead><tbody id="projectWorkersBody"></tbody></table></div>
+                        <div class="table-wrapper"><table class="project-workers-table" id="projectWorkersTable"><thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th><th>المدفوع</th><th></th></tr></thead><tbody id="projectWorkersBody"></tbody></table></div>
                         <div class="project-workers-summary">
                             <div class="pw-sum-item">👷 العمال: <span id="pwWorkersCount">0</span></div>
                             <div class="pw-sum-item">📅 الأيام: <span id="pwTotalDays">0</span></div>
@@ -758,17 +758,7 @@
             return d > 0 || (w.expense||0) > 0;
         });
         if(!hasData) return;
-        let alreadyLoggedKey = userData.workersArchives.find(a => a.weekKey === weekKey && a.loggedToAccounting);
-        if(!alreadyLoggedKey) {
-            userData.workers.forEach(w => {
-                let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
-                let wages = days * (w.price||0);
-                let exp = w.expense||0;
-                if(wages > 0) logToAccounting('expense', w.name, wages, 'أجر عامل - ' + weekKey);
-                if(exp > 0) logToAccounting('expense', w.name, exp, 'مصروف عامل - ' + weekKey);
-            });
-        }
-        let record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) }, loggedToAccounting: true };
+        let record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) } };
         userData.workersArchives = userData.workersArchives.filter(a=>a.weekKey!==weekKey);
         userData.workersArchives.unshift(record);
         saveToLocal();
@@ -882,13 +872,12 @@
     function updateProjectSummary(proj) {
         let grand = (proj.rooms||[]).reduce((s,r)=>s+(r.totalCost||0),0);
         let totalGoods = (proj.goods||[]).reduce((s,g) => s + calculateGoodsTotal(g), 0);
-        let totalCost = 0;
-        (proj.workers||[]).forEach(pw => { let d = dayKeys.reduce((s,k)=>s+(pw.days?.[k]||0),0); totalCost += d * (pw.price||0); });
+        let totalPaid = (proj.workers||[]).reduce((s,pw)=>s+(pw.paid||0),0);
         let totalDiscount = (proj.payments||[]).filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0);
-        let profit = grand - totalCost - totalGoods - totalDiscount;
+        let profit = grand - totalPaid - totalGoods - totalDiscount;
         let profitEl = document.getElementById('projectProfitSum');
         if(profitEl) { profitEl.textContent = profit.toFixed(2); profitEl.style.color = profit >= 0 ? '#059669' : '#dc2626'; }
-        let tcEl = document.getElementById('pwTotalCostSum'); if(tcEl) tcEl.textContent = totalCost.toFixed(2);
+        let tcEl = document.getElementById('pwTotalCostSum'); if(tcEl) tcEl.textContent = totalPaid.toFixed(2);
         let tgEl = document.getElementById('totalGoodsCostSum'); if(tgEl) tgEl.textContent = totalGoods.toFixed(2);
     }
     function updateProjectTotal(proj){ let price=parseFloat(document.getElementById("globalPricePerMeter").value)||0; proj.globalPricePerMeter=price; proj.rooms.forEach(r=>{ if(!r.calcMode) r.calcMode='area'; let meters=0; if(r.calcMode==='area'){ meters=(r.lengthVal||0)*(r.widthVal||0); } else { meters=((r.lengthVal||0)+(r.widthVal||0))*2; } r.totalCost=meters*price; }); let grand = proj.rooms.reduce((s,r)=>s+r.totalCost,0); document.getElementById("projectGrandTotal").innerHTML=grand.toFixed(2); let totalPaid = proj.payments?.filter(p=>p.type!=='discount').reduce((s,p)=>s+p.amount,0)||0; let totalDiscount = proj.payments?.filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0)||0; let effectiveTotal = grand - totalDiscount; let remaining = effectiveTotal - totalPaid; document.getElementById("remainingAmount").innerHTML=remaining.toFixed(2); document.getElementById("totalPayments").textContent=totalPaid.toFixed(2); document.getElementById("totalDiscounts").textContent=totalDiscount.toFixed(2);         let totalArea = proj.rooms.reduce((s,r)=>{ if(!r.calcMode) r.calcMode='area'; return s+(r.calcMode==='area'?(r.lengthVal||0)*(r.widthVal||0):((r.lengthVal||0)+(r.widthVal||0))*2); },0); document.getElementById("projectTotalArea").textContent=totalArea.toFixed(2); let paidPercent = effectiveTotal > 0 ? Math.min((totalPaid / effectiveTotal) * 100, 100) : 0; let bar = document.getElementById('paymentProgressBar'); let statusText = document.getElementById('paymentStatusText'); if(bar) { bar.style.width = paidPercent + '%'; bar.className = 'payment-progress-bar ' + (paidPercent >= 100 ? 'paid' : paidPercent > 0 ? 'partial' : 'unpaid'); } if(statusText) { if(paidPercent >= 100) { statusText.textContent = '✅ تم الدفع بالكامل'; statusText.className = 'payment-status-text paid'; } else if(paidPercent > 0) { statusText.textContent = '⏳ متبقي ' + remaining.toFixed(2) + ' د.ع (' + paidPercent.toFixed(0) + '%)'; statusText.className = 'payment-status-text partial'; } else { statusText.textContent = '❌ لم يتم الدفع'; statusText.className = 'payment-status-text unpaid'; } } updateProjectSummary(proj); }
@@ -962,20 +951,22 @@
         let tbody = document.getElementById('projectWorkersBody');
         if(!tbody) return;
         populateWorkerSelect();
-        if(proj.workers.length === 0) { tbody.innerHTML = '<tr><td colspan="10" style="color:#94a3b8; padding:12px;">لا يوجد عمال في هذا المشروع</td></tr>'; updateProjectWorkersSummary(proj); return; }
+        if(proj.workers.length === 0) { tbody.innerHTML = '<tr><td colspan="11" style="color:#94a3b8; padding:12px;">لا يوجد عمال في هذا المشروع</td></tr>'; updateProjectWorkersSummary(proj); return; }
         tbody.innerHTML = proj.workers.map((pw, idx) => {
             let total = calculateProjectWorkerTotal(pw);
-            return `<tr><td>${idx+1}</td><td class="name-cell">${escapeHtml(pw.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="pw-attend" data-pw-idx="${idx}" data-day="${d}" ${pw.days?.[d]?'checked':''}></td>`).join('')}<td class="week-total-cell">${total.toFixed(2)}</td></tr>`;
+            let paid = pw.paid || 0;
+            return `<tr><td>${idx+1}</td><td class="name-cell">${escapeHtml(pw.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="pw-attend" data-pw-idx="${idx}" data-day="${d}" ${pw.days?.[d]?'checked':''}></td>`).join('')}<td class="week-total-cell">${total.toFixed(2)}</td><td style="color:#10b981; font-weight:bold;">${paid.toFixed(2)}</td><td><button class="btn-success pw-pay-btn" data-idx="${idx}" style="padding:2px 6px; font-size:0.55rem;">💰 دفع</button></td></tr>`;
         }).join('');
         tbody.querySelectorAll('.pw-attend').forEach(cb => { cb.onchange = () => { let idx = parseInt(cb.dataset.pwIdx); proj.workers[idx].days = proj.workers[idx].days || {}; proj.workers[idx].days[cb.dataset.day] = cb.checked ? 1 : 0; window.renderProjectWorkers(); autoSave(); }; });
+        tbody.querySelectorAll('.pw-pay-btn').forEach(btn => { btn.onclick = () => { let idx = parseInt(btn.dataset.idx); window.payProjectWorker(idx); }; });
         updateProjectWorkersSummary(proj);
     };
     function updateProjectWorkersSummary(proj) {
-        let totalDays = 0, totalCost = 0;
-        proj.workers.forEach(pw => { let d = dayKeys.reduce((s,k)=>s+(pw.days?.[k]||0),0); totalDays += d; totalCost += d * (pw.price||0); });
+        let totalDays = 0, totalEarned = 0, totalPaid = 0;
+        proj.workers.forEach(pw => { let d = dayKeys.reduce((s,k)=>s+(pw.days?.[k]||0),0); totalDays += d; totalEarned += d * (pw.price||0); totalPaid += (pw.paid||0); });
         document.getElementById('pwWorkersCount').textContent = proj.workers.length;
         document.getElementById('pwTotalDays').textContent = totalDays;
-        document.getElementById('pwTotalCost').textContent = totalCost.toFixed(2);
+        document.getElementById('pwTotalCost').textContent = totalPaid.toFixed(2) + ' / ' + totalEarned.toFixed(2);
         updateProjectSummary(proj);
     }
     window.addWorkerToProject = function() {
@@ -988,8 +979,21 @@
         let proj = cust?.projects.find(p=>p.id===currentProjectId);
         if(!proj) return;
         if(!proj.workers) proj.workers = [];
-        proj.workers.push({ sourceId: sourceWorker.id, name: sourceWorker.name, price: sourceWorker.price||0, days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0} });
+        proj.workers.push({ sourceId: sourceWorker.id, name: sourceWorker.name, price: sourceWorker.price||0, days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}, paid:0 });
         window.renderProjectWorkers();
+        autoSave();
+    };
+    window.payProjectWorker = function(idx) {
+        let cust = userData.customers.find(c=>c.id===currentCustomerId);
+        let proj = cust?.projects.find(p=>p.id===currentProjectId);
+        if(!proj || !proj.workers[idx]) return;
+        let pw = proj.workers[idx];
+        let amount = prompt('💰 مبلغ الدفع لـ ' + pw.name + ':\nالمستحق: ' + calculateProjectWorkerTotal(pw).toFixed(2) + ' دينار');
+        if(!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) return;
+        pw.paid = (pw.paid || 0) + parseFloat(amount);
+        logToAccounting('expense', pw.name, parseFloat(amount), 'دفعة لعامل في مشروع ' + proj.name);
+        window.renderProjectWorkers();
+        updateProjectSummary(proj);
         autoSave();
     };
 
