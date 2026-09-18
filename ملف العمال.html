@@ -841,6 +841,11 @@
         if (proj.completed) {
             card.classList.add("project-completed");
             btn.textContent = "↩️ إلغاء الإنهاء";
+            let rating = prompt("⭐ تقييم العميل بعد انتهاء المشروع:\n\n1 - عميل جيد ✅\n2 - عميل متعب ⚠️\n3 - لا يُنصح بالتعامل ❌\n\n(اتركه فارغاً لتقييم لاحقاً)");
+            if (rating === "1") { cust.classification = "good"; alert("✅ تم تقييم العميل: عميل جيد"); }
+            else if (rating === "2") { cust.classification = "hard"; alert("⚠️ تم تقييم العميل: عميل متعب"); }
+            else if (rating === "3") { cust.classification = "bad"; alert("❌ تم تقييم العميل: لا يُنصح بالتعامل"); }
+            window.renderCustomersScreen();
         } else {
             card.classList.remove("project-completed");
             btn.textContent = "✅ إنهاء المشروع";
