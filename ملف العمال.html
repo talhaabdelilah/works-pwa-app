@@ -915,16 +915,15 @@
         loadWeekData();
     };
     function loadWeekData() {
-        if(weekOffset === 0) {
-            let weekKey = getCurrentWeekKey();
-            let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
-            if(archive) { userData.workers = JSON.parse(JSON.stringify(archive.workers)); }
-        } else {
-            let weekKey = getWeekKey(weekOffset);
-            let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
-            if(archive) { userData.workers = JSON.parse(JSON.stringify(archive.workers)); }
-            else { userData.workers.forEach(w => { w.days = {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}; w.expense=0; w.expenseRaw=''; }); }
-        }
+        let weekKey = weekOffset === 0 ? getCurrentWeekKey() : getWeekKey(weekOffset);
+        let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
+        userData.workers.forEach(w => {
+            if(archive) {
+                let aw = archive.workers.find(x => x.id === w.id);
+                if(aw) { w.days = JSON.parse(JSON.stringify(aw.days || {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0})); w.expense = aw.expense || 0; w.expenseRaw = aw.expenseRaw || ''; w.price = aw.price || w.price; }
+                else { w.days = {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}; w.expense=0; w.expenseRaw=''; }
+            } else { w.days = {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}; w.expense=0; w.expenseRaw=''; }
+        });
         window.renderWorkersTable();
         autoSave();
     }
