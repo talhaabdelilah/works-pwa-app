@@ -734,7 +734,7 @@
         if(!selected.pw.payments) selected.pw.payments = [];
         selected.pw.payments.push({ amount: parseFloat(amount), date: today, weekKey: wkKey });
         logToAccounting('expense', worker.name, parseFloat(amount), 'دفعة لعامل في مشروع ' + selected.proj.name);
-        renderWorkerPaymentsFromProjects(workerId);
+        window.showWorkerDetail(workerId);
         autoSave();
         alert('✅ تم تسجيل الدفعة: ' + parseFloat(amount).toFixed(2) + ' دينار');
     };
