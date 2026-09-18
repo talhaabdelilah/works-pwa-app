@@ -525,6 +525,13 @@
             <h4>📅 الأسابيع السابقة</h4>
             <div id="workerWeeksList"></div>
         </div>
+        <div class="worker-weeks-section" style="margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h4 style="margin:0;">💰 الدفعات في المشاريع</h4>
+                <button class="btn-primary" onclick="window.addPaymentFromWorkerDetail()" style="padding:4px 10px; font-size:0.65rem;">➕ دفعة</button>
+            </div>
+            <div id="workerPaymentsList"></div>
+        </div>
     </div>
 </div>
 
@@ -618,10 +625,80 @@
             }
         };
         renderWorkerWeeks(workerId);
+        window.renderWorkerPaymentsFromProjects(workerId);
         document.getElementById('workerDetailPage').style.display = 'block';
     };
     window.closeWorkerDetail = function() {
         document.getElementById('workerDetailPage').style.display = 'none';
+    };
+    window.renderWorkerPaymentsFromProjects = function(workerId) {
+        let container = document.getElementById('workerPaymentsList');
+        if(!container) return;
+        let allPayments = [];
+        userData.customers.forEach(c => {
+            (c.projects||[]).forEach(p => {
+                (p.workers||[]).forEach(pw => {
+                    if(pw.sourceId === workerId && pw.payments && pw.payments.length > 0) {
+                        pw.payments.forEach(pay => allPayments.push({...pay, projectName: p.name}));
+                    }
+                });
+            });
+        });
+        if(allPayments.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:12px; font-size:0.8rem;">لا توجد دفعات</div>'; return; }
+        let groups = {};
+        allPayments.forEach(p => { let wk = p.weekKey || 'أخرى'; if(!groups[wk]) groups[wk] = []; groups[wk].push(p); });
+        let html = '';
+        for(let wk in groups) {
+            let wkLabel = 'الأسبوع ' + wk;
+            let wkDateRange = '';
+            if(wk !== 'أخرى' && wk.includes('-W')) {
+                let parts = wk.split('-W');
+                let yr = parseInt(parts[0]);
+                let wn = parseInt(parts[1]);
+                let sat = new Date(yr, 0, 1);
+                let dayOfWeek = sat.getDay();
+                if(dayOfWeek !== 6) sat.setDate(sat.getDate() + (6 - dayOfWeek));
+                sat.setDate(sat.getDate() + (wn - 1) * 7);
+                let fri = new Date(sat); fri.setDate(sat.getDate() + 6);
+                wkDateRange = ' (' + sat.getDate() + '-' + fri.getDate() + '/' + (sat.getMonth()+1) + '/' + sat.getFullYear() + ')';
+            }
+            let wkTotal = groups[wk].reduce((s,p)=>s+p.amount,0);
+            html += '<div class="pw-pay-group">';
+            html += '<div class="pw-pay-week-header">📅 ' + wkLabel + wkDateRange + ' - الإجمالي: ' + wkTotal.toFixed(2) + '</div>';
+            html += '<table class="accounting-table" style="font-size:0.7rem; margin-bottom:8px;"><thead><tr><th>المبلغ</th><th>التاريخ</th><th>المشروع</th></tr></thead><tbody>';
+            groups[wk].forEach(p => { html += '<tr><td>' + p.amount.toFixed(2) + '</td><td>' + p.date + '</td><td>' + escapeHtml(p.projectName) + '</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        container.innerHTML = html;
+    };
+    window.addPaymentFromWorkerDetail = function() {
+        let workerId = window._currentDetailWorkerId;
+        let worker = userData.workers.find(w=>w.id===workerId);
+        if(!worker) return;
+        let projects = [];
+        userData.customers.forEach(c => {
+            (c.projects||[]).forEach(p => {
+                if(p.completed) return;
+                let pw = (p.workers||[]).find(w=>w.sourceId === workerId);
+                if(pw) projects.push({cust: c, proj: p, pw: pw});
+            });
+        });
+        if(projects.length === 0) { alert('⚠️ العامل غير مسجل في أي مشروع نشط'); return; }
+        let msg = '💰 اختر المشروع:\n\n';
+        projects.forEach((pr, i) => { msg += (i+1) + '. ' + pr.proj.name + ' (' + pr.cust.name + ')\n'; });
+        let choice = prompt(msg);
+        if(!choice || isNaN(parseInt(choice)) || parseInt(choice) < 1 || parseInt(choice) > projects.length) return;
+        let selected = projects[parseInt(choice)-1];
+        let amount = prompt('💰 مبلغ الدفع:');
+        if(!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) return;
+        let today = new Date().toLocaleDateString('ar-EG');
+        let wkKey = getCurrentWeekKey();
+        if(!selected.pw.payments) selected.pw.payments = [];
+        selected.pw.payments.push({ amount: parseFloat(amount), date: today, weekKey: wkKey });
+        logToAccounting('expense', worker.name, parseFloat(amount), 'دفعة لعامل في مشروع ' + selected.proj.name);
+        window.renderWorkerPaymentsFromProjects(workerId);
+        autoSave();
+        alert('✅ تم تسجيل الدفعة');
     };
     window.saveWorkerDetail = function() {
         let workerId = window._currentDetailWorkerId;
