@@ -423,7 +423,6 @@
                 </div>
             </div>
             <div class="workers-table-wrapper">
-            <div class="workers-table-wrapper">
                 <table class="workers-table">
                     <thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
@@ -867,7 +866,8 @@
         let totalGoods = (proj.goods||[]).reduce((s,g) => s + calculateGoodsTotal(g), 0);
         let totalCost = 0;
         (proj.workers||[]).forEach(pw => { let d = dayKeys.reduce((s,k)=>s+(pw.days?.[k]||0),0); totalCost += d * (pw.price||0); });
-        let profit = grand - totalCost - totalGoods;
+        let totalDiscount = (proj.payments||[]).filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0);
+        let profit = grand - totalCost - totalGoods - totalDiscount;
         let profitEl = document.getElementById('projectProfitSum');
         if(profitEl) { profitEl.textContent = profit.toFixed(2); profitEl.style.color = profit >= 0 ? '#059669' : '#dc2626'; }
         let tcEl = document.getElementById('pwTotalCostSum'); if(tcEl) tcEl.textContent = totalCost.toFixed(2);
