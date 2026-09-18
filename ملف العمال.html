@@ -309,7 +309,7 @@
         <!-- تبويب العملاء -->
         <div id="projectsTab" class="tab-content active">
             <div id="customersScreen"><div style="margin-bottom:10px;"><button id="addCustomerBtn" class="btn-primary" style="width:100%;">➕ عميل جديد</button></div><div id="customersGrid" class="customers-grid"></div></div>
-            <div id="projectsScreen" style="display:none;"><div class="breadcrumb" style="background:#f8fafc; padding:8px; border-radius:30px; margin-bottom:12px;"><span>📂 <span id="currentCustomerNameSpan"></span></span><button id="addProjectFromProjects" class="btn-secondary">➕ مشروع جديد</button><button onclick="window.showProjectScreen('customers')" class="btn-outline">🔙 رجوع</button></div><div id="projectsGrid" class="projects-grid"></div></div>
+            <div id="projectsScreen" style="display:none;"><div class="breadcrumb" style="background:#f8fafc; padding:8px; border-radius:30px; margin-bottom:12px;"><span>📂 <span id="currentCustomerNameSpan"></span></span><button id="showCustomerInfoBtn" class="btn-outline" onclick="window.showCustomerDetail(currentCustomerId)" style="padding:4px 8px; font-size:0.65rem;">ℹ️ العميل</button><button id="addProjectFromProjects" class="btn-secondary">➕ مشروع جديد</button><button onclick="window.showProjectScreen('customers')" class="btn-outline">🔙 رجوع</button></div><div id="projectsGrid" class="projects-grid"></div></div>
             <div id="projectDetailScreen" style="display:none;">
                 <div class="breadcrumb"><span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span><button onclick="window.openCustomerProjects(currentCustomerId)" class="btn-outline">🔙 رجوع</button></div>
                 <div class="project-detail-card" id="projectDetailCard" style="background:white; border-radius:20px; padding:16px;">
@@ -422,27 +422,18 @@
 
 <!-- نافذة تفاصيل العميل -->
 <div id="customerDetailModal" class="modal customer-detail-modal" style="display:none;">
-    <div class="modal-content">
-        <div class="customer-detail-header none" id="customerDetailHeader">
-            <h3 id="customerDetailName"></h3>
-            <span id="customerDetailClassBadge"></span>
-        </div>
+    <div class="modal-content" style="max-width:350px; margin:auto; padding:20px;">
+        <h3 style="text-align:center; margin-bottom:16px;">👤 معلومات العميل</h3>
         <div class="customer-detail-info">
             <div class="customer-info-row"><span class="icon">👤</span><div class="text"><div class="label">الاسم</div><div class="value" id="customerDetailFullName"></div></div></div>
             <div class="customer-info-row"><span class="icon">📱</span><div class="text"><div class="label">رقم الهاتف</div><div class="value" id="customerDetailPhone"></div></div></div>
             <div class="customer-info-row"><span class="icon">🏢</span><div class="text"><div class="label">مكان العمل</div><div class="value" id="customerDetailWorkplace"></div></div></div>
-            <div class="customer-info-row"><span class="icon">📊</span><div class="text"><div class="label">تصنيف العميل</div><div class="value" id="customerDetailClassification"></div></div></div>
-            <div class="customer-info-row"><span class="icon">📁</span><div class="text"><div class="label">عدد المشاريع</div><div class="value" id="customerDetailProjectsCount"></div></div></div>
+            <div class="customer-info-row"><span class="icon">💰</span><div class="text"><div class="label">مجموع المعاملات</div><div class="value" id="customerDetailTotal" style="color:#10b981; font-weight:bold;"></div></div></div>
         </div>
-        <div class="customer-detail-projects">
-            <h4 style="font-size:0.85rem; color:#1e293b; margin-bottom:8px;">📂 مشاريع العميل</h4>
-            <div id="customerDetailProjectsList"></div>
-        </div>
-        <div class="customer-detail-actions">
-            <button class="btn-primary" onclick="window.addProjectFromDetail()">➕ مشروع جديد</button>
-            <button class="btn-info" onclick="window.editCustomerFromDetail()">✏️ تعديل</button>
-            <button class="btn-danger" id="customerDetailDeleteBtn">🗑️ حذف</button>
-            <button class="btn-outline" onclick="window.closeCustomerDetail()">✖ إغلاق</button>
+        <div class="customer-detail-actions" style="display:flex; gap:8px; margin-top:16px;">
+            <button class="btn-primary" onclick="window.editCustomerFromDetail()" style="flex:1;">✏️ تعديل</button>
+            <button class="btn-danger" id="customerDetailDeleteBtn" style="flex:1;">🗑️ حذف</button>
+            <button class="btn-outline" onclick="window.closeCustomerDetail()" style="flex:1;">✖ إغلاق</button>
         </div>
     </div>
 </div>
@@ -728,31 +719,22 @@
     // Customers & Projects
     function getClassLabel(cls) { const labels = { good: 'عميل جيد', hard: 'عميل متعب', bad: 'لا يُنصح بالتعامل' }; return labels[cls] || 'غير مصنف'; }
     function getClassIcon(cls) { const icons = { good: '😊', hard: '😤', bad: '🚫' }; return icons[cls] || '👤'; }
-    window.renderCustomersScreen = function() { let grid=document.getElementById("customersGrid"); if(!grid) return; if(!userData.customers.length){ grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء</div>'; return; } grid.innerHTML = userData.customers.map(c=>`<div class="customer-folder class-${c.classification||'none'}" data-id="${c.id}"><div class="folder-icon">📂</div><div style="flex:1; cursor:pointer;" class="customer-name-click" data-id="${c.id}"><div class="customer-name">${escapeHtml(c.name)}</div><div class="customer-stats">📁 ${c.projects?.length||0} مشروع</div></div><span class="customer-class-badge ${c.classification||'none'}">${getClassIcon(c.classification)} ${getClassLabel(c.classification)}</span><button class="btn-outline customer-info-btn" data-id="${c.id}" style="padding:4px 8px; font-size:0.6rem;">ℹ️</button></div>`).join(''); document.querySelectorAll('.customer-name-click').forEach(el=>el.addEventListener('click',(e)=>{ e.stopPropagation(); window.openCustomerProjects(parseInt(el.dataset.id)); })); document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>window.showCustomerDetail(parseInt(el.dataset.id)))); document.querySelectorAll('.customer-info-btn').forEach(btn=>btn.addEventListener('click',(e)=>{ e.stopPropagation(); window.showCustomerDetail(parseInt(btn.dataset.id)); })); };
+    window.renderCustomersScreen = function() { let grid=document.getElementById("customersGrid"); if(!grid) return; if(!userData.customers.length){ grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء</div>'; return; } grid.innerHTML = userData.customers.map(c=>`<div class="customer-folder class-${c.classification||'none'}" data-id="${c.id}"><div class="folder-icon">📂</div><div style="flex:1; cursor:pointer;" class="customer-name-click" data-id="${c.id}"><div class="customer-name">${escapeHtml(c.name)}</div><div class="customer-stats">📁 ${c.projects?.length||0} مشروع</div></div><span class="customer-class-badge ${c.classification||'none'}">${getClassIcon(c.classification)} ${getClassLabel(c.classification)}</span></div>`).join(''); document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>window.openCustomerProjects(parseInt(el.dataset.id)))); };
     window.openCustomerProjects = function(custId) { currentCustomerId=custId; let cust=userData.customers.find(c=>c.id===custId); if(!cust) return; document.getElementById("currentCustomerNameSpan").innerText=cust.name; let grid=document.getElementById("projectsGrid"); if(cust.projects?.length){ grid.innerHTML=cust.projects.map(p=>`<div class="project-card" data-id="${p.id}"><div class="project-info"><div class="project-name">🏢 ${escapeHtml(p.name)}</div><div class="project-total">💰 ${(p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2)}</div></div></div>`).join(''); document.querySelectorAll('.project-card').forEach(el=>el.addEventListener('click',()=>window.openProjectDetail(custId,parseInt(el.dataset.id)))); } else grid.innerHTML='<div class="empty-message">لا توجد مشاريع</div>'; window.showProjectScreen('projects'); };
     window.openProjectDetail = function(custId,projId) { currentCustomerId=custId; currentProjectId=projId; let cust=userData.customers.find(c=>c.id===custId); let proj=cust?.projects.find(p=>p.id===projId); if(!proj) return; document.getElementById("navCustomerName").innerText=cust.name; document.getElementById("navProjectName").innerText=proj.name; document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50; renderPaymentsTable(proj); renderRoomsTable(proj); updateProjectTotal(proj); window.renderProjectWorkers(); window.renderGoodsTable(); let card = document.getElementById('projectDetailCard'); let btn = document.getElementById('completeProjectBtn'); if(proj.completed) { card.classList.add('project-completed'); btn.textContent = '↩️ إلغاء الإنهاء'; } else { card.classList.remove('project-completed'); btn.textContent = '✅ إنهاء المشروع'; } window.showProjectScreen('detail'); };
     window.showCustomerDetail = function(custId) {
         let cust = userData.customers.find(c=>c.id===custId);
         if(!cust) return;
         currentCustomerId = custId;
-        let cls = cust.classification || 'none';
-        document.getElementById('customerDetailName').textContent = cust.name;
         document.getElementById('customerDetailFullName').textContent = cust.name;
         document.getElementById('customerDetailPhone').textContent = cust.phone || 'غير مسجل';
         document.getElementById('customerDetailWorkplace').textContent = cust.workplace || 'غير مسجل';
-        document.getElementById('customerDetailClassification').innerHTML = `<span class="customer-class-badge ${cls}">${getClassIcon(cls)} ${getClassLabel(cls)}</span>`;
-        document.getElementById('customerDetailProjectsCount').textContent = (cust.projects?.length || 0) + ' مشروع';
-        let header = document.getElementById('customerDetailHeader');
-        header.className = 'customer-detail-header ' + cls;
-        let projectsList = document.getElementById('customerDetailProjectsList');
-        if(cust.projects?.length) {
-            projectsList.innerHTML = cust.projects.map(p => {
-                let total = (p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2);
-                return `<div class="project-mini-card" onclick="window.closeCustomerDetail(); setTimeout(()=>window.openProjectDetail(${custId},${p.id}),300);"><div><strong>🏢 ${escapeHtml(p.name)}</strong></div><div style="color:#10b981; font-weight:bold;">💰 ${total}</div></div>`;
-            }).join('');
-        } else {
-            projectsList.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:10px;">لا توجد مشاريع</div>';
-        }
+        let totalDeals = 0;
+        (cust.projects||[]).forEach(p => {
+            totalDeals += (p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0);
+            (p.payments||[]).forEach(x => { if(x.type !== 'discount') totalDeals += x.amount||0; });
+        });
+        document.getElementById('customerDetailTotal').textContent = totalDeals.toFixed(2) + ' دينار';
         document.getElementById('customerDetailDeleteBtn').onclick = function() {
             if(confirm("حذف العميل '" + cust.name + "' وجميع مشاريعه؟")) {
                 userData.customers = userData.customers.filter(c=>c.id !== custId);
