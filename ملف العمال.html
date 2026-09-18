@@ -519,6 +519,7 @@
         </div>
         <div class="worker-detail-actions">
             <button class="btn-primary" onclick="window.saveWorkerDetail()">💾 حفظ</button>
+            <button class="btn-success" onclick="window.addPaymentFromWorkerDetail()" style="font-size:0.65rem;">💰 دفعة</button>
             <button class="btn-danger" id="workerDetailDeleteBtn">🗑️ حذف</button>
         </div>
         <div class="worker-weeks-section">
@@ -526,10 +527,7 @@
             <div id="workerWeeksList"></div>
         </div>
         <div class="worker-weeks-section" style="margin-top:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h4 style="margin:0;">💰 الدفعات في المشاريع</h4>
-                <button class="btn-primary" onclick="window.addPaymentFromWorkerDetail()" style="padding:4px 10px; font-size:0.65rem;">➕ دفعة</button>
-            </div>
+            <h4>💰 الدفعات في المشاريع</h4>
             <div id="workerPaymentsList"></div>
         </div>
     </div>
