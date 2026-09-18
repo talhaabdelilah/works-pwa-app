@@ -75,16 +75,32 @@
         .add-worker-select { padding: 6px 12px; border-radius: 20px; border: 1px solid #bbf7d0; font-size: 0.7rem; background: white; }
 
         /* Goods Section */
-        .goods-section { background: #fef3c7; padding: 12px; border-radius: 16px; margin: 12px 0; border: 1px solid #fde68a; }
-        .goods-section h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: #92400e; }
-        .goods-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
-        .goods-table th { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 6px 4px; font-size: 0.65rem; }
-        .goods-table td { padding: 5px 4px; text-align: center; border-bottom: 1px solid #fde68a; }
-        .goods-table input { width: 100px; padding: 4px; text-align: center; border: 1px solid #fde68a; border-radius: 8px; font-size: 0.65rem; }
-        .goods-table .g-delete { background: #ef4444; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 0.6rem; }
-        .goods-summary { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
-        .goods-summary .g-sum-item { background: white; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
-        .btn-goods { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; padding: 6px 14px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; font-weight: bold; }
+        .goods-section { background: #fffbeb; padding: 10px; border-radius: 16px; margin: 10px 0; border: 1px solid #fde68a; }
+        .goods-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+        .goods-table th { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 5px 2px; font-size: 0.58rem; }
+        .goods-table td { padding: 3px 2px; text-align: center; border-bottom: 1px solid #fde68a; }
+        .goods-table input { width: 55px; padding: 2px; text-align: center; border: 1px solid #fde68a; border-radius: 6px; font-size: 0.6rem; }
+        .goods-table .g-delete { background: #ef4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 0.5rem; }
+        .goods-table .g-total { color: #d97706; font-weight: bold; }
+        .btn-goods { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; padding: 5px 10px; border-radius: 20px; color: white; font-size: 0.6rem; cursor: pointer; }
+
+        /* Rooms Table */
+        .rooms-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+        .rooms-table th { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 5px 2px; font-size: 0.58rem; }
+        .rooms-table td { padding: 3px 2px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        .rooms-table input { width: 50px; padding: 2px; text-align: center; border: 1px solid #c7d2fe; border-radius: 6px; font-size: 0.6rem; }
+        .rooms-table .calc-val { color: #4f46e5; font-weight: bold; font-size: 0.58rem; }
+        .rooms-table .delete-room-btn { background: #ef4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 0.5rem; }
+
+        /* Section Box */
+        .section-box { background: #f8fafc; padding: 10px; border-radius: 16px; margin: 10px 0; border: 1px solid #e2e8f0; }
+
+        /* Project Summary */
+        .project-summary-box { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); padding: 12px; border-radius: 16px; margin: 10px 0; border: 1px solid #a7f3d0; }
+        .project-summary-box h4 { margin: 0 0 8px 0; font-size: 0.85rem; color: #065f46; }
+        .summary-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.7rem; color: #374151; border-bottom: 1px solid #e5e7eb; }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-row.total { font-weight: bold; color: #059669; font-size: 0.8rem; background: rgba(255,255,255,0.6); margin: 4px 0; border-radius: 8px; padding: 4px 8px; }
 
         /* Tabs */
         .tabs { display: flex; gap: 8px; margin-bottom: 16px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 6px; border-radius: 50px; position: sticky; top: 70px; z-index: 99; }
@@ -313,53 +329,73 @@
             <div id="projectDetailScreen" style="display:none;">
                 <div class="breadcrumb"><span><span id="navCustomerName"></span> / <strong id="navProjectName"></strong></span><button onclick="window.openCustomerProjects(currentCustomerId)" class="btn-outline">🔙 رجوع</button></div>
                 <div class="project-detail-card" id="projectDetailCard" style="background:white; border-radius:20px; padding:16px;">
-                    <div><label>💰 سعر المتر:</label><input type="number" id="globalPricePerMeter" step="0.01" value="50" style="margin:8px 0; padding:6px; border-radius:20px;"></div>
-                    <div><strong>💵 إجمالي المشروع:</strong> <span id="projectGrandTotal">0.00</span> دينار</div>
-                    <div class="payment-progress"><div class="payment-progress-bar unpaid" id="paymentProgressBar" style="width:0%"></div></div>
-                    <div class="payment-status-text unpaid" id="paymentStatusText">لم يتم الدفع</div>
+                    <div><label>💰 سعر المتر:</label><input type="number" id="globalPricePerMeter" step="0.01" value="50" style="margin:8px 0; padding:6px; border-radius:20px; width:120px;"></div>
+
+                    <!-- ملخص المشروع -->
+                    <div class="project-summary-box">
+                        <h4>📊 ملخص المشروع</h4>
+                        <div class="summary-row"><span>💵 إجمالي المشروع:</span><span id="projectGrandTotal">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>💰 مجموع الدفعات:</span><span id="totalPayments">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>🏷️ الخصومات:</span><span id="totalDiscounts">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>👷 تكلفة العمال:</span><span id="pwTotalCostSum">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>📦 تكلفة البضاعة:</span><span id="totalGoodsCostSum">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>📐 مساحة المشروع:</span><span id="projectTotalArea">0.00</span> م²</div>
+                        <div class="summary-row total"><span>📊 أرباح المشروع:</span><span id="projectProfitSum">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>⏳ المتبقي:</span><span id="remainingAmount">0.00</span> د.ع</div>
+                        <div class="payment-progress"><div class="payment-progress-bar unpaid" id="paymentProgressBar" style="width:0%"></div></div>
+                        <div class="payment-status-text unpaid" id="paymentStatusText">لم يتم الدفع</div>
+                    </div>
+
+                    <!-- الدفعات -->
                     <div class="payments-section" style="background:#fef3c7; padding:12px; border-radius:16px; margin:12px 0;">
-                        <h4>💰 الدفعات</h4>
-                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <button id="addPaymentBtn" class="btn-secondary">➕ إضافة دفعة</button>
-                            <button class="btn-discount" onclick="window.addDiscount()">🏷️ تخفيض</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <h4 style="margin:0;">💰 الدفعات</h4>
+                            <div style="display:flex; gap:6px;">
+                                <button id="addPaymentBtn" class="btn-secondary">➕ دفعة</button>
+                                <button class="btn-discount" onclick="window.addDiscount()">🏷️ تخفيض</button>
+                            </div>
                         </div>
                         <table class="payments-table" style="width:100%; margin-top:8px;">
-                            <thead><tr><th>التاريخ</th><th>المبلغ</th><th>نوع</th><th>ملاحظة</th><th></th></tr></thead>
+                            <thead><tr><th>التاريخ</th><th>المبلغ</th><th>النوع</th><th>ملاحظة</th><th></th></tr></thead>
                             <tbody id="paymentsBody"></tbody>
                         </table>
-                        <div><strong>إجمالي المدفوعات:</strong> <span id="totalPayments">0.00</span></div>
-                        <div><strong>الخصومات:</strong> <span id="totalDiscounts" style="color:#f59e0b;">0.00</span></div>
-                        <div><strong>المتبقي:</strong> <span id="remainingAmount">0.00</span></div>
                     </div>
-                    <button id="addRoomInProject" class="btn-primary">➕ إضافة غرفة</button>
-                    <div class="table-wrapper"><table class="rooms-table" style="width:100%; border-collapse:collapse;"><thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>المساحة</th><th>الإجمالي</th><th></th></tr></thead><tbody id="roomsTableBody"></tbody></table></div>
-                    <div class="project-workers-section">
-                        <h4>👷 عمال المشروع</h4>
-                        <div style="display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
-                            <select id="addWorkerToProjectSelect" class="add-worker-select"><option value="">اختر عامل...</option></select>
+
+                    <!-- الغرف -->
+                    <div class="section-box">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <h4 style="margin:0;">🏠 الغرف</h4>
+                            <button id="addRoomInProject" class="btn-primary">➕ غرفة</button>
+                        </div>
+                        <div class="table-wrapper"><table class="rooms-table"><thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>المساحة</th><th>المحيط</th><th>القيمة</th><th></th></tr></thead><tbody id="roomsTableBody"></tbody></table></div>
+                    </div>
+
+                    <!-- عمال المشروع -->
+                    <div class="section-box project-workers-section">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <h4 style="margin:0;">👷 عمال المشروع</h4>
+                        </div>
+                        <div style="display:flex; gap:6px; margin:8px 0; flex-wrap:wrap;">
+                            <select id="addWorkerToProjectSelect" class="add-worker-select" style="flex:1; min-width:120px;"><option value="">اختر عامل...</option></select>
                             <button class="btn-primary" onclick="window.addWorkerToProject()">➕ إضافة</button>
                         </div>
                         <div class="table-wrapper"><table class="project-workers-table" id="projectWorkersTable"><thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th></tr></thead><tbody id="projectWorkersBody"></tbody></table></div>
                         <div class="project-workers-summary">
-                            <div class="pw-sum-item">👷 عدد العمال: <span id="pwWorkersCount">0</span></div>
-                            <div class="pw-sum-item">📅 إجمالي الأيام: <span id="pwTotalDays">0</span></div>
-                            <div class="pw-sum-item">💰 تكلفة العمال: <span id="pwTotalCost">0</span></div>
-                        </div>
-                        <div class="project-profit">
-                            <div class="profit-label">📊 أرباح المشروع = إجمالي المشروع - تكلفة العمال - البضاعة</div>
-                            <div class="profit-value" id="projectProfit">0.00 دينار</div>
-                        </div>
-                        <div class="goods-section">
-                            <h4>📦 البضاعة المستخدمة</h4>
-                            <div style="display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
-                                <button class="btn-goods" onclick="window.addGoodsRow()">➕ إضافة بضاعة</button>
-                            </div>
-                            <table class="goods-table" id="goodsTable"><thead><tr><th>#</th><th>البضاعة</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th></th></tr></thead><tbody id="goodsBody"></tbody></table>
-                            <div class="goods-summary">
-                                <div class="g-sum-item">📦 إجمالي البضاعة: <span id="totalGoodsCost">0.00</span> دينار</div>
-                            </div>
+                            <div class="pw-sum-item">👷 العمال: <span id="pwWorkersCount">0</span></div>
+                            <div class="pw-sum-item">📅 الأيام: <span id="pwTotalDays">0</span></div>
+                            <div class="pw-sum-item">💰 التكلفة: <span id="pwTotalCost">0</span></div>
                         </div>
                     </div>
+
+                    <!-- البضاعة -->
+                    <div class="section-box goods-section">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                            <h4 style="margin:0;">📦 البضاعة</h4>
+                            <button class="btn-goods" onclick="window.addGoodsRow()">➕ إضافة</button>
+                        </div>
+                        <div class="table-wrapper"><table class="goods-table" id="goodsTable"><thead><tr><th>#</th><th>البضاعة</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th></th></tr></thead><tbody id="goodsBody"></tbody></table></div>
+                    </div>
+
                     <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
                         <button id="saveProjectData" class="btn-secondary">💾 حفظ</button>
                         <button id="deleteProjectBtn" class="btn-danger">🗑️ حذف</button>
@@ -773,10 +809,10 @@
     };
     window.addNewCustomer = function(){ let name=prompt("👤 اسم العميل:"); if(name && name.trim()){ let newCust = {id:userData.nextCustId++, name:name.trim(), phone:'', workplace:'', classification:'', projects:[]}; let phone = prompt("📱 رقم الهاتف (اختياري):", ''); if(phone !== null) newCust.phone = phone.trim(); let workplace = prompt("🏢 مكان العمل (اختياري):", ''); if(workplace !== null) newCust.workplace = workplace.trim(); let cls = prompt("📊 تصنيف العميل:\n1 - عميل جيد\n2 - عميل متعب\n3 - لا يُنصح بالتعامل\n(اتركه فارغاً لاحقاً)", ''); if(cls === '1') newCust.classification = 'good'; else if(cls === '2') newCust.classification = 'hard'; else if(cls === '3') newCust.classification = 'bad'; userData.customers.push(newCust); window.renderCustomersScreen(); autoSave(); } };
     function renderPaymentsTable(proj){ let tbody=document.getElementById("paymentsBody"); if(!proj.payments) proj.payments=[]; tbody.innerHTML=proj.payments.map((p,idx)=>`<tr><td>${p.date}</td><td style="color:${p.type==='discount'?'#f59e0b':'#10b981'}; font-weight:bold;">${p.type==='discount'?'-':'+'}${p.amount.toFixed(2)}</td><td>${p.type==='discount'?'🏷️ خصم':'💰 دفعة'}</td><td>${escapeHtml(p.note||'')}</td><td><button class="delete-payment-btn btn-danger" data-idx="${idx}">✖</button></td></tr>`).join(''); let totalPaid = proj.payments.filter(p=>p.type!=='discount').reduce((s,p)=>s+p.amount,0); let totalDiscount = proj.payments.filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0); document.getElementById("totalPayments").innerText=totalPaid.toFixed(2); document.getElementById("totalDiscounts").innerText=totalDiscount.toFixed(2); updateProjectTotal(proj); document.querySelectorAll('.delete-payment-btn').forEach(btn=>{ btn.onclick=()=>{ proj.payments.splice(parseInt(btn.dataset.idx),1); renderPaymentsTable(proj); autoSave(); }; }); }
-    function renderRoomsTable(proj){ let tbody=document.getElementById("roomsTableBody"); if(!proj.rooms) proj.rooms=[]; tbody.innerHTML=proj.rooms.map((r,idx)=>`<tr data-room-id="${r.id}"><td>${idx+1}</td><td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||0}"></td><td><input type="number" class="room-width" step="0.01" value="${r.widthVal||0}"></td><td class="calc-val">${(r.lengthVal&&r.widthVal)?(r.lengthVal*r.widthVal).toFixed(2):0}</td><td class="room-total">${r.totalCost||0}</td><td><button class="delete-room-btn btn-danger" data-id="${r.id}">✖</button></td></tr>`).join(''); attachRoomEvents(proj); }
+    function renderRoomsTable(proj){ let tbody=document.getElementById("roomsTableBody"); if(!proj.rooms) proj.rooms=[]; tbody.innerHTML=proj.rooms.map((r,idx)=>{ let area=(r.lengthVal&&r.widthVal)?(r.lengthVal*r.widthVal):0; let perimeter=(r.lengthVal&&r.widthVal)?((r.lengthVal+r.widthVal)*2):0; return `<tr data-room-id="${r.id}"><td>${idx+1}</td><td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||0}"></td><td><input type="number" class="room-width" step="0.01" value="${r.widthVal||0}"></td><td class="calc-val">${area.toFixed(2)}</td><td class="calc-val">${perimeter.toFixed(2)}</td><td class="room-total">${(r.totalCost||0).toFixed(2)}</td><td><button class="delete-room-btn btn-danger" data-id="${r.id}">✖</button></td></tr>`; }).join(''); attachRoomEvents(proj); }
     function attachRoomEvents(proj){ document.querySelectorAll('.room-length, .room-width').forEach(el=>{ el.onchange=()=>{ syncRoomsFromDOM(proj); updateProjectTotal(proj); autoSave(); }; }); document.querySelectorAll('.delete-room-btn').forEach(btn=>{ btn.onclick=()=>{ proj.rooms=proj.rooms.filter(r=>r.id!=parseInt(btn.dataset.id)); renderRoomsTable(proj); updateProjectTotal(proj); autoSave(); }; }); }
     function syncRoomsFromDOM(proj){ document.querySelectorAll('#roomsTableBody tr[data-room-id]').forEach(row=>{ let id=parseInt(row.dataset.roomId); let room=proj.rooms.find(r=>r.id===id); if(room){ room.lengthVal=parseFloat(row.querySelector('.room-length')?.value)||0; room.widthVal=parseFloat(row.querySelector('.room-width')?.value)||0; } }); }
-    function updateProjectTotal(proj){ let price=parseFloat(document.getElementById("globalPricePerMeter").value)||0; proj.globalPricePerMeter=price; proj.rooms.forEach(r=>{ let meters = r.lengthVal * r.widthVal; r.totalCost = meters * price; }); let grand = proj.rooms.reduce((s,r)=>s+r.totalCost,0); document.getElementById("projectGrandTotal").innerHTML=grand.toFixed(2); let totalPaid = proj.payments?.filter(p=>p.type!=='discount').reduce((s,p)=>s+p.amount,0)||0; let totalDiscount = proj.payments?.filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0)||0; let effectiveTotal = grand - totalDiscount; let remaining = effectiveTotal - totalPaid; document.getElementById("remainingAmount").innerHTML=remaining.toFixed(2); let paidPercent = effectiveTotal > 0 ? Math.min((totalPaid / effectiveTotal) * 100, 100) : 0; let bar = document.getElementById('paymentProgressBar'); let statusText = document.getElementById('paymentStatusText'); if(bar) { bar.style.width = paidPercent + '%'; bar.className = 'payment-progress-bar ' + (paidPercent >= 100 ? 'paid' : paidPercent > 0 ? 'partial' : 'unpaid'); } if(statusText) { if(paidPercent >= 100) { statusText.textContent = '✅ تم الدفع بالكامل'; statusText.className = 'payment-status-text paid'; } else if(paidPercent > 0) { statusText.textContent = '⏳ متبقي ' + remaining.toFixed(2) + ' دينار (' + paidPercent.toFixed(0) + '%)'; statusText.className = 'payment-status-text partial'; } else { statusText.textContent = '❌ لم يتم الدفع'; statusText.className = 'payment-status-text unpaid'; } } updateProjectWorkersSummary(proj); }
+    function updateProjectTotal(proj){ let price=parseFloat(document.getElementById("globalPricePerMeter").value)||0; proj.globalPricePerMeter=price; proj.rooms.forEach(r=>{ let meters = r.lengthVal * r.widthVal; r.totalCost = meters * price; }); let grand = proj.rooms.reduce((s,r)=>s+r.totalCost,0); document.getElementById("projectGrandTotal").innerHTML=grand.toFixed(2); let totalPaid = proj.payments?.filter(p=>p.type!=='discount').reduce((s,p)=>s+p.amount,0)||0; let totalDiscount = proj.payments?.filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0)||0; let effectiveTotal = grand - totalDiscount; let remaining = effectiveTotal - totalPaid; document.getElementById("remainingAmount").innerHTML=remaining.toFixed(2); document.getElementById("totalPayments").textContent=totalPaid.toFixed(2); document.getElementById("totalDiscounts").textContent=totalDiscount.toFixed(2); let totalArea = proj.rooms.reduce((s,r)=>s+(r.lengthVal||0)*(r.widthVal||0),0); document.getElementById("projectTotalArea").textContent=totalArea.toFixed(2); let paidPercent = effectiveTotal > 0 ? Math.min((totalPaid / effectiveTotal) * 100, 100) : 0; let bar = document.getElementById('paymentProgressBar'); let statusText = document.getElementById('paymentStatusText'); if(bar) { bar.style.width = paidPercent + '%'; bar.className = 'payment-progress-bar ' + (paidPercent >= 100 ? 'paid' : paidPercent > 0 ? 'partial' : 'unpaid'); } if(statusText) { if(paidPercent >= 100) { statusText.textContent = '✅ تم الدفع بالكامل'; statusText.className = 'payment-status-text paid'; } else if(paidPercent > 0) { statusText.textContent = '⏳ متبقي ' + remaining.toFixed(2) + ' د.ع (' + paidPercent.toFixed(0) + '%)'; statusText.className = 'payment-status-text partial'; } else { statusText.textContent = '❌ لم يتم الدفع'; statusText.className = 'payment-status-text unpaid'; } } updateProjectSummary(proj); }
     window.addNewCustomer = function(){ let name=prompt("اسم العميل:"); if(name){ userData.customers.push({id:userData.nextCustId++, name, projects:[]}); window.renderCustomersScreen(); autoSave(); } };
     window.addProject = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); if(cust){ let name=prompt("اسم المشروع:"); if(name){ cust.projects.push({id:userData.nextProjId++, name, rooms:[], workers:[], globalPricePerMeter:50, payments:[]}); window.openCustomerProjects(currentCustomerId); autoSave(); } } };
     window.addRoom = function(){ let cust=userData.customers.find(c=>c.id===currentCustomerId); let proj=cust?.projects.find(p=>p.id===currentProjectId); if(proj){ proj.rooms.push({id:userData.nextRoomId++, lengthVal:0, widthVal:0, totalCost:0}); renderRoomsTable(proj); autoSave(); } };
@@ -862,12 +898,7 @@
         document.getElementById('pwWorkersCount').textContent = proj.workers.length;
         document.getElementById('pwTotalDays').textContent = totalDays;
         document.getElementById('pwTotalCost').textContent = totalCost.toFixed(2);
-        let grand = (proj.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0);
-        let totalGoods = (proj.goods||[]).reduce((s,g) => s + calculateGoodsTotal(g), 0);
-        let profit = grand - totalCost - totalGoods;
-        let profitEl = document.getElementById('projectProfit');
-        profitEl.textContent = profit.toFixed(2) + ' دينار';
-        profitEl.className = 'profit-value ' + (profit >= 0 ? 'positive' : 'negative');
+        updateProjectSummary(proj);
     }
     window.addWorkerToProject = function() {
         let sel = document.getElementById('addWorkerToProjectSelect');
