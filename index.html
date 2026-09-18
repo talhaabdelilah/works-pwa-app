@@ -40,6 +40,10 @@
         .hamburger-item { padding: 10px 14px; border-bottom: 1px solid #f1f5f9; font-size: 0.75rem; }
         .hamburger-item:last-child { border-bottom: none; }
 
+        /* Worker Payment Groups */
+        .pw-pay-group { margin-bottom: 12px; }
+        .pw-pay-week-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-bottom: 6px; text-align: center; }
+
         /* Buttons */
         .btn-primary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; padding: 8px 16px; border-radius: 30px; color: white; font-weight: bold; cursor: pointer; font-size: 0.75rem; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-secondary { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none; padding: 6px 14px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
@@ -471,12 +475,7 @@
             <input type="number" id="payWorkerAmount" placeholder="المبلغ" step="0.01" style="flex:1; padding:6px 10px; border-radius:20px; border:1px solid #cbd5e1; font-size:0.75rem;">
             <button class="btn-primary" onclick="window.addWorkerPayment()">💰 إضافة</button>
         </div>
-        <div style="max-height:200px; overflow-y:auto;">
-            <table class="accounting-table" style="font-size:0.7rem;">
-                <thead><tr><th>المبلغ</th><th>التاريخ</th><th></th></tr></thead>
-                <tbody id="workerPaymentsBody"></tbody>
-            </table>
-        </div>
+        <div style="max-height:250px; overflow-y:auto;" id="workerPaymentsBody"></div>
         <button class="btn-secondary" onclick="window.closeWorkerPayments()" style="width:100%; margin-top:12px;">إغلاق</button>
     </div>
 </div>
@@ -1018,10 +1017,33 @@
         document.getElementById('workerPaymentsModal').style.display = 'flex';
     };
     window.renderWorkerPaymentsList = function(pw) {
-        let tbody = document.getElementById('workerPaymentsBody');
-        if(!pw.payments || pw.payments.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="color:#94a3b8; text-align:center; padding:12px;">لا توجد دفعات</td></tr>'; return; }
-        tbody.innerHTML = pw.payments.map((p,i) => `<tr><td>${p.amount.toFixed(2)}</td><td>${p.date}</td><td><button class="btn-danger delete-pw-pay" data-i="${i}" style="padding:2px 6px; font-size:0.55rem;">✖</button></td></tr>`).join('');
-        tbody.querySelectorAll('.delete-pw-pay').forEach(btn => { btn.onclick = () => { pw.payments.splice(parseInt(btn.dataset.i), 1); window.renderWorkerPaymentsList(pw); window.updateProjectSummary(proj); window.renderProjectWorkers(); autoSave(); }; });
+        let container = document.getElementById('workerPaymentsBody');
+        if(!pw.payments || pw.payments.length === 0) { container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:12px; font-size:0.8rem;">لا توجد دفعات</div>'; return; }
+        let groups = {};
+        pw.payments.forEach((p,i) => { let wk = p.weekKey || 'أخرى'; if(!groups[wk]) groups[wk] = []; groups[wk].push({...p, _idx: i}); });
+        let html = '';
+        for(let wk in groups) {
+            let wkLabel = 'الأسبوع ' + wk;
+            let wkDateRange = '';
+            if(wk !== 'أخرى' && wk.includes('-W')) {
+                let parts = wk.split('-W');
+                let yr = parseInt(parts[0]);
+                let wn = parseInt(parts[1]);
+                let sat = new Date(yr, 0, 1);
+                let dayOfWeek = sat.getDay();
+                if(dayOfWeek !== 6) sat.setDate(sat.getDate() + (6 - dayOfWeek));
+                sat.setDate(sat.getDate() + (wn - 1) * 7);
+                let fri = new Date(sat); fri.setDate(sat.getDate() + 6);
+                wkDateRange = ' (' + sat.getDate() + '-' + fri.getDate() + '/' + (sat.getMonth()+1) + '/' + sat.getFullYear() + ')';
+            }
+            html += '<div class="pw-pay-group">';
+            html += '<div class="pw-pay-week-header">📅 ' + wkLabel + wkDateRange + '</div>';
+            html += '<table class="accounting-table" style="font-size:0.7rem; margin-bottom:8px;"><thead><tr><th>المبلغ</th><th>التاريخ</th><th></th></tr></thead><tbody>';
+            groups[wk].forEach(p => { html += '<tr><td>' + p.amount.toFixed(2) + '</td><td>' + p.date + '</td><td><button class="btn-danger delete-pw-pay" data-i="' + p._idx + '" style="padding:2px 6px; font-size:0.55rem;">✖</button></td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        container.innerHTML = html;
+        container.querySelectorAll('.delete-pw-pay').forEach(btn => { btn.onclick = () => { pw.payments.splice(parseInt(btn.dataset.i), 1); window.renderWorkerPaymentsList(pw); let cust = userData.customers.find(c=>c.id===currentCustomerId); let proj = cust?.projects.find(p=>p.id===currentProjectId); window.updateProjectSummary(proj); window.renderProjectWorkers(); autoSave(); }; });
     };
     window.addWorkerPayment = function() {
         let cust = userData.customers.find(c=>c.id===currentCustomerId);
@@ -1031,8 +1053,9 @@
         let amount = parseFloat(document.getElementById('payWorkerAmount').value);
         if(!amount || amount <= 0) return;
         let today = new Date().toLocaleDateString('ar-EG');
+        let wkKey = getCurrentWeekKey();
         if(!pw.payments) pw.payments = [];
-        pw.payments.push({ amount: amount, date: today });
+        pw.payments.push({ amount: amount, date: today, weekKey: wkKey });
         document.getElementById('payWorkerAmount').value = '';
         logToAccounting('expense', pw.name, amount, 'دفعة لعامل في مشروع ' + proj.name);
         let total = calculateProjectWorkerTotal(pw);
