@@ -515,7 +515,16 @@
                 <span class="label">💵 المصروفات</span>
                 <input type="text" id="workerDetailExpenseInput" placeholder="30+40" style="background:#fef3c7; border-color:#fde68a;">
             </div>
-            <div class="worker-detail-row"><span class="label">📊 مجموع الأسبوع الحالي</span><span class="value" id="workerDetailTotal" style="color:#10b981; font-size:1rem;"></span></div>
+            <div style="border-top:1px solid #e2e8f0; margin-top:8px; padding-top:8px;">
+                <div class="worker-detail-row"><span class="label">📦 مجموع المصروفات الأسبوع</span><span class="value" id="workerWeekExpenses" style="color:#f59e0b;"></span></div>
+                <div class="worker-detail-row"><span class="label">📊 مستحق الأسبوع</span><span class="value" id="workerWeekDue" style="color:#3b82f6;"></span></div>
+                <div class="worker-detail-row" style="background:#ecfdf5; border-radius:12px; padding:6px 8px;"><span class="label" style="font-weight:bold;">💰 الباقي</span><span class="value" id="workerWeekRemaining" style="font-weight:bold; font-size:1rem;"></span></div>
+            </div>
+            <div style="border-top:1px solid #e2e8f0; margin-top:8px; padding-top:8px;">
+                <div class="worker-detail-row"><span class="label">📦 مجموع المصروفات كل الأسابيع</span><span class="value" id="workerAllExpenses" style="color:#f59e0b;"></span></div>
+                <div class="worker-detail-row"><span class="label">📊 مجموع المستحقات كل الأسابيع</span><span class="value" id="workerAllDue" style="color:#3b82f6;"></span></div>
+                <div class="worker-detail-row" style="background:#eff6ff; border-radius:12px; padding:6px 8px;"><span class="label" style="font-weight:bold;">📈 الناتج</span><span class="value" id="workerAllNet" style="font-weight:bold; font-size:1rem;"></span></div>
+            </div>
         </div>
         <div class="worker-detail-actions">
             <button class="btn-primary" onclick="window.saveWorkerDetail()">💾 حفظ</button>
@@ -613,7 +622,31 @@
         let daysCount = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
         document.getElementById('workerDetailDays').textContent = daysCount + ' يوم';
         document.getElementById('workerDetailExpenseInput').value = w.expenseRaw || '';
-        document.getElementById('workerDetailTotal').textContent = calculateWorkerTotal(w).toFixed(2) + ' دينار';
+        let weekDue = daysCount * (w.price||0);
+        let weekExpenses = w.expense||0;
+        let weekRemaining = weekDue - weekExpenses;
+        document.getElementById('workerWeekExpenses').textContent = weekExpenses.toFixed(2) + ' دينار';
+        document.getElementById('workerWeekDue').textContent = weekDue.toFixed(2) + ' دينار';
+        let remEl = document.getElementById('workerWeekRemaining');
+        remEl.textContent = weekRemaining.toFixed(2) + ' دينار';
+        remEl.style.color = weekRemaining >= 0 ? '#059669' : '#dc2626';
+        let allExpenses = weekExpenses;
+        let allDue = weekDue;
+        let archives = userData.workersArchives || [];
+        archives.forEach(a => {
+            let wk = a.workers?.find(x=>x.id === workerId);
+            if(wk) {
+                let d = dayKeys.reduce((s,k)=>s+(wk.days?.[k]||0),0);
+                allDue += d * (wk.price||0);
+                allExpenses += (wk.expense||0);
+            }
+        });
+        let allNet = allDue - allExpenses;
+        document.getElementById('workerAllExpenses').textContent = allExpenses.toFixed(2) + ' دينار';
+        document.getElementById('workerAllDue').textContent = allDue.toFixed(2) + ' دينار';
+        let netEl = document.getElementById('workerAllNet');
+        netEl.textContent = allNet.toFixed(2) + ' دينار';
+        netEl.style.color = allNet >= 0 ? '#059669' : '#dc2626';
         document.getElementById('workerDetailDeleteBtn').onclick = function() {
             if(confirm("حذف العامل '" + w.name + "'؟")) {
                 userData.workers = userData.workers.filter(x=>x.id !== workerId);
