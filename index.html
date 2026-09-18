@@ -402,7 +402,7 @@
                             <select id="addWorkerToProjectSelect" class="add-worker-select" style="flex:1; min-width:120px;"><option value="">اختر عامل...</option></select>
                             <button class="btn-primary" onclick="window.addWorkerToProject()">➕ إضافة</button>
                         </div>
-                        <div class="table-wrapper"><table class="project-workers-table" id="projectWorkersTable"><thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th><th>المدفوع</th><th></th></tr></thead><tbody id="projectWorkersBody"></tbody></table></div>
+                        <div class="table-wrapper"><table class="project-workers-table" id="projectWorkersTable"><thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th><th>المدفوع</th></tr></thead><tbody id="projectWorkersBody"></tbody></table></div>
                         <div class="project-workers-summary">
                             <div class="pw-sum-item">👷 العمال: <span id="pwWorkersCount">0</span></div>
                             <div class="pw-sum-item">📅 الأيام: <span id="pwTotalDays">0</span></div>
@@ -1052,10 +1052,9 @@
         tbody.innerHTML = proj.workers.map((pw, idx) => {
             let total = calculateProjectWorkerTotal(pw);
             let paid = (pw.payments||[]).reduce((s,p)=>s+p.amount,0);
-            return `<tr><td>${idx+1}</td><td class="name-cell">${escapeHtml(pw.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="pw-attend" data-pw-idx="${idx}" data-day="${d}" ${pw.days?.[d]?'checked':''}></td>`).join('')}<td class="week-total-cell">${total.toFixed(2)}</td><td style="color:#10b981; font-weight:bold;">${paid.toFixed(2)}</td><td><button class="btn-success pw-pay-btn" data-idx="${idx}" style="padding:2px 6px; font-size:0.55rem;">💰 دفع</button></td></tr>`;
+            return `<tr><td>${idx+1}</td><td class="name-cell">${escapeHtml(pw.name)}</td>${dayKeys.map(d=>`<td><input type="checkbox" class="pw-attend" data-pw-idx="${idx}" data-day="${d}" ${pw.days?.[d]?'checked':''}></td>`).join('')}<td class="week-total-cell">${total.toFixed(2)}</td><td style="color:#10b981; font-weight:bold;">${paid.toFixed(2)}</td></tr>`;
         }).join('');
         tbody.querySelectorAll('.pw-attend').forEach(cb => { cb.onchange = () => { let idx = parseInt(cb.dataset.pwIdx); proj.workers[idx].days = proj.workers[idx].days || {}; proj.workers[idx].days[cb.dataset.day] = cb.checked ? 1 : 0; window.renderProjectWorkers(); autoSave(); }; });
-        tbody.querySelectorAll('.pw-pay-btn').forEach(btn => { btn.onclick = () => { let idx = parseInt(btn.dataset.idx); window.payProjectWorker(idx); }; });
         updateProjectWorkersSummary(proj);
     };
     function updateProjectWorkersSummary(proj) {
