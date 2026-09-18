@@ -185,11 +185,11 @@
 
         /* Accounting */
         .person-selector { background: white; padding: 10px 16px; border-radius: 40px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .accounting-table-wrapper { overflow-x: auto; border-radius: 20px; background: white; padding: 4px; }
-        .accounting-table { width: 100%; min-width: 500px; border-collapse: collapse; font-size: 0.75rem; }
-        .accounting-table th, .accounting-table td { border: 1px solid #e2e8f0; padding: 10px 8px; text-align: center; }
-        .accounting-table th { background: #f1f5f9; font-weight: bold; }
-        .accounting-table input { width: 100px; padding: 6px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; }
+        .accounting-table-wrapper { border-radius: 16px; background: white; padding: 4px; }
+        .accounting-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+        .accounting-table th, .accounting-table td { border: 1px solid #e2e8f0; padding: 6px 4px; text-align: center; }
+        .accounting-table th { background: #f1f5f9; font-weight: bold; font-size: 0.65rem; }
+        .accounting-table input { width: 100%; padding: 4px; border-radius: 10px; border: 1px solid #cbd5e1; text-align: center; font-size: 0.65rem; }
         .summary { background: #f8fafc; padding: 12px; border-radius: 20px; margin-top: 12px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; }
         .summary-item { font-size: 0.8rem; font-weight: bold; }
         .profit.positive { color: #10b981; }
@@ -448,21 +448,21 @@
 
         <!-- تبويب المحاسبة - تم إصلاح تشوه الجدول -->
         <div id="accountingTab" class="tab-content">
-            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+            <div class="summary" style="margin-bottom:12px;">
+                <div class="summary-item">📈 الإيرادات: <span id="totalRevenue">0</span></div>
+                <div class="summary-item">📉 المصاريف: <span id="totalExpense">0</span></div>
+                <div class="summary-item">💰 صافي الربح: <span id="netProfit" class="profit">0</span></div>
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
                 <button class="btn-primary" onclick="window.addAccountingRow()">➕ إضافة صف</button>
                 <button class="btn-danger" onclick="window.archiveAndClearAccounting()">📦 حذف وحفظ</button>
                 <button class="btn-info" onclick="window.showAccountingHistory()">📋 السجل</button>
             </div>
             <div class="accounting-table-wrapper">
                 <table class="accounting-table">
-                    <thead><tr><th>المصاريف (دينار)</th><th>الإيرادات (دينار)</th><th>ملاحظة</th><th style="width:50px"></th></tr></thead>
+                    <thead><tr><th>المصاريف</th><th>الإيرادات</th><th>ملاحظة</th><th style="width:40px"></th></tr></thead>
                     <tbody id="accountingBody"></tbody>
                 </table>
-            </div>
-            <div class="summary">
-                <div class="summary-item">📈 الإيرادات: <span id="totalRevenue">0</span></div>
-                <div class="summary-item">📉 المصاريف: <span id="totalExpense">0</span></div>
-                <div class="summary-item">💰 صافي الربح: <span id="netProfit" class="profit">0</span></div>
             </div>
         </div>
     </div>
