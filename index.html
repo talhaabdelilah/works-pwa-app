@@ -420,7 +420,6 @@
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap:wrap;">
                     <button class="btn-primary" onclick="window.addNewWorker()">➕ إضافة عامل</button>
-                    <button class="btn-success" onclick="window.saveCurrentWeek()">💾 حفظ</button>
                 </div>
             </div>
             <div class="workers-table-wrapper">
@@ -538,7 +537,6 @@
     const dayNames = ['سبت', 'أحد', 'إثن', 'ثلاث', 'أربع', 'خميس', 'جمعة'];
     function getDeviceId() { let id = localStorage.getItem('device_id'); if(!id) { id = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2,9); localStorage.setItem('device_id', id); } return id; }
     const deviceId = getDeviceId();
-    function getCurrentWeekKey() { const today = new Date(); const dayOfWeek = today.getDay(); let lastSaturday = new Date(today); if(dayOfWeek === 6) lastSaturday = today; else lastSaturday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); const year = lastSaturday.getFullYear(); const start = new Date(year,0,1); const days = Math.floor((lastSaturday - start)/(24*60*60*1000)); const weekNum = Math.ceil((days+1)/7); return `${year}-W${weekNum.toString().padStart(2,'0')}`; }
     function escapeHtml(s){ if(!s)return ''; return s.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
     function updateHeaderSync(status) { let el = document.getElementById("syncStatusHeader"); if(el) { el.innerHTML = status === 'online' ? '☁️ سحابي' : '💾 محلي'; el.className = 'sync-badge ' + (status === 'online' ? '' : 'offline'); } }
 
@@ -705,6 +703,17 @@
     window.filterWorkers = function() { window.renderWorkersTable(); };
     // Week Navigation
     let weekOffset = 0;
+    function getCurrentWeekKey() {
+        let d = new Date();
+        let dayOfWeek = d.getDay();
+        let lastSaturday = new Date(d);
+        if(dayOfWeek === 6) lastSaturday = d; else lastSaturday.setDate(d.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+        let year = lastSaturday.getFullYear();
+        let start = new Date(year,0,1);
+        let days = Math.floor((lastSaturday - start)/(24*60*60*1000));
+        let weekNum = Math.ceil((days+1)/7);
+        return `${year}-W${weekNum.toString().padStart(2,'0')}`;
+    }
     function getWeekKey(offset) {
         let d = new Date();
         d.setDate(d.getDate() + (offset * 7));
@@ -721,16 +730,44 @@
         let label = document.getElementById('currentWeekLabel');
         if(!label) return;
         if(weekOffset === 0) { label.textContent = 'الأسبوع الحالي'; label.style.color = '#10b981'; }
-        else if(weekOffset < 0) { label.textContent = `الأسبوع ${weekOffset}`; label.style.color = '#f59e0b'; }
-        else { label.textContent = `+${weekOffset}`; label.style.color = '#3b82f6'; }
+        else { label.textContent = `أسبوع ${weekOffset > 0 ? '+' : ''}${weekOffset}`; label.style.color = weekOffset < 0 ? '#f59e0b' : '#3b82f6'; }
     }
-    window.prevWeek = function() { weekOffset--; updateWeekLabel(); loadWeekData(); };
-    window.nextWeek = function() { if(weekOffset < 0) { weekOffset++; updateWeekLabel(); loadWeekData(); } };
-    window.goCurrentWeek = function() { weekOffset = 0; updateWeekLabel(); loadWeekData(); };
+    function saveWeekToArchive(weekKey) {
+        if(!userData.workers || userData.workers.length === 0) return;
+        let hasData = userData.workers.some(w => {
+            let d = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
+            return d > 0 || (w.expense||0) > 0;
+        });
+        if(!hasData) return;
+        let record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) } };
+        userData.workersArchives = userData.workersArchives.filter(a=>a.weekKey!==weekKey);
+        userData.workersArchives.unshift(record);
+    }
+    window.prevWeek = function() {
+        saveWeekToArchive(getCurrentWeekKey());
+        weekOffset--;
+        updateWeekLabel();
+        loadWeekData();
+    };
+    window.nextWeek = function() {
+        if(weekOffset < 0) {
+            saveWeekToArchive(getCurrentWeekKey());
+            weekOffset++;
+            updateWeekLabel();
+            loadWeekData();
+        }
+    };
+    window.goCurrentWeek = function() {
+        saveWeekToArchive(getCurrentWeekKey());
+        weekOffset = 0;
+        updateWeekLabel();
+        loadWeekData();
+    };
     function loadWeekData() {
         if(weekOffset === 0) {
-            let saved = localStorage.getItem(`data_${currentUser?.uid || 'local'}_${currentAccountingPerson?.id}`);
-            if(saved) { let d = JSON.parse(saved); userData.workers = d.workers || []; }
+            let weekKey = getCurrentWeekKey();
+            let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
+            if(archive) { userData.workers = JSON.parse(JSON.stringify(archive.workers)); }
         } else {
             let weekKey = getWeekKey(weekOffset);
             let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
@@ -738,8 +775,8 @@
             else { userData.workers.forEach(w => { w.days = {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}; w.expense=0; w.expenseRaw=''; }); }
         }
         window.renderWorkersTable();
+        autoSave();
     }
-    window.saveCurrentWeek = function() { if(userData.workers.length===0) return; const weekKey = getCurrentWeekKey(); const record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) } }; userData.workersArchives = userData.workersArchives.filter(a=>a.weekKey!==weekKey); userData.workersArchives.unshift(record); userData.workers.forEach(w=>{ let total = calculateWorkerTotal(w); if(total > 0) { logToAccounting('expense', w.name, total, 'رواتب عمال - ' + weekKey); } w.days = {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}; w.expense=0; w.expenseRaw=''; }); window.renderWorkersTable(); autoSave(); loadWorkersArchivesList(); alert(`✅ تم حفظ أسبوع ${weekKey}`); };
     window.toggleArchivePanel = function() { document.getElementById('archivePanel').classList.toggle('show'); loadWorkersArchivesList(); };
     function loadWorkersArchivesList() { let div=document.getElementById('archiveList'); if(!div) return; if(userData.workersArchives.length===0){ div.innerHTML='<div class="empty-message">لا توجد سجلات</div>'; return; } div.innerHTML = userData.workersArchives.map(a=>`<div class="archive-item" data-week="${a.weekKey}"><div><strong>📅 ${a.weekKey}</strong><br><span style="font-size:0.6rem;">💰 ${a.summary.weekTotal.toFixed(2)}</span></div><div><button class="btn-info load-week-btn" data-week="${a.weekKey}">تحميل</button> <button class="btn-danger delete-archive-btn" data-week="${a.weekKey}">🗑</button></div></div>`).join(''); document.querySelectorAll('.load-week-btn').forEach(btn=>{ btn.onclick=(e)=>{ e.stopPropagation(); let archive = userData.workersArchives.find(a=>a.weekKey===btn.dataset.week); if(archive){ userData.workers = JSON.parse(JSON.stringify(archive.workers)); window.renderWorkersTable(); autoSave(); alert(`تم تحميل ${btn.dataset.week}`); } }; }); document.querySelectorAll('.delete-archive-btn').forEach(btn=>{ btn.onclick=(e)=>{ e.stopPropagation(); userData.workersArchives = userData.workersArchives.filter(a=>a.weekKey!==btn.dataset.week); loadWorkersArchivesList(); autoSave(); }; }); }
 
