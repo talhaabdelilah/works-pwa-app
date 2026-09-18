@@ -681,22 +681,25 @@
                 if(pw) projects.push({cust: c, proj: p, pw: pw});
             });
         });
-        if(projects.length === 0) { alert('⚠️ العامل غير مسجل في أي مشروع نشط'); return; }
-        let msg = '💰 اختر المشروع:\n\n';
-        projects.forEach((pr, i) => { msg += (i+1) + '. ' + pr.proj.name + ' (' + pr.cust.name + ')\n'; });
-        let choice = prompt(msg);
-        if(!choice || isNaN(parseInt(choice)) || parseInt(choice) < 1 || parseInt(choice) > projects.length) return;
-        let selected = projects[parseInt(choice)-1];
-        let amount = prompt('💰 مبلغ الدفع:');
+        if(projects.length === 0) { alert('⚠️ العامل غير مسجل في أي مشروع نشط\nأضف العامل في مشروع أولاً'); return; }
+        let selected = projects[0];
+        if(projects.length > 1) {
+            let msg = '💰 اختر المشروع:\n\n';
+            projects.forEach((pr, i) => { msg += (i+1) + '. ' + pr.proj.name + ' (' + pr.cust.name + ')\n'; });
+            let choice = prompt(msg);
+            if(!choice || isNaN(parseInt(choice)) || parseInt(choice) < 1 || parseInt(choice) > projects.length) return;
+            selected = projects[parseInt(choice)-1];
+        }
+        let amount = prompt('💰 مبلغ الدفع لـ ' + worker.name + ':');
         if(!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) return;
         let today = new Date().toLocaleDateString('ar-EG');
         let wkKey = getCurrentWeekKey();
         if(!selected.pw.payments) selected.pw.payments = [];
         selected.pw.payments.push({ amount: parseFloat(amount), date: today, weekKey: wkKey });
         logToAccounting('expense', worker.name, parseFloat(amount), 'دفعة لعامل في مشروع ' + selected.proj.name);
-        window.renderWorkerPaymentsFromProjects(workerId);
+        renderWorkerPaymentsFromProjects(workerId);
         autoSave();
-        alert('✅ تم تسجيل الدفعة');
+        alert('✅ تم تسجيل الدفعة: ' + parseFloat(amount).toFixed(2) + ' دينار');
     };
     window.saveWorkerDetail = function() {
         let workerId = window._currentDetailWorkerId;
