@@ -615,11 +615,29 @@
         document.getElementById('workerDetailDays').textContent = daysCount + ' يوم';
         let weekDue = daysCount * (w.price||0);
         let weekPaid = 0;
-        (userData.projects||[]).forEach(p=>{
-            (p.workers||[]).forEach(pw=>{
-                if(pw.sourceId === workerId && pw.weekKey === getCurrentWeekKey()) {
-                    (pw.payments||[]).forEach(pm => weekPaid += pm.amount||0);
-                }
+        let allPaid = 0;
+        let allDue = weekDue;
+        (userData.customers||[]).forEach(c=>{
+            (c.projects||[]).forEach(p=>{
+                (p.workers||[]).forEach(pw=>{
+                    if(pw.sourceId === workerId) {
+                        (pw.payments||[]).forEach(pm => {
+                            allPaid += pm.amount||0;
+                            if(pm.weekKey === getCurrentWeekKey()) weekPaid += pm.amount||0;
+                        });
+                        if(pw.weekKey !== getCurrentWeekKey()) {
+                            let wkKey = pw.weekKey;
+                            let wkd = (userData.workersArchives||[]).find(a=>a.weekKey===wkKey);
+                            if(wkd) {
+                                let wkw = wkd.workers?.find(x=>x.id===workerId);
+                                if(wkw) {
+                                    let d = dayKeys.reduce((s,k)=>s+(wkw.days?.[k]||0),0);
+                                    allDue += d * (wkw.price||0);
+                                }
+                            }
+                        }
+                    }
+                });
             });
         });
         let weekRemaining = weekDue - weekPaid;
@@ -628,24 +646,6 @@
         let remEl = document.getElementById('workerWeekRemaining');
         remEl.textContent = weekRemaining.toFixed(2) + ' دينار';
         remEl.style.color = weekRemaining >= 0 ? '#059669' : '#dc2626';
-        let allPaid = weekPaid;
-        let allDue = weekDue;
-        (userData.projects||[]).forEach(p=>{
-            (p.workers||[]).forEach(pw=>{
-                if(pw.sourceId === workerId && pw.weekKey !== getCurrentWeekKey()) {
-                    (pw.payments||[]).forEach(pm => allPaid += pm.amount||0);
-                    let wkKey = pw.weekKey;
-                    let wkd = (userData.workersArchives||[]).find(a=>a.weekKey===wkKey);
-                    if(wkd) {
-                        let wkw = wkd.workers?.find(x=>x.id===workerId);
-                        if(wkw) {
-                            let d = dayKeys.reduce((s,k)=>s+(wkw.days?.[k]||0),0);
-                            allDue += d * (wkw.price||0);
-                        }
-                    }
-                }
-            });
-        });
         let allNet = allDue - allPaid;
         document.getElementById('workerAllDue').textContent = allDue.toFixed(2) + ' دينار';
         document.getElementById('workerAllPaid').textContent = allPaid.toFixed(2) + ' دينار';
