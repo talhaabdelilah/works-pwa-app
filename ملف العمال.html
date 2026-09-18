@@ -221,7 +221,7 @@
         /* Worker Detail Page */
         .worker-detail-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); z-index: 500; overflow-y: auto; padding: 12px; }
         .worker-detail-card { background: white; border-radius: 24px; padding: 16px; max-width: 600px; margin: 0 auto; }
-        .worker-detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .worker-detail-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; justify-content: space-between; }
         .worker-detail-back { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; padding: 8px 16px; border-radius: 30px; color: white; font-size: 0.8rem; cursor: pointer; }
         .worker-detail-title { font-size: 1.1rem; font-weight: bold; color: #1e293b; flex: 1; }
         .worker-detail-stats { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
@@ -504,6 +504,11 @@
         <div class="worker-detail-header">
             <button class="worker-detail-back" onclick="window.closeWorkerDetail()">🔙 رجوع</button>
             <div class="worker-detail-title" id="workerDetailName"></div>
+            <div style="display:flex; gap:4px;">
+                <button class="btn-primary" onclick="window.saveWorkerDetail()" style="padding:4px 10px; font-size:0.65rem;">💾 حفظ</button>
+                <button class="btn-success" onclick="window.addPaymentFromWorkerDetail()" style="padding:4px 10px; font-size:0.65rem;">💰 دفعة</button>
+                <button class="btn-danger" id="workerDetailDeleteBtn" style="padding:4px 10px; font-size:0.65rem;">🗑️</button>
+            </div>
         </div>
         <div class="worker-detail-stats">
             <div class="worker-detail-row">
@@ -525,15 +530,6 @@
                 <div class="worker-detail-row"><span class="label">📊 مجموع المستحقات كل الأسابيع</span><span class="value" id="workerAllDue" style="color:#3b82f6;"></span></div>
                 <div class="worker-detail-row" style="background:#eff6ff; border-radius:12px; padding:6px 8px;"><span class="label" style="font-weight:bold;">📈 الناتج</span><span class="value" id="workerAllNet" style="font-weight:bold; font-size:1rem;"></span></div>
             </div>
-        </div>
-        <div class="worker-detail-actions">
-            <button class="btn-primary" onclick="window.saveWorkerDetail()">💾 حفظ</button>
-            <button class="btn-success" onclick="window.addPaymentFromWorkerDetail()" style="font-size:0.65rem;">💰 دفعة</button>
-            <button class="btn-danger" id="workerDetailDeleteBtn">🗑️ حذف</button>
-        </div>
-        <div class="worker-weeks-section">
-            <h4>📅 الأسابيع السابقة</h4>
-            <div id="workerWeeksList"></div>
         </div>
         <div class="worker-weeks-section" style="margin-top:12px;">
             <h4>💰 الدفعات في المشاريع</h4>
@@ -655,7 +651,6 @@
                 autoSave();
             }
         };
-        renderWorkerWeeks(workerId);
         window.renderWorkerPaymentsFromProjects(workerId);
         document.getElementById('workerDetailPage').style.display = 'block';
     };
