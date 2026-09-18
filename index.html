@@ -423,20 +423,11 @@
 
         <!-- تبويب العمال -->
         <div id="workersTab" class="tab-content">
-            <div class="workers-header">
-                <div class="workers-stats">
-                    <div class="stat-card"><span class="value" id="totalWorkersCount">0</span> <span class="label">عمال</span></div>
-                    <div class="stat-card"><span class="value" id="presentTodayCount">0</span> <span class="label">حضور اليوم</span></div>
-                    <div class="stat-card"><span class="value" id="totalWagesCount">0</span> <span class="label">المستحقات</span></div>
-                </div>
-                <div class="week-nav">
-                    <button class="btn-outline" onclick="window.prevWeek()">◀ السابق</button>
-                    <span id="currentWeekLabel" style="font-weight:bold; font-size:0.8rem; color:#1e293b; padding:0 8px;">الأسبوع الحالي</span>
-                    <button class="btn-outline" onclick="window.nextWeek()">التالي ▶</button>
-                </div>
-                <div style="display: flex; gap: 8px; flex-wrap:wrap;">
-                    <button class="btn-primary" onclick="window.addNewWorker()">➕ إضافة عامل</button>
-                </div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:10px;">
+                <button class="btn-outline" onclick="window.prevWeek()" style="padding:4px 10px;">◀</button>
+                <span id="currentWeekLabel" style="font-weight:bold; font-size:0.8rem; color:#1e293b; padding:4px 10px; background:rgba(255,255,255,0.9); border-radius:20px;"></span>
+                <button class="btn-outline" onclick="window.nextWeek()" style="padding:4px 10px;">▶</button>
+                <button class="btn-primary" onclick="window.addNewWorker()" style="padding:4px 10px; font-size:0.65rem;">➕ عامل</button>
             </div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
