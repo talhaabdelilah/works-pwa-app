@@ -327,6 +327,8 @@
                 <div class="hamburger-dropdown" id="hamburgerDropdown">
                     <div class="hamburger-item" id="systemUserName"></div>
                     <div class="hamburger-item"><span id="syncStatusHeader" class="sync-badge">💾 محلي</span></div>
+                    <div class="hamburger-item"><button class="btn-danger" onclick="window.archiveAndClearAccounting()" style="width:100%;">📦 حفظ ومسح المحاسبة</button></div>
+                    <div class="hamburger-item"><button class="btn-info" onclick="window.showAccountingHistory()" style="width:100%;">📋 سجل المحاسبة</button></div>
                     <div class="hamburger-item"><button class="back-users-btn" onclick="window.backToUsersList()" style="width:100%;">👥 تغيير المستخدم</button></div>
                     <div class="hamburger-item"><button class="logout-btn" onclick="window.logout()" style="width:100%;">🚪 تسجيل خروج</button></div>
                 </div>
@@ -441,14 +443,12 @@
         <!-- تبويب المحاسبة - تم إصلاح تشوه الجدول -->
         <div id="accountingTab" class="tab-content">
             <div class="summary" style="margin-bottom:12px;">
-                <div class="summary-item">📈 الإيرادات: <span id="totalRevenue">0</span></div>
-                <div class="summary-item">📉 المصاريف: <span id="totalExpense">0</span></div>
-                <div class="summary-item">💰 صافي الربح: <span id="netProfit" class="profit">0</span></div>
-            </div>
-            <div style="display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
-                <button class="btn-primary" onclick="window.addAccountingRow()">➕ إضافة صف</button>
-                <button class="btn-danger" onclick="window.archiveAndClearAccounting()">📦 حذف وحفظ</button>
-                <button class="btn-info" onclick="window.showAccountingHistory()">📋 السجل</button>
+                <div class="summary-item" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <span>📈 الإيرادات: <span id="totalRevenue">0</span></span>
+                    <span>📉 المصاريف: <span id="totalExpense">0</span></span>
+                    <span>💰 صافي الربح: <span id="netProfit" class="profit">0</span></span>
+                    <button class="btn-primary" onclick="window.addAccountingRow()" style="margin-right:auto;">➕ إضافة صف</button>
+                </div>
             </div>
             <div class="accounting-table-wrapper">
                 <table class="accounting-table">
@@ -759,10 +759,11 @@
         });
         if(!hasData) return;
         userData.workers.forEach(w => {
-            let total = calculateWorkerTotal(w);
-            if(total !== 0) {
-                logToAccounting(total < 0 ? 'revenue' : 'expense', w.name, Math.abs(total), 'أجر عامل - ' + weekKey);
-            }
+            let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
+            let wages = days * (w.price||0);
+            let exp = w.expense||0;
+            if(wages > 0) logToAccounting('expense', w.name, wages, 'أجر عامل - ' + weekKey);
+            if(exp > 0) logToAccounting('expense', w.name, exp, 'مصروف عامل - ' + weekKey);
         });
         let record = { weekKey, savedAt: new Date().toISOString(), workers: JSON.parse(JSON.stringify(userData.workers)), summary: { weekTotal: userData.workers.reduce((s,w)=>s+calculateWorkerTotal(w),0) } };
         userData.workersArchives = userData.workersArchives.filter(a=>a.weekKey!==weekKey);
