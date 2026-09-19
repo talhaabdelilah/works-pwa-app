@@ -902,14 +902,14 @@
     };
     window.nextWeek = function() {
         if(weekOffset < 0) {
-            saveWeekToArchive(getCurrentWeekKey());
+            saveWeekToArchive(getWeekKey(weekOffset));
             weekOffset++;
             updateWeekLabel();
             loadWeekData();
         }
     };
     window.goCurrentWeek = function() {
-        saveWeekToArchive(getCurrentWeekKey());
+        if(weekOffset !== 0) saveWeekToArchive(getWeekKey(weekOffset));
         weekOffset = 0;
         updateWeekLabel();
         loadWeekData();
