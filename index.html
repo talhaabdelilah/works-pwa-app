@@ -204,6 +204,11 @@
         .back-notice.show { opacity: 1; }
         .breadcrumb { background: #f8fafc; padding: 8px 12px; border-radius: 30px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
+        .sync-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30,41,59,0.9); display: flex; align-items: center; justify-content: center; z-index: 9000; }
+        .sync-content { background: white; padding: 30px; border-radius: 24px; text-align: center; max-width: 320px; }
+        .sync-spinner { border: 4px solid #e2e8f0; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         @media (max-width: 700px) {
             .search-box input { width: 100%; }
             .workers-table { font-size: 0.7rem; }
@@ -273,6 +278,7 @@
                 <div class="hamburger-dropdown" id="hamburgerDropdown">
                     <div class="hamburger-item" id="systemUserName"></div>
                     <div class="hamburger-item"><span id="syncStatusHeader" class="sync-badge">💾 محلي</span></div>
+                    <div class="hamburger-item"><button class="btn-success" onclick="window.syncNow()" style="width:100%;">🔄 مزامنة الآن</button></div>
                     <div class="hamburger-item"><button class="btn-info" onclick="window.importOldData()" style="width:100%;">📥 استيراد بيانات قديمة</button></div>
                     <div class="hamburger-item"><button class="btn-danger" onclick="window.archiveAndClearAccounting()" style="width:100%;">📦 حفظ ومسح المحاسبة</button></div>
                     <div class="hamburger-item"><button class="btn-info" onclick="window.showAccountingHistory()" style="width:100%;">📋 سجل المحاسبة</button></div>
@@ -617,6 +623,19 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 2800);
 }
 
+function showSyncOverlay(text) {
+    let overlay = document.createElement('div');
+    overlay.className = 'sync-overlay';
+    overlay.id = 'syncOverlay';
+    overlay.innerHTML = `<div class="sync-content"><div class="sync-spinner"></div><h3 style="color:#1e293b; margin-bottom:8px;">${text || 'جاري المزامنة...'}</h3><p style="color:#64748b; font-size:0.8rem;">يرجى الانتظار</p></div>`;
+    document.body.appendChild(overlay);
+}
+
+function hideSyncOverlay() {
+    let el = document.getElementById('syncOverlay');
+    if(el) el.remove();
+}
+
 // ==================== Storage ====================
 function getDataKey() { return currentUser?.isLocalOnly ? `data_local_${currentUser.uid}_${currentAccountingPerson.id}` : `data_${currentUser?.uid}_${currentAccountingPerson.id}`; }
 function getAccKey() { return `accounting_data_${currentUser?.uid || 'local'}_${currentAccountingPerson.id}`; }
@@ -667,20 +686,79 @@ function loadFromLocal() {
     } catch(e) { console.error('loadFromLocal error:', e); }
 }
 
+// ⭐ التحميل من Firebase (المصدر الأساسي)
+async function loadFromCloud(silent) {
+    if (!useCloudSync || !currentUser || currentUser.isLocalOnly || !db) return false;
+    if (!currentAccountingPerson) return false;
+
+    try {
+        if (!silent) showSyncOverlay('☁️ جاري تحميل البيانات...');
+
+        let snapshot = await db.ref(`users/${currentUser.uid}/data_${currentAccountingPerson.id}`).once('value');
+        let cloudData = snapshot.val();
+
+        if (cloudData) {
+            userData.customers = cloudData.customers || [];
+            userData.workers = cloudData.workers || [];
+            userData.workersArchives = cloudData.workersArchives || [];
+            userData.workersByWeek = cloudData.workersByWeek || {};
+            userData.accountingRows = cloudData.accountingRows || [];
+            userData.accountingHistory = cloudData.accountingHistory || [];
+            userData._lastRolledWeek = cloudData._lastRolledWeek || null;
+            userData.nextCustId = cloudData.nextCustId || 1;
+            userData.nextProjId = cloudData.nextProjId || 100;
+            userData.nextRoomId = cloudData.nextRoomId || 1000;
+
+            saveToLocal();
+
+            if (!silent) {
+                hideSyncOverlay();
+                showToast('✅ تم تحميل البيانات من السحابة');
+            }
+            return true;
+        } else {
+            // لا توجد بيانات في السحابة
+            if (!silent) {
+                hideSyncOverlay();
+                showToast('📭 لا توجد بيانات سحابية — عرض محلي');
+            }
+            return false;
+        }
+    } catch(e) {
+        console.warn('Cloud load error:', e);
+        if (!silent) {
+            hideSyncOverlay();
+            showToast('⚠️ تعذر التحميل — عرض محلي');
+        }
+        return false;
+    }
+}
+
+// ⭐ الحفظ في Firebase
 async function autoSave() {
     syncWorkersToWeek();
     saveToLocal();
+
     if(useCloudSync && isOnline && currentUser && !currentUser.isLocalOnly && db && currentAccountingPerson) {
         try {
             await db.ref(`users/${currentUser.uid}/data_${currentAccountingPerson.id}`).set({
-                customers: userData.customers, workers: userData.workers,
+                customers: userData.customers,
+                workers: userData.workers,
                 workersArchives: userData.workersArchives,
                 workersByWeek: userData.workersByWeek || {},
+                accountingRows: userData.accountingRows || [],
+                accountingHistory: userData.accountingHistory || [],
                 _lastRolledWeek: userData._lastRolledWeek || null,
+                nextCustId: userData.nextCustId || 1,
+                nextProjId: userData.nextProjId || 100,
+                nextRoomId: userData.nextRoomId || 1000,
                 lastModified: firebase.database.ServerValue.TIMESTAMP
             });
             updateHeaderSync('online');
-        } catch(e) { updateHeaderSync('offline'); }
+        } catch(e) {
+            console.warn('Cloud save error:', e);
+            updateHeaderSync('offline');
+        }
     } else {
         updateHeaderSync(currentUser?.isLocalOnly ? 'offline' : 'online');
     }
@@ -691,6 +769,34 @@ function syncWorkersToWeek() {
     let wk = getCurrentWeekKey();
     userData.workersByWeek[wk] = JSON.parse(JSON.stringify(userData.workers));
 }
+
+// ⭐ زر المزامنة اليدوية
+window.syncNow = async function() {
+    if (!currentAccountingPerson) {
+        alert("⚠️ اختر مستخدماً أولاً");
+        return;
+    }
+    if (!useCloudSync || !currentUser || currentUser.isLocalOnly) {
+        alert("⚠️ أنت في الوضع المحلي");
+        return;
+    }
+    if (!isOnline) {
+        alert("⚠️ لا يوجد اتصال بالإنترنت");
+        return;
+    }
+
+    showSyncOverlay('🔄 جاري المزامنة...');
+
+    // 1. ارفع أولاً
+    await autoSave();
+
+    // 2. ثم اسحب
+    await loadFromCloud(true);
+
+    hideSyncOverlay();
+    window.renderAll();
+    showToast('✅ تمت المزامنة بنجاح');
+};
 
 // ==================== Users Management ====================
 function loadAccountingUsersList() {
@@ -718,20 +824,39 @@ function renderUsersSelectScreen() {
         </div>`).join('');
 }
 
-window.selectAccountingUser = function(id) {
+// ⭐ اختيار المستخدم مع المزامنة التلقائية
+window.selectAccountingUser = async function(id) {
     const user = accountingUsersList.find(u=>u.id===id);
-    if(user) {
-        currentAccountingPerson = user;
+    if(!user) return;
+
+    currentAccountingPerson = user;
+
+    // ⭐ حمّل من Firebase أولاً (المصدر الأساسي)
+    let loadedFromCloud = false;
+    if (useCloudSync && isOnline && currentUser && !currentUser.isLocalOnly) {
+        loadedFromCloud = await loadFromCloud(false);
+    }
+
+    // إذا فشل التحميل من السحابة، استخدم المحلي
+    if (!loadedFromCloud) {
         loadFromLocal();
-        autoRollWeek();
-        document.getElementById("usersSelectScreen").style.display = "none";
-        document.getElementById("mainSystem").style.display = "block";
-        document.getElementById("systemUserName").innerHTML = `👋 ${escapeHtml(user.name)}`;
-        weekOffset = 0;
-        displayedWorkers = [];
-        window.renderAll();
-        window.initNavigationStack();
-        autoSave();
+    }
+
+    // نقل تلقائي للأسبوع الجديد
+    autoRollWeek();
+
+    // عرض الواجهة
+    document.getElementById("usersSelectScreen").style.display = "none";
+    document.getElementById("mainSystem").style.display = "block";
+    document.getElementById("systemUserName").innerHTML = `👋 ${escapeHtml(user.name)}`;
+    weekOffset = 0;
+    displayedWorkers = [];
+    window.renderAll();
+    window.initNavigationStack();
+
+    // ارفع أول مرة إن كانت السحابة فارغة
+    if (!loadedFromCloud && useCloudSync) {
+        setTimeout(() => autoSave(), 500);
     }
 };
 
@@ -883,11 +1008,6 @@ function calculateWorkerTotal(w) {
     return (weekEarn + previousBalance) - expense;
 }
 
-function calculateWeekEarn(w) {
-    let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
-    return days * (w.price||0);
-}
-
 function parseExpenseString(val) {
     if(!val) return 0;
     let str = String(val).replace(/[,،\s]+/g, '+');
@@ -1035,7 +1155,6 @@ window.renderWorkersTable = function() {
     updateWorkersStats();
 };
 
-// ⭐ إضافة عامل (بدون حقول الدين)
 window.addNewWorker = function() {
     if (weekOffset !== 0) {
         alert("⚠️ لا يمكن إضافة عامل في أسبوع سابق. اضغط 📅 الحالي أولاً");
@@ -1262,6 +1381,7 @@ window.showWorkerDetail = function(workerId) {
                 window.closeWorkerDetail();
                 window.renderWorkersTable();
                 saveToLocal();
+                autoSave();
                 showToast(`✅ تم إزالة "${w.name}" من الأسبوع ${weekKey}`);
             }
         } else {
@@ -1288,7 +1408,6 @@ window.closeWorkerDetail = function() {
     document.getElementById('workerDetailPage').style.display = 'none';
 };
 
-// ⭐⭐ عرض الأسابيع السابقة كجدول موحّد
 function renderWorkerWeeks(workerId) {
     let container = document.getElementById('workerWeeksList');
     if(!container) return;
@@ -1468,6 +1587,7 @@ window.saveWorkerDetail = function() {
         window.renderWorkersTable();
         window.closeWorkerDetail();
         saveToLocal();
+        autoSave();
     }
 };
 
@@ -2591,7 +2711,7 @@ window.addEventListener('offline',()=>{ isOnline=false; updateHeaderSync('offlin
     });
 })();
 
-console.log("✅ النظام جاهز - جدول الأسابيع الموحّد + إضافة عامل مبسّطة");
+console.log("✅ النظام جاهز - المزامنة التلقائية عند كل فتح");
 </script>
 </body>
 </html>
