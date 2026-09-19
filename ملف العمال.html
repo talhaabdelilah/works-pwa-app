@@ -417,7 +417,7 @@
             </div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
-                    <thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th></tr></thead>
+                    <thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>دين سابق</th><th>المجموع</th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
             </div>
@@ -498,6 +498,14 @@
                 <input type="text" id="workerDetailExpenseInput" placeholder="30+40" style="background:#fef3c7; border-color:#fde68a;">
             </div>
             <div class="worker-detail-row"><span class="label">📅 أيام الحضور هذا الأسبوع</span><span class="value" id="workerDetailDays"></span></div>
+            <div class="worker-detail-row" style="background:#fef3c7; border:1px solid #fde68a;">
+                <span class="label">📌 دين سابق</span>
+                <input type="number" id="workerDetailPreviousBalance" step="0.01" placeholder="0">
+            </div>
+            <div class="worker-detail-row" id="workerPreviousNoteRow" style="display:none; background:#fffbeb;">
+                <span class="label" style="font-size:0.65rem;">📝 ملاحظة الدين</span>
+                <input type="text" id="workerDetailPreviousNote" placeholder="ملاحظة" style="width:150px; font-size:0.7rem;">
+            </div>
             <div style="border-top:2px solid #e2e8f0; margin:10px 0; padding-top:10px;">
                 <div class="worker-detail-row"><span class="label">📊 مستحق الأسبوع (أيام × أجر)</span><span class="value" id="workerWeekDue" style="color:#3b82f6;"></span></div>
                 <div class="worker-detail-row"><span class="label">💰 المدفوع هذا الأسبوع</span><span class="value" id="workerWeekPaid" style="color:#10b981;"></span></div>
@@ -558,7 +566,18 @@ let auth = null, db = null, currentUser = null, currentAccountingPerson = null, 
 try { firebase.initializeApp(firebaseConfig); auth = firebase.auth(); db = firebase.database(); auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch(e) { console.warn(e); }
 
 // ==================== Data ====================
-let userData = { customers: [], workers: [], accountingRows: [], nextCustId: 1, nextProjId: 100, nextRoomId: 1000, workersArchives: [], accountingHistory: [] };
+let userData = {
+    customers: [],
+    workers: [],
+    accountingRows: [],
+    nextCustId: 1,
+    nextProjId: 100,
+    nextRoomId: 1000,
+    workersArchives: [],
+    accountingHistory: [],
+    workersByWeek: {},
+    _lastRolledWeek: null
+};
 let accountingUsersList = [{ id: 'main', name: 'المدير الرئيسي', type: 'admin' }];
 let currentCustomerId = null, currentProjectId = null, navigationStack = [];
 let popstateHandlerAttached = false;
@@ -575,7 +594,6 @@ const deviceId = getDeviceId();
 function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function updateHeaderSync(status) { let el = document.getElementById("syncStatusHeader"); if(el) { el.innerHTML = status === 'online' ? '☁️ سحابي' : '💾 محلي'; el.className = 'sync-badge ' + (status === 'online' ? '' : 'offline'); } }
 
-// ⭐ تاريخ بالأرقام الإنجليزية: 19/9/2026
 function getEnglishDate(dateParam) {
     const d = dateParam || new Date();
     const day = d.getDate();
@@ -584,7 +602,6 @@ function getEnglishDate(dateParam) {
     return `${day}/${month}/${year}`;
 }
 
-// ⭐ وقت بصيغة 24 ساعة
 function getEnglishTime() {
     const d = new Date();
     const hh = String(d.getHours()).padStart(2, '0');
@@ -610,7 +627,9 @@ function saveToLocal() {
         localStorage.setItem(getDataKey(), JSON.stringify({
             customers: userData.customers, workers: userData.workers,
             nextCustId: userData.nextCustId, nextProjId: userData.nextProjId, nextRoomId: userData.nextRoomId,
-            workersArchives: userData.workersArchives
+            workersArchives: userData.workersArchives,
+            workersByWeek: userData.workersByWeek || {},
+            _lastRolledWeek: userData._lastRolledWeek || null
         }));
         localStorage.setItem(getAccKey(), JSON.stringify({
             accountingRows: userData.accountingRows, accountingHistory: userData.accountingHistory
@@ -630,10 +649,14 @@ function loadFromLocal() {
             userData.nextProjId = d.nextProjId || 100;
             userData.nextRoomId = d.nextRoomId || 1000;
             userData.workersArchives = d.workersArchives || [];
+            userData.workersByWeek = d.workersByWeek || {};
+            userData._lastRolledWeek = d._lastRolledWeek || null;
         } else {
             userData.customers = []; userData.workers = [];
             userData.nextCustId = 1; userData.nextProjId = 100; userData.nextRoomId = 1000;
             userData.workersArchives = [];
+            userData.workersByWeek = {};
+            userData._lastRolledWeek = null;
         }
         const accSaved = localStorage.getItem(getAccKey());
         if(accSaved) {
@@ -645,12 +668,15 @@ function loadFromLocal() {
 }
 
 async function autoSave() {
+    syncWorkersToWeek();
     saveToLocal();
     if(useCloudSync && isOnline && currentUser && !currentUser.isLocalOnly && db && currentAccountingPerson) {
         try {
             await db.ref(`users/${currentUser.uid}/data_${currentAccountingPerson.id}`).set({
                 customers: userData.customers, workers: userData.workers,
                 workersArchives: userData.workersArchives,
+                workersByWeek: userData.workersByWeek || {},
+                _lastRolledWeek: userData._lastRolledWeek || null,
                 lastModified: firebase.database.ServerValue.TIMESTAMP
             });
             updateHeaderSync('online');
@@ -658,6 +684,12 @@ async function autoSave() {
     } else {
         updateHeaderSync(currentUser?.isLocalOnly ? 'offline' : 'online');
     }
+}
+
+function syncWorkersToWeek() {
+    if (!userData.workersByWeek) userData.workersByWeek = {};
+    let wk = getCurrentWeekKey();
+    userData.workersByWeek[wk] = JSON.parse(JSON.stringify(userData.workers));
 }
 
 // ==================== Users Management ====================
@@ -691,6 +723,7 @@ window.selectAccountingUser = function(id) {
     if(user) {
         currentAccountingPerson = user;
         loadFromLocal();
+        autoRollWeek();
         document.getElementById("usersSelectScreen").style.display = "none";
         document.getElementById("mainSystem").style.display = "block";
         document.getElementById("systemUserName").innerHTML = `👋 ${escapeHtml(user.name)}`;
@@ -753,6 +786,12 @@ function getWeekKeyFromDate(d) {
 
 function getCurrentWeekKey() { return getWeekKeyFromDate(new Date()); }
 
+function getLastWeekKey() {
+    let d = new Date();
+    d.setDate(d.getDate() - 7);
+    return getWeekKeyFromDate(d);
+}
+
 function getWeekKey(offset) {
     let d = new Date();
     d.setDate(d.getDate() + (offset * 7));
@@ -781,11 +820,74 @@ function updateWeekLabel() {
     if(notice) notice.style.display = weekOffset === 0 ? 'none' : 'block';
 }
 
+function autoRollWeek() {
+    if (!currentAccountingPerson) return;
+
+    let currentWeekKey = getCurrentWeekKey();
+    if (!userData.workersByWeek) userData.workersByWeek = {};
+
+    if (userData.workersByWeek[currentWeekKey] && userData.workersByWeek[currentWeekKey].length > 0) {
+        return;
+    }
+
+    if (!userData.workers || userData.workers.length === 0) {
+        return;
+    }
+
+    if (userData._lastRolledWeek === currentWeekKey) {
+        return;
+    }
+
+    let archiveKeys = Object.keys(userData.workersByWeek).filter(k => k !== currentWeekKey).sort();
+    if (archiveKeys.length === 0) {
+        userData.workersByWeek[currentWeekKey] = JSON.parse(JSON.stringify(userData.workers));
+        userData._lastRolledWeek = currentWeekKey;
+        return;
+    }
+
+    let lastWeekKey = archiveKeys[archiveKeys.length - 1];
+    let lastWeekWorkers = userData.workersByWeek[lastWeekKey];
+
+    if (userData.workers.length > 0) {
+        userData.workersByWeek[currentWeekKey] = JSON.parse(JSON.stringify(userData.workers));
+        userData._lastRolledWeek = currentWeekKey;
+        return;
+    }
+
+    userData.workersByWeek[currentWeekKey] = lastWeekWorkers.map(w => ({
+        id: w.id,
+        name: w.name,
+        price: w.price || 0,
+        days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0},
+        expense: 0,
+        expenseRaw: '',
+        previousBalance: w.previousBalance || 0,
+        previousBalanceNote: w.previousBalanceNote || ''
+    }));
+
+    userData.workers = JSON.parse(JSON.stringify(userData.workersByWeek[currentWeekKey]));
+    userData._lastRolledWeek = currentWeekKey;
+    saveToLocal();
+
+    setTimeout(() => {
+        showToast(`🔄 تم نقل ${lastWeekWorkers.length} عامل للأسبوع الجديد`);
+    }, 1000);
+}
+
 // ==================== Workers Functions ====================
 function calculateWorkerTotal(w) {
     let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
-    return (days*(w.price||0)) - (w.expense||0);
+    let weekEarn = days * (w.price||0);
+    let previousBalance = w.previousBalance || 0;
+    let expense = w.expense || 0;
+    return (weekEarn + previousBalance) - expense;
 }
+
+function calculateWeekEarn(w) {
+    let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
+    return days * (w.price||0);
+}
+
 function parseExpenseString(val) {
     if(!val) return 0;
     let str = String(val).replace(/[,،\s]+/g, '+');
@@ -810,20 +912,55 @@ function updateWorkersStats() {
     if(el3) el3.innerText = workers.reduce((s,w)=>s+calculateWorkerTotal(w),0).toFixed(2);
 }
 
+function getAllWorkerNames() {
+    let names = new Map();
+    userData.workers.forEach(w => {
+        if (!names.has(w.name)) names.set(w.name, { id: w.id, price: w.price || 0 });
+    });
+    (userData.workersArchives || []).forEach(a => {
+        (a.workers || []).forEach(w => {
+            if (!names.has(w.name)) names.set(w.name, { id: w.id, price: w.price || 0 });
+        });
+    });
+    if (userData.workersByWeek) {
+        Object.values(userData.workersByWeek).forEach(weekWorkers => {
+            (weekWorkers || []).forEach(w => {
+                if (!names.has(w.name)) names.set(w.name, { id: w.id, price: w.price || 0 });
+            });
+        });
+    }
+    return names;
+}
+
+function suggestWorkerNames(input) {
+    if (!input || input.length < 1) return [];
+    let allNames = getAllWorkerNames();
+    let suggestions = [];
+    let lowerInput = input.toLowerCase();
+    for (let [name, info] of allNames) {
+        if (name.toLowerCase().includes(lowerInput) && name !== input) {
+            suggestions.push({ name, ...info });
+        }
+    }
+    suggestions.sort((a, b) => {
+        let aStarts = a.name.toLowerCase().startsWith(lowerInput) ? 0 : 1;
+        let bStarts = b.name.toLowerCase().startsWith(lowerInput) ? 0 : 1;
+        return aStarts - bStarts;
+    });
+    return suggestions.slice(0, 5);
+}
+
 function saveDisplayedWorkersToArchive() {
     if (weekOffset === 0) return;
     if (!displayedWorkers || displayedWorkers.length === 0) return;
 
     let weekKey = getWeekKey(weekOffset);
+    if (!userData.workersByWeek) userData.workersByWeek = {};
+    userData.workersByWeek[weekKey] = JSON.parse(JSON.stringify(displayedWorkers));
 
     userData.workersArchives = userData.workersArchives.filter(a => a.weekKey !== weekKey);
-
     let weekTotal = 0;
-    displayedWorkers.forEach(w => {
-        let days = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
-        weekTotal += (days * (w.price||0)) - (w.expense||0);
-    });
-
+    displayedWorkers.forEach(w => { weekTotal += calculateWorkerTotal(w); });
     userData.workersArchives.unshift({
         weekKey: weekKey,
         savedAt: new Date().toISOString(),
@@ -842,16 +979,22 @@ window.renderWorkersTable = function() {
     let filtered = workersToRender.filter(w => w.name.toLowerCase().includes(search));
 
     if(filtered.length === 0){
-        tbody.innerHTML='<tr><td colspan="10" class="empty-message">لا يوجد عمال</td></tr>';
+        tbody.innerHTML='<tr><td colspan="11" class="empty-message">لا يوجد عمال</td></tr>';
         updateWorkersStats();
         return;
     }
 
     tbody.innerHTML = filtered.map((w,idx)=>{
+        let prevBalance = w.previousBalance || 0;
+        let prevCell = prevBalance > 0
+            ? `<td style="background:#fef3c7; font-weight:bold; color:#92400e; font-size:0.7rem;">${prevBalance.toFixed(0)}</td>`
+            : `<td style="color:#94a3b8; font-size:0.7rem;">—</td>`;
+
         return `<tr class="worker-row" data-id="${w.id}" style="cursor:pointer;">
             <td>${idx+1}</td>
             <td class="name-cell">${escapeHtml(w.name)}</td>
             ${dayKeys.map(d=>`<td><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days?.[d]?'checked':''} onclick="event.stopPropagation();"></td>`).join('')}
+            ${prevCell}
             <td class="week-total-cell">${calculateWorkerTotal(w).toFixed(2)}</td>
         </tr>`;
     }).join('');
@@ -892,34 +1035,148 @@ window.renderWorkersTable = function() {
     updateWorkersStats();
 };
 
+// ⭐ إضافة عامل (بدون حقول الدين)
 window.addNewWorker = function() {
-    let name = prompt("👤 اسم العامل:");
-    if(!name || !name.trim()) return;
+    if (weekOffset !== 0) {
+        alert("⚠️ لا يمكن إضافة عامل في أسبوع سابق. اضغط 📅 الحالي أولاً");
+        return;
+    }
 
-    let allIds = [];
-    userData.workers.forEach(w=>allIds.push(w.id));
-    (userData.customers||[]).forEach(c=>(c.projects||[]).forEach(p=>(p.workers||[]).forEach(pw=>{ if(pw.sourceId) allIds.push(pw.sourceId); })));
-    let newId = allIds.length ? Math.max(...allIds)+1 : 1;
+    let modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.zIndex = '4000';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:380px; padding:20px;">
+            <h3 style="text-align:center; margin-bottom:16px;">👷 إضافة عامل</h3>
 
-    let newWorker = {
-        id: newId,
-        name: name.trim(),
-        price: 0,
-        expense: 0,
-        expenseRaw: '',
-        days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}
-    };
+            <div style="position:relative;">
+                <input type="text" id="newWorkerNameInput" placeholder="اسم العامل"
+                    style="width:100%; padding:10px; border:2px solid #10b981; border-radius:12px; font-size:0.9rem; box-sizing:border-box;"
+                    autocomplete="off">
+                <div id="nameSuggestions" style="position:absolute; top:100%; right:0; left:0; background:white; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.15); max-height:200px; overflow-y:auto; display:none; z-index:10; margin-top:4px;"></div>
+            </div>
 
-    if (weekOffset === 0) {
+            <div style="margin-top:12px;">
+                <label style="font-size:0.75rem; color:#64748b;">💰 الأجر اليومي:</label>
+                <input type="number" id="newWorkerPrice" placeholder="0" step="0.01"
+                    style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.9rem; box-sizing:border-box; margin-top:4px;">
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:16px;">
+                <button id="confirmAddWorkerBtn" class="btn-primary" style="flex:1;">✅ إضافة</button>
+                <button id="cancelAddWorkerBtn" class="btn-outline" style="flex:1;">❌ إلغاء</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    let nameInput = document.getElementById('newWorkerNameInput');
+    let suggestionsDiv = document.getElementById('nameSuggestions');
+    let selectedWorkerId = null;
+
+    nameInput.focus();
+
+    nameInput.addEventListener('input', () => {
+        let val = nameInput.value.trim();
+        if (!val) {
+            suggestionsDiv.style.display = 'none';
+            selectedWorkerId = null;
+            return;
+        }
+
+        let suggestions = suggestWorkerNames(val);
+        if (suggestions.length === 0) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+
+        suggestionsDiv.innerHTML = suggestions.map(s => `
+            <div class="suggestion-item" data-name="${escapeHtml(s.name)}" data-id="${s.id}" data-price="${s.price}"
+                style="padding:10px 14px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-size:0.85rem; display:flex; justify-content:space-between;">
+                <span>👤 ${escapeHtml(s.name)}</span>
+                <span style="color:#64748b; font-size:0.7rem;">${s.price} دينار</span>
+            </div>
+        `).join('');
+        suggestionsDiv.style.display = 'block';
+
+        suggestionsDiv.querySelectorAll('.suggestion-item').forEach(item => {
+            item.onclick = () => {
+                nameInput.value = item.dataset.name;
+                document.getElementById('newWorkerPrice').value = item.dataset.price || 0;
+                selectedWorkerId = parseInt(item.dataset.id);
+                suggestionsDiv.style.display = 'none';
+            };
+            item.onmouseenter = () => item.style.background = '#f0fdf4';
+            item.onmouseleave = () => item.style.background = 'white';
+        });
+    });
+
+    let confirmBtn = document.getElementById('confirmAddWorkerBtn');
+    let cancelBtn = document.getElementById('cancelAddWorkerBtn');
+
+    let doAdd = () => {
+        let name = nameInput.value.trim();
+        if (!name) {
+            nameInput.style.borderColor = '#ef4444';
+            nameInput.focus();
+            return;
+        }
+
+        let price = parseFloat(document.getElementById('newWorkerPrice').value) || 0;
+
+        let allIds = [];
+        userData.workers.forEach(w => allIds.push(w.id));
+        (userData.customers||[]).forEach(c => (c.projects||[]).forEach(p => (p.workers||[]).forEach(pw => {
+            if (pw.sourceId) allIds.push(pw.sourceId);
+        })));
+
+        let newId;
+        if (selectedWorkerId) {
+            newId = selectedWorkerId;
+            if (userData.workers.find(w => w.id === newId)) {
+                alert(`⚠️ العامل "${name}" موجود بالفعل في هذا الأسبوع`);
+                return;
+            }
+        } else {
+            newId = allIds.length ? Math.max(...allIds) + 1 : 1;
+        }
+
+        let newWorker = {
+            id: newId,
+            name: name,
+            price: price,
+            expense: 0,
+            expenseRaw: '',
+            days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0},
+            previousBalance: 0,
+            previousBalanceNote: ''
+        };
+
         userData.workers.push(newWorker);
         window.renderWorkersTable();
         autoSave();
-    } else {
-        displayedWorkers.push(newWorker);
-        saveDisplayedWorkersToArchive();
-        window.renderWorkersTable();
-        saveToLocal();
-    }
+        showToast(`✅ تم إضافة "${name}"`);
+        modal.remove();
+    };
+
+    confirmBtn.onclick = doAdd;
+    cancelBtn.onclick = () => modal.remove();
+
+    nameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            if (suggestionsDiv.style.display === 'block') {
+                let first = suggestionsDiv.querySelector('.suggestion-item');
+                if (first) first.click();
+            } else {
+                doAdd();
+            }
+        }
+        if (e.key === 'Escape') modal.remove();
+    });
+
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
 };
 
 window.showWorkerDetail = function(workerId) {
@@ -931,6 +1188,21 @@ window.showWorkerDetail = function(workerId) {
     document.getElementById('workerDetailName').textContent = w.name;
     document.getElementById('workerDetailPriceInput').value = w.price || 0;
     document.getElementById('workerDetailExpenseInput').value = w.expenseRaw || '';
+
+    let prevBalanceInput = document.getElementById('workerDetailPreviousBalance');
+    let prevNoteInput = document.getElementById('workerDetailPreviousNote');
+    let prevNoteRow = document.getElementById('workerPreviousNoteRow');
+    if (prevBalanceInput) {
+        prevBalanceInput.value = w.previousBalance || 0;
+        prevBalanceInput.disabled = (weekOffset !== 0);
+    }
+    if (prevNoteInput) {
+        prevNoteInput.value = w.previousBalanceNote || '';
+        prevNoteInput.disabled = (weekOffset !== 0);
+    }
+    if (prevNoteRow) {
+        prevNoteRow.style.display = (w.previousBalance > 0 || w.previousBalanceNote) ? 'flex' : 'none';
+    }
 
     let daysCount = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
     document.getElementById('workerDetailDays').textContent = daysCount + ' يوم';
@@ -949,22 +1221,29 @@ window.showWorkerDetail = function(workerId) {
             });
         });
     });
+
     let weekDue = daysCount * (w.price||0);
-    let weekRemaining = weekDue - weekPaid;
-    document.getElementById('workerWeekDue').textContent = weekDue.toFixed(2) + ' دينار';
+    let prevBalance = w.previousBalance || 0;
+    let totalDue = weekDue + prevBalance;
+    let weekRemaining = totalDue - weekPaid;
+
+    document.getElementById('workerWeekDue').textContent = totalDue.toFixed(2) + ' دينار';
     document.getElementById('workerWeekPaid').textContent = weekPaid.toFixed(2) + ' دينار';
     let remEl = document.getElementById('workerWeekRemaining');
     remEl.textContent = weekRemaining.toFixed(2) + ' دينار';
     remEl.style.color = weekRemaining >= 0 ? '#059669' : '#dc2626';
 
-    let allDue = weekDue;
-    (userData.workersArchives||[]).forEach(a => {
-        let wkw = a.workers?.find(x=>x.id===workerId);
-        if(wkw) {
-            let d = dayKeys.reduce((s,k)=>s+(wkw.days?.[k]||0),0);
-            allDue += (d * (wkw.price||0)) - (wkw.expense||0);
-        }
-    });
+    let allDue = totalDue;
+    if (userData.workersByWeek) {
+        Object.entries(userData.workersByWeek).forEach(([wkKey, weekWorkers]) => {
+            if (wkKey === currentWkKey) return;
+            let wkw = (weekWorkers || []).find(x => x.id === workerId);
+            if (wkw) {
+                allDue += calculateWorkerTotal(wkw);
+            }
+        });
+    }
+
     let allNet = allDue - allPaid;
     document.getElementById('workerAllDue').textContent = allDue.toFixed(2) + ' دينار';
     document.getElementById('workerAllPaid').textContent = allPaid.toFixed(2) + ' دينار';
@@ -974,19 +1253,28 @@ window.showWorkerDetail = function(workerId) {
 
     document.getElementById('workerDetailDeleteBtn').onclick = function() {
         if (weekOffset !== 0) {
-            if(confirm("إزالة العامل '" + w.name + "' من أرشيف هذا الأسبوع؟")) {
-                displayedWorkers = displayedWorkers.filter(x=>x.id !== workerId);
-                saveDisplayedWorkersToArchive();
+            if(confirm("⚠️ إزالة العامل '" + w.name + "' من أرشيف هذا الأسبوع فقط؟\n\n✅ لن يُحذف من الأسابيع الأخرى")) {
+                let weekKey = getWeekKey(weekOffset);
+                if (userData.workersByWeek && userData.workersByWeek[weekKey]) {
+                    userData.workersByWeek[weekKey] = userData.workersByWeek[weekKey].filter(x => x.id !== workerId);
+                }
+                displayedWorkers = displayedWorkers.filter(x => x.id !== workerId);
                 window.closeWorkerDetail();
                 window.renderWorkersTable();
                 saveToLocal();
+                showToast(`✅ تم إزالة "${w.name}" من الأسبوع ${weekKey}`);
             }
         } else {
-            if(confirm("حذف العامل '" + w.name + "' نهائياً؟")) {
-                userData.workers = userData.workers.filter(x=>x.id !== workerId);
+            if(confirm("⚠️ إزالة العامل '" + w.name + "' من الأسبوع الحالي فقط؟\n\n✅ لن يُحذف من الأسابيع السابقة")) {
+                userData.workers = userData.workers.filter(x => x.id !== workerId);
+                let wk = getCurrentWeekKey();
+                if (userData.workersByWeek) {
+                    userData.workersByWeek[wk] = JSON.parse(JSON.stringify(userData.workers));
+                }
                 window.closeWorkerDetail();
                 window.renderWorkersTable();
                 autoSave();
+                showToast(`✅ تم إزالة "${w.name}" من الأسبوع الحالي`);
             }
         }
     };
@@ -1000,27 +1288,85 @@ window.closeWorkerDetail = function() {
     document.getElementById('workerDetailPage').style.display = 'none';
 };
 
+// ⭐⭐ عرض الأسابيع السابقة كجدول موحّد
 function renderWorkerWeeks(workerId) {
     let container = document.getElementById('workerWeeksList');
     if(!container) return;
-    let archives = userData.workersArchives || [];
-    let weeksHtml = '';
-    archives.forEach(a => {
-        let wk = a.workers?.find(x=>x.id === workerId);
-        if(wk) {
-            let daysCount = dayKeys.reduce((s,k)=>s+(wk.days?.[k]||0),0);
-            let weekTotal = (daysCount * (wk.price||0)) - (wk.expense||0);
-            let savedDate = a.savedAt ? getEnglishDate(new Date(a.savedAt)) : '';
-            let daysList = dayNames.filter((_,i)=>wk.days[dayKeys[i]]===1).join('، ') || 'بدون حضور';
-            weeksHtml += `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px; margin-bottom:8px;">
-                <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:4px;"><span style="font-weight:bold;">📅 ${a.weekKey}</span><span style="color:#94a3b8;">${savedDate}</span></div>
-                <div style="font-size:0.7rem; color:#64748b; margin:4px 0;">الحضور: ${daysList} (${daysCount} يوم) | الأجر: ${wk.price||0} | المصروف: ${wk.expense||0}</div>
-                <div style="background:#d1fae5; padding:4px 12px; border-radius:20px; font-weight:bold; color:#065f46; font-size:0.75rem; text-align:center;">الصافي: ${weekTotal.toFixed(2)} دينار</div>
-            </div>`;
-        }
+
+    let currentWeekKey = getCurrentWeekKey();
+
+    let allWeeks = [];
+    if (userData.workersByWeek) {
+        Object.keys(userData.workersByWeek).forEach(wkKey => {
+            if (wkKey === currentWeekKey) return;
+            let w = (userData.workersByWeek[wkKey] || []).find(x => x.id === workerId);
+            if (w) allWeeks.push({ weekKey: wkKey, worker: w });
+        });
+    }
+
+    allWeeks.sort((a, b) => b.weekKey.localeCompare(a.weekKey));
+
+    if (allWeeks.length === 0) {
+        container.innerHTML = '<div class="empty-message">لا توجد أسابيع محفوظة</div>';
+        return;
+    }
+
+    let tableHtml = `
+        <div style="background:white; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.68rem;">
+                <thead>
+                    <tr style="background:linear-gradient(135deg, #1e293b 0%, #334155 100%); color:white;">
+                        <th style="padding:8px 3px; text-align:center; font-weight:bold; font-size:0.6rem;">الأسبوع</th>
+                        <th style="padding:8px 3px; text-align:center; font-weight:bold; font-size:0.6rem;">التاريخ</th>
+                        <th style="padding:8px 3px; text-align:center; font-weight:bold; font-size:0.6rem;">أيام</th>
+                        <th style="padding:8px 3px; text-align:center; font-weight:bold; font-size:0.6rem;">أجر</th>
+                        <th style="padding:8px 3px; text-align:center; font-weight:bold; font-size:0.6rem;">مصروف</th>
+                        <th style="padding:8px 3px; text-align:center; font-weight:bold; font-size:0.6rem;">الصافي</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    allWeeks.forEach(({weekKey, worker: w}, idx) => {
+        let daysCount = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
+        let weekEarn = daysCount * (w.price || 0);
+        let expense = w.expense || 0;
+        let prevBalance = w.previousBalance || 0;
+        let net = weekEarn + prevBalance - expense;
+
+        let dateRange = getWeekDateRangeFromKey(weekKey).replace(/[()]/g, '').trim();
+        let bgColor = idx % 2 === 0 ? 'white' : '#f8fafc';
+        let netColor = net >= 0 ? '#059669' : '#dc2626';
+
+        tableHtml += `
+            <tr style="background:${bgColor}; border-bottom:1px solid #f1f5f9;">
+                <td style="padding:8px 3px; text-align:center; font-weight:bold; color:#1e293b; font-size:0.65rem;">${weekKey}</td>
+                <td style="padding:8px 3px; text-align:center; color:#64748b; font-size:0.6rem;">${dateRange}</td>
+                <td style="padding:8px 3px; text-align:center; font-weight:bold; color:#3b82f6;">${daysCount}</td>
+                <td style="padding:8px 3px; text-align:center; color:#1e293b;">${w.price || 0}</td>
+                <td style="padding:8px 3px; text-align:center; color:${expense > 0 ? '#ef4444' : '#94a3b8'};">${expense}</td>
+                <td style="padding:8px 3px; text-align:center; font-weight:bold; color:${netColor}; background:${net >= 0 ? '#ecfdf5' : '#fef2f2'}; border-radius:8px;">${net.toFixed(2)}</td>
+            </tr>
+        `;
     });
-    if(!weeksHtml) weeksHtml = '<div class="empty-message">لا توجد أسابيع محفوظة</div>';
-    container.innerHTML = weeksHtml;
+
+    tableHtml += `</tbody></table></div>`;
+    container.innerHTML = tableHtml;
+}
+
+function getWeekDateRangeFromKey(wk) {
+    if(!wk || wk === 'أخرى' || !wk.includes('-W')) return '';
+    try {
+        let parts = wk.split('-W');
+        let yr = parseInt(parts[0]);
+        let wn = parseInt(parts[1]);
+        let sat = new Date(yr, 0, 1);
+        let dayOfWeek = sat.getDay();
+        if(dayOfWeek !== 6) sat.setDate(sat.getDate() + (6 - dayOfWeek));
+        sat.setDate(sat.getDate() + (wn - 1) * 7);
+        let fri = new Date(sat); fri.setDate(sat.getDate() + 6);
+        return ' (' + sat.getDate() + '-' + fri.getDate() + '/' + (sat.getMonth()+1) + '/' + sat.getFullYear() + ')';
+    } catch(e) { return ''; }
 }
 
 window.renderWorkerPaymentsFromProjects = function(workerId) {
@@ -1051,21 +1397,6 @@ window.renderWorkerPaymentsFromProjects = function(workerId) {
     }
     container.innerHTML = html;
 };
-
-function getWeekDateRangeFromKey(wk) {
-    if(!wk || wk === 'أخرى' || !wk.includes('-W')) return '';
-    try {
-        let parts = wk.split('-W');
-        let yr = parseInt(parts[0]);
-        let wn = parseInt(parts[1]);
-        let sat = new Date(yr, 0, 1);
-        let dayOfWeek = sat.getDay();
-        if(dayOfWeek !== 6) sat.setDate(sat.getDate() + (6 - dayOfWeek));
-        sat.setDate(sat.getDate() + (wn - 1) * 7);
-        let fri = new Date(sat); fri.setDate(sat.getDate() + 6);
-        return ' (' + sat.getDate() + '-' + fri.getDate() + '/' + (sat.getMonth()+1) + '/' + sat.getFullYear() + ')';
-    } catch(e) { return ''; }
-}
 
 window.addPaymentFromWorkerDetail = function() {
     if (weekOffset !== 0) { alert("⚠️ لا يمكن إضافة دفعة من أسبوع سابق. اضغط 📅 الحالي أولاً"); return; }
@@ -1111,6 +1442,12 @@ window.saveWorkerDetail = function() {
         let rawExpense = document.getElementById('workerDetailExpenseInput').value;
         w.expense = parseExpenseString(rawExpense);
         w.expenseRaw = rawExpense;
+
+        let prevBalanceInput = document.getElementById('workerDetailPreviousBalance');
+        let prevNoteInput = document.getElementById('workerDetailPreviousNote');
+        if (prevBalanceInput) w.previousBalance = parseFloat(prevBalanceInput.value) || 0;
+        if (prevNoteInput) w.previousBalanceNote = prevNoteInput.value.trim();
+
         window.renderWorkersTable();
         window.closeWorkerDetail();
         autoSave();
@@ -1121,6 +1458,12 @@ window.saveWorkerDetail = function() {
         let rawExpense = document.getElementById('workerDetailExpenseInput').value;
         w.expense = parseExpenseString(rawExpense);
         w.expenseRaw = rawExpense;
+
+        let prevBalanceInput = document.getElementById('workerDetailPreviousBalance');
+        let prevNoteInput = document.getElementById('workerDetailPreviousNote');
+        if (prevBalanceInput) w.previousBalance = parseFloat(prevBalanceInput.value) || 0;
+        if (prevNoteInput) w.previousBalanceNote = prevNoteInput.value.trim();
+
         saveDisplayedWorkersToArchive();
         window.renderWorkersTable();
         window.closeWorkerDetail();
@@ -1134,14 +1477,15 @@ window.showWorkerInvoice = function() {
     if(!w) { alert('⚠️ لم يتم تحديد العامل'); return; }
     document.getElementById('invoiceWorkerName').textContent = w.name + ' | الأجر: ' + (w.price||0) + ' دينار/يوم';
     let body = document.getElementById('invoiceBody');
-    let archives = userData.workersArchives || [];
     let weeksHtml = '';
     let grandTotal = 0;
+    let currentWeekKey = getCurrentWeekKey();
 
     if(w.days && weekOffset === 0) {
         let currentDays = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
-        if(currentDays > 0 || (w.expense||0) > 0) {
-            let weekTotal = (currentDays * (w.price||0)) - (w.expense||0);
+        let prevBalance = w.previousBalance || 0;
+        if(currentDays > 0 || (w.expense||0) > 0 || prevBalance > 0) {
+            let weekTotal = (currentDays * (w.price||0)) + prevBalance - (w.expense||0);
             grandTotal += weekTotal;
             let daysList = dayNames.filter((_,i)=>w.days[dayKeys[i]]===1).join('، ') || 'بدون حضور';
             weeksHtml += `<div class="invoice-week" style="border-color:#10b981;">
@@ -1149,6 +1493,7 @@ window.showWorkerInvoice = function() {
                 <div class="invoice-week-details">
                     <div class="invoice-week-row"><span class="label">أيام الحضور:</span><span class="value">${daysList} (${currentDays} يوم)</span></div>
                     <div class="invoice-week-row"><span class="label">المصروفات:</span><span class="value" style="color:#ef4444;">${(w.expense||0)} دينار</span></div>
+                    ${prevBalance > 0 ? `<div class="invoice-week-row"><span class="label">دين سابق:</span><span class="value" style="color:#92400e;">${prevBalance} دينار</span></div>` : ''}
                     <div class="invoice-week-row"><span class="label">الأجر (${currentDays}×${w.price||0}):</span><span class="value">${(currentDays*(w.price||0)).toFixed(2)} دينار</span></div>
                 </div>
                 <div class="invoice-week-total">صافي: ${weekTotal.toFixed(2)} دينار</div>
@@ -1156,24 +1501,32 @@ window.showWorkerInvoice = function() {
         }
     }
 
-    archives.forEach(a => {
-        let wk = a.workers?.find(x=>x.id===workerId);
-        if(!wk) return;
-        let daysCount = dayKeys.reduce((s,k)=>s+(wk.days?.[k]||0),0);
-        let weekTotal = (daysCount * (wk.price||0)) - (wk.expense||0);
-        grandTotal += weekTotal;
-        let daysList = dayNames.filter((_,i)=>wk.days[dayKeys[i]]===1).join('، ') || 'بدون حضور';
-        let savedDate = a.savedAt ? getEnglishDate(new Date(a.savedAt)) : '';
-        weeksHtml += `<div class="invoice-week">
-            <div class="invoice-week-header"><span class="invoice-week-title">📅 ${a.weekKey}</span><span class="invoice-week-date">${savedDate}</span></div>
-            <div class="invoice-week-details">
-                <div class="invoice-week-row"><span class="label">أيام الحضور:</span><span class="value">${daysList} (${daysCount} يوم)</span></div>
-                <div class="invoice-week-row"><span class="label">المصروفات:</span><span class="value" style="color:#ef4444;">${(wk.expense||0)} دينار</span></div>
-                <div class="invoice-week-row"><span class="label">الأجر (${daysCount}×${wk.price||0}):</span><span class="value">${(daysCount*(wk.price||0)).toFixed(2)} دينار</span></div>
-            </div>
-            <div class="invoice-week-total">صافي: ${weekTotal.toFixed(2)} دينار</div>
-        </div>`;
-    });
+    if (userData.workersByWeek) {
+        Object.keys(userData.workersByWeek).sort().reverse().forEach(wkKey => {
+            if (wkKey === currentWeekKey && weekOffset === 0) return;
+            let wk = (userData.workersByWeek[wkKey] || []).find(x => x.id === workerId);
+            if(!wk) return;
+
+            let daysCount = dayKeys.reduce((s,k)=>s+(wk.days?.[k]||0),0);
+            let prevBal = wk.previousBalance || 0;
+            let weekTotal = (daysCount * (wk.price||0)) + prevBal - (wk.expense||0);
+            grandTotal += weekTotal;
+            let daysList = dayNames.filter((_,i)=>wk.days[dayKeys[i]]===1).join('، ') || 'بدون حضور';
+            let dateRange = getWeekDateRangeFromKey(wkKey);
+
+            weeksHtml += `<div class="invoice-week">
+                <div class="invoice-week-header"><span class="invoice-week-title">📅 ${wkKey}</span><span class="invoice-week-date">${dateRange}</span></div>
+                <div class="invoice-week-details">
+                    <div class="invoice-week-row"><span class="label">أيام الحضور:</span><span class="value">${daysList} (${daysCount} يوم)</span></div>
+                    <div class="invoice-week-row"><span class="label">المصروفات:</span><span class="value" style="color:#ef4444;">${(wk.expense||0)} دينار</span></div>
+                    ${prevBal > 0 ? `<div class="invoice-week-row"><span class="label">دين سابق:</span><span class="value" style="color:#92400e;">${prevBal} دينار</span></div>` : ''}
+                    <div class="invoice-week-row"><span class="label">الأجر (${daysCount}×${wk.price||0}):</span><span class="value">${(daysCount*(wk.price||0)).toFixed(2)} دينار</span></div>
+                </div>
+                <div class="invoice-week-total">صافي: ${weekTotal.toFixed(2)} دينار</div>
+            </div>`;
+        });
+    }
+
     body.innerHTML = weeksHtml || '<div class="invoice-no-data">📭 لا توجد بيانات</div>';
     document.getElementById('invoiceGrandTotal').textContent = grandTotal.toFixed(2) + ' دينار';
     document.getElementById('workerInvoiceModal').style.display = 'flex';
@@ -1222,19 +1575,25 @@ function loadWeekData() {
     }
 
     let weekKey = getWeekKey(weekOffset);
-    let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
 
-    if (archive && archive.workers) {
-        displayedWorkers = JSON.parse(JSON.stringify(archive.workers));
+    if (userData.workersByWeek && userData.workersByWeek[weekKey]) {
+        displayedWorkers = JSON.parse(JSON.stringify(userData.workersByWeek[weekKey]));
     } else {
-        displayedWorkers = userData.workers.map(w => ({
-            id: w.id,
-            name: w.name,
-            price: w.price || 0,
-            expense: 0,
-            expenseRaw: '',
-            days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0}
-        }));
+        let archive = userData.workersArchives.find(a => a.weekKey === weekKey);
+        if (archive && archive.workers) {
+            displayedWorkers = JSON.parse(JSON.stringify(archive.workers));
+        } else {
+            displayedWorkers = userData.workers.map(w => ({
+                id: w.id,
+                name: w.name,
+                price: w.price || 0,
+                expense: 0,
+                expenseRaw: '',
+                days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0},
+                previousBalance: w.previousBalance || 0,
+                previousBalanceNote: w.previousBalanceNote || ''
+            }));
+        }
     }
 
     updateWeekLabel();
@@ -1249,6 +1608,9 @@ function saveWeekToArchive(weekKey) {
     });
     if(!hasData) return;
 
+    if (!userData.workersByWeek) userData.workersByWeek = {};
+    userData.workersByWeek[weekKey] = JSON.parse(JSON.stringify(userData.workers));
+
     let record = {
         weekKey,
         savedAt: new Date().toISOString(),
@@ -1261,11 +1623,9 @@ function saveWeekToArchive(weekKey) {
 }
 
 // ==================== Accounting ====================
-// ⭐ دالة معدّلة: تتجنب تكرار الاسم في الملاحظة
 function logToAccounting(type, name, amount, note) {
     if(!userData.accountingRows) userData.accountingRows=[];
     let today = getEnglishDate();
-    // إذا كانت الملاحظة تحتوي على الاسم بالفعل، لا تكرره
     let fullNote;
     if (note && note.includes(name)) {
         fullNote = `${note} - ${today}`;
@@ -1277,7 +1637,6 @@ function logToAccounting(type, name, amount, note) {
     window.renderAccountingTable();
 }
 
-// ⭐ دالة جديدة: تسجيل البضاعة في المحاسبة
 function logGoodsToAccounting(projectName, customerName, goodsName, quantity, price, total) {
     if (!userData.accountingRows) userData.accountingRows = [];
     let today = getEnglishDate();
@@ -2083,11 +2442,13 @@ window.importOldData = function() {
                 userData.customers = data.customers || [];
                 userData.workers = data.workers || [];
                 userData.workersArchives = data.workersArchives || [];
+                userData.workersByWeek = data.workersByWeek || {};
                 userData.accountingRows = data.accountingRows || [];
                 userData.accountingHistory = data.accountingHistory || [];
                 userData.nextCustId = data.nextCustId || 1;
                 userData.nextProjId = data.nextProjId || 100;
                 userData.nextRoomId = data.nextRoomId || 1000;
+                userData._lastRolledWeek = data._lastRolledWeek || null;
 
                 weekOffset = 0;
                 displayedWorkers = [];
@@ -2230,7 +2591,7 @@ window.addEventListener('offline',()=>{ isOnline=false; updateHeaderSync('offlin
     });
 })();
 
-console.log("✅ النظام جاهز - تواريخ إنجليزية + صيغة دفعة لي");
+console.log("✅ النظام جاهز - جدول الأسابيع الموحّد + إضافة عامل مبسّطة");
 </script>
 </body>
 </html>
