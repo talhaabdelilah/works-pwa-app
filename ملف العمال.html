@@ -598,15 +598,12 @@
                 <div class="stat-card"><div class="value" id="totalWagesCount">0</div><div class="label">مجموع الأجور</div></div>
             </div>
             <div class="wk-toolbar">
-                <button class="wk-nav-btn" onclick="window.prevWeek()">◀</button>
+                <button class="wk-nav-btn" onclick="window.prevWeek()" title="الأسابيع السابقة — قابلة للتعديل بحرية">◀ السابق</button>
                 <span class="wk-label" id="currentWeekLabel"></span>
-                <button class="wk-nav-btn" onclick="window.nextWeek()">▶</button>
+                <button class="wk-nav-btn" onclick="window.nextWeek()" title="الأسبوع التالي (الأقرب للأسبوع الحالي)">التالي ▶</button>
                 <button class="wk-nav-btn green" onclick="window.goCurrentWeek()">📅 الحالي</button>
                 <button class="wk-nav-btn" onclick="window.addNewWorker()">➕ عامل</button>
                 <button class="wk-nav-btn" id="showHiddenWorkersBtn" style="display:none;" onclick="window.showAllHiddenWorkers()">👁 إظهار المخفي (<span id="hiddenWorkersCount">0</span>)</button>
-            </div>
-            <div id="weekModeNotice" style="text-align:center; margin-bottom:8px; display:none;">
-                <span style="background:#dbeafe; color:#1e40af; padding:4px 12px; border-radius:20px; font-size:0.7rem;">📦 وضع الأرشيف — التعديلات تُحفظ في الأرشيف</span>
             </div>
             <div style="margin-bottom:8px;">
                 <input type="text" id="searchInput" class="wk-search" placeholder="🔍 بحث باسم العامل..." oninput="window.filterWorkers()">
@@ -1293,9 +1290,7 @@ function updateWeekLabel() {
     if(!label) return;
     let dateRange = getWeekDateRange(weekOffset);
     if(weekOffset === 0) { label.textContent = dateRange + ' (الحالي)'; label.style.color = '#10b981'; }
-    else { label.textContent = dateRange; label.style.color = weekOffset < 0 ? '#f59e0b' : '#3b82f6'; }
-    let notice = document.getElementById('weekModeNotice');
-    if(notice) notice.style.display = weekOffset === 0 ? 'none' : 'block';
+    else { label.textContent = dateRange + ' — سابق'; label.style.color = weekOffset < 0 ? '#f59e0b' : '#3b82f6'; }
 }
 
 function autoRollWeek() {
@@ -1350,7 +1345,7 @@ function autoRollWeek() {
         userData._lastRolledWeek = currentWeekKey;
         userData._daysWeekKey = currentWeekKey;
         saveToLocal();
-        setTimeout(() => showToast(`✅ بيانات الأسبوع السابق محفوظة في الأرشيف — تم بدء أسبوع جديد`), 600);
+        setTimeout(() => showToast(`✅ تم حفظ بيانات الأسبوع السابق — تم بدء أسبوع جديد`), 600);
     };
 
     if (hasLiveDays && !userData._daysWeekKey && !userData._lastRolledWeek && lastOlder &&
@@ -1415,7 +1410,7 @@ function autoRollWeek() {
             userData.workersByWeek[outgoingKey] = JSON.parse(JSON.stringify(userData.workers));
         }
         zeroLive();
-        setTimeout(() => showToast(`🔄 بدء أسبوع جديد — نُقلت بيانات الأسبوع السابق إلى أرشيفه`), 600);
+        setTimeout(() => showToast(`🔄 بدء أسبوع جديد — نُقلت بيانات الأسبوع السابق`), 600);
     }
 
     userData.workersByWeek[currentWeekKey] = JSON.parse(JSON.stringify(userData.workers));
@@ -1709,7 +1704,7 @@ window.renderWorkersTable = function() {
         if (q) {
             tbody.innerHTML='<tr><td colspan="10" class="empty-message">🔍 لا توجد نتائج مطابقة للبحث</td></tr>';
         } else if (weekOffset !== 0) {
-            tbody.innerHTML='<tr><td colspan="10" class="empty-message">📭 لا توجد بيانات محفوظة لهذا الأسبوع<br><button class="btn-primary" style="margin-top:8px;" onclick="window.initEmptyWeek()">➕ إنشاء جدول لهذا الأسبوع</button></td></tr>';
+            tbody.innerHTML='<tr><td colspan="10" class="empty-message">📭 لا توجد بيانات لهذا الأسبوع<br><button class="btn-primary" style="margin-top:8px;" onclick="window.initEmptyWeek()">➕ إنشاء جدول لهذا الأسبوع</button></td></tr>';
         } else {
             tbody.innerHTML='<tr><td colspan="10" class="empty-message">لا يوجد عمال</td></tr>';
         }
@@ -1782,7 +1777,7 @@ window.addNewWorker = function() {
     modal.style.zIndex = '4000';
     modal.innerHTML = `
         <div class="modal-content" style="max-width:380px; padding:20px;">
-            <h3 style="text-align:center; margin-bottom:16px;">👷 إضافة عامل${isArchiveWeek ? ' — لأرشيف ' + getWeekDateRange(weekOffset) : ''}</h3>
+            <h3 style="text-align:center; margin-bottom:16px;">👷 إضافة عامل${isArchiveWeek ? ' — لأسبوع ' + getWeekDateRange(weekOffset) : ''}</h3>
 
             <div style="position:relative;">
                 <input type="text" id="newWorkerNameInput" placeholder="اسم العامل"
@@ -1901,7 +1896,7 @@ window.addNewWorker = function() {
         } else {
             autoSave();
         }
-        showToast(isArchiveWeek ? `✅ تم إضافة "${name}" لأرشيف هذا الأسبوع` : `✅ تم إضافة "${name}"`);
+        showToast(isArchiveWeek ? `✅ تم إضافة "${name}" لهذا الأسبوع` : `✅ تم إضافة "${name}"`);
         modal.remove();
     };
 
@@ -1949,7 +1944,7 @@ window.showWorkerDetail = function(workerId) {
 
     document.getElementById('workerDetailDeleteBtn').onclick = function() {
         if (weekOffset !== 0) {
-            if(confirm("⚠️ إزالة العامل '" + w.name + "' من أرشيف هذا الأسبوع فقط؟\n\n✅ لن يُحذف من الأسابيع الأخرى")) {
+            if(confirm("⚠️ إزالة العامل '" + w.name + "' من هذا الأسبوع فقط؟\n\n✅ لن يُحذف من الأسابيع الأخرى")) {
                 let weekKey = getWeekKey(weekOffset);
                 if (userData.workersByWeek && userData.workersByWeek[weekKey]) {
                     userData.workersByWeek[weekKey] = userData.workersByWeek[weekKey].filter(x => x.id !== workerId);
@@ -2318,7 +2313,7 @@ window.openWeekEditor = function(workerId, weekKey) {
     document.getElementById('weTitle').textContent = '✏️ تعديل: ' + (rec.name || '');
     let range = (getWeekDateRangeFromKey(weekKey) || '').replace(/[()]/g, '').trim();
     document.getElementById('weWeekInfo').textContent = '📅 ' + (range || weekKey) +
-        (weekKey === getCurrentWeekKey() ? ' — الأسبوع الحالي ⭐' : ' — أرشيف');
+        (weekKey === getCurrentWeekKey() ? ' — الأسبوع الحالي ⭐' : ' — أسبوع سابق ✏️');
     document.getElementById('wePrice').value = rec.price || 0;
     document.getElementById('weExpense').value = rec.expense || 0;
 
