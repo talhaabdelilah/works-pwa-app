@@ -221,8 +221,13 @@
 
         /* ===== شاشة العمال: الجدول ===== */
         .workers-table-wrapper { margin: 8px 0; max-height: 62vh; overflow: auto; border-radius: 18px; background: white; box-shadow: 0 6px 20px rgba(15,23,42,0.08); border: 1px solid #eef2f7; }
-        .workers-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.75rem; background: white; }
-        .workers-table th { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%); color: #e2e8f0; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.3px; white-space: nowrap; position: sticky; top: 0; z-index: 10; padding: 10px 4px; }
+        /* تخطيط ثابت: عرض محسوب (620px) متوسّط على الشاشات الكبيرة — بلا تمدد أفقي مبالغ */
+        .workers-table { table-layout: fixed; width: 620px; max-width: 100%; margin: 0 auto; border-collapse: separate; border-spacing: 0; font-size: 0.75rem; background: white; }
+        .workers-table th { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%); color: #e2e8f0; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; position: sticky; top: 0; z-index: 10; padding: 10px 3px; }
+        .workers-table th:nth-child(1) { width: 24px; }
+        .workers-table th:nth-child(2) { width: 150px; text-align: left; padding-left: 6px; }
+        .workers-table th:nth-child(n+3):nth-child(-n+9) { width: 52px; text-align: center; }
+        .workers-table th:nth-child(10) { width: 82px; text-align: center; }
         .workers-table th:first-child { border-top-left-radius: 18px; }
         .workers-table th:last-child { border-top-right-radius: 18px; }
         .workers-table td { padding: 7px 4px; text-align: center; border-bottom: 1px solid #f1f5f9; }
@@ -232,11 +237,8 @@
         .workers-table tbody tr:last-child td { border-bottom: none; }
         .wk-idx { color: #cbd5e1; font-weight: 700; font-size: 0.68rem; }
         .attendance-check { width: 17px; height: 17px; cursor: pointer; accent-color: #10b981; }
-        .name-cell { font-weight: 700; font-size: 0.75rem; text-align: right !important; max-width: 115px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; }
+        .name-cell { font-weight: 700; font-size: 0.75rem; text-align: left !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; padding-left: 6px !important; }
         .wk-avatar { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 5px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; font-size: 0.6rem; font-weight: 800; vertical-align: middle; }
-        .days-chip { display: inline-block; min-width: 34px; padding: 3px 6px; border-radius: 999px; font-size: 0.64rem; font-weight: 800; background: #f1f5f9; color: #64748b; }
-        .days-chip.mid { background: #dbeafe; color: #1e40af; }
-        .days-chip.full { background: #d1fae5; color: #065f46; }
         .week-total-cell { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); font-weight: 800; color: #065f46; border-radius: 12px; font-size: 0.7rem; box-shadow: inset 0 0 0 1px rgba(16,185,129,0.25); }
         .empty-message { text-align: center; padding: 26px 20px; color: #94a3b8; font-size: 0.85rem; }
 
@@ -393,8 +395,18 @@
 
         @media (max-width: 700px) {
             .search-box input { width: 100%; }
-            .workers-table { font-size: 0.7rem; }
-            .workers-table th, .workers-table td { padding: 5px 3px; }
+            /* جدول العمال على الهاتف: عرض 100% + أعمدة مضغوطة → بلا تمرير أفقي */
+            .workers-table { width: 100%; font-size: 0.7rem; }
+            .workers-table th, .workers-table td { padding: 5px 2px; }
+            .workers-table th { font-size: 0.55rem; padding: 8px 2px; letter-spacing: 0; }
+            .workers-table th:nth-child(1) { width: 16px; }
+            .workers-table th:nth-child(2) { width: auto; text-align: left; padding-left: 4px; }
+            .workers-table th:nth-child(n+3):nth-child(-n+9) { width: 25px; }
+            .workers-table th:nth-child(10) { width: 56px; }
+            .wk-avatar { display: none; }
+            .name-cell { font-size: 0.7rem; padding-left: 4px !important; }
+            .attendance-check { width: 16px; height: 16px; }
+            .week-total-cell { font-size: 0.64rem; border-radius: 8px; }
         }
     </style>
 </head>
@@ -588,7 +600,7 @@
             </div>
             <div class="workers-table-wrapper">
                 <table class="workers-table">
-                    <thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>أيام</th><th>المجموع</th></tr></thead>
+                    <thead><tr><th>#</th><th>الاسم</th><th>سبت</th><th>أحد</th><th>إثن</th><th>ثلاث</th><th>أربع</th><th>خميس</th><th>جمعة</th><th>المجموع</th></tr></thead>
                     <tbody id="workersTableBody"></tbody>
                 </table>
             </div>
@@ -1600,26 +1612,23 @@ window.renderWorkersTable = function() {
     if(filtered.length === 0){
         let q = (document.getElementById("searchInput")?.value || '').trim();
         if (q) {
-            tbody.innerHTML='<tr><td colspan="11" class="empty-message">🔍 لا توجد نتائج مطابقة للبحث</td></tr>';
+            tbody.innerHTML='<tr><td colspan="10" class="empty-message">🔍 لا توجد نتائج مطابقة للبحث</td></tr>';
         } else if (weekOffset !== 0) {
-            tbody.innerHTML='<tr><td colspan="11" class="empty-message">📭 لا توجد بيانات محفوظة لهذا الأسبوع<br><button class="btn-primary" style="margin-top:8px;" onclick="window.initEmptyWeek()">➕ إنشاء جدول لهذا الأسبوع</button></td></tr>';
+            tbody.innerHTML='<tr><td colspan="10" class="empty-message">📭 لا توجد بيانات محفوظة لهذا الأسبوع<br><button class="btn-primary" style="margin-top:8px;" onclick="window.initEmptyWeek()">➕ إنشاء جدول لهذا الأسبوع</button></td></tr>';
         } else {
-            tbody.innerHTML='<tr><td colspan="11" class="empty-message">لا يوجد عمال</td></tr>';
+            tbody.innerHTML='<tr><td colspan="10" class="empty-message">لا يوجد عمال</td></tr>';
         }
         updateWorkersStats();
         return;
     }
 
     tbody.innerHTML = filtered.map((w,idx)=>{
-        let daysCount = dayKeys.reduce((s,k)=>s+(w.days?.[k]||0),0);
-        let chipCls = daysCount >= 7 ? 'full' : (daysCount >= 4 ? 'mid' : '');
         let initial = escapeHtml((w.name || '؟').trim().charAt(0));
 
         return `<tr class="worker-row" data-id="${w.id}" style="cursor:pointer;">
             <td class="wk-idx">${idx+1}</td>
             <td class="name-cell"><span class="wk-avatar">${initial}</span>${escapeHtml(w.name)}</td>
             ${dayKeys.map(d=>`<td><input type="checkbox" class="attendance-check" data-day="${d}" data-id="${w.id}" ${w.days?.[d]?'checked':''} onclick="event.stopPropagation();"></td>`).join('')}
-            <td><span class="days-chip ${chipCls}">${daysCount}/7</span></td>
             <td class="week-total-cell">${calculateWorkerTotal(w).toFixed(2)}</td>
         </tr>`;
     }).join('');
@@ -1664,7 +1673,7 @@ window.renderWorkersTable = function() {
     } catch (e) {
         // أي خطأ في الرسم لا يترك الجدول عالقاً على الأسبوع السابق
         console.error('renderWorkersTable:', e);
-        tbody.innerHTML = '<tr><td colspan="11" class="empty-message">⚠️ تعذّر عرض الجدول — أعد فتح التبويب</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-message">⚠️ تعذّر عرض الجدول — أعد فتح التبويب</td></tr>';
     }
 };
 
