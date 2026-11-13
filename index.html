@@ -231,6 +231,9 @@
         .workers-table th:nth-child(2) { text-align: center; }
         .workers-table th:nth-child(n+3):nth-child(-n+9) { width: 52px; text-align: center; }
         .workers-table th:nth-child(10) { width: 82px; text-align: center; }
+        /* اسم أطول من العمود (حالة نادرة): محاذاة يمنى ليظهر … بدل قصّ الطرفين */
+        .workers-table.name-clip th:nth-child(2) { text-align: right; }
+        .workers-table.name-clip .name-cell { text-align: right !important; }
         /* اتجاه RTL: أول عمود (#) يمين visually، وآخر عمود (المجموع) يسار */
         .workers-table th:first-child { border-top-right-radius: 18px; }
         .workers-table th:last-child { border-top-left-radius: 18px; }
@@ -399,8 +402,8 @@
 
         @media (max-width: 700px) {
             .search-box input { width: 100%; }
-            /* جدول العمال: حاوية مضغوطة (≤360px) متوسّطة + أعمدة صغيرة → بلا تمرير أفقي */
-            .workers-table-wrapper { max-width: 360px; margin: 8px auto; }
+            /* جدول العمال: يملأ عرض الشاشة كاملًا على الهاتف + أعمدة مضغوطة → بلا تمرير أفقي */
+            .workers-table-wrapper { max-width: 100%; margin: 8px auto; }
             .workers-table { width: 100%; font-size: 0.7rem; }
             .workers-table th, .workers-table td { padding: 5px 2px; }
             .workers-table th { font-size: 0.55rem; padding: 8px 2px; letter-spacing: 0; }
@@ -1605,16 +1608,24 @@ window.initEmptyWeek = function() {
     showToast('➕ تم إنشاء جدول لهذا الأسبوع — ابدأ بتسجيل الحضور');
 };
 
-/* ملاءمة عرض الجدول مع أطول اسم: عمود الاسم = أطول اسم + هامش، والباقي أعمدة ثابتة
-   → لا قصّ للأسماء، وفراغات متساوية صغيرة من الجانبين، وبلا تمرير أفقي */
+/* ملاءمة الجدول:
+   - الهاتف (≤700px): بطاقة بعرض الشاشة كاملًا، والاسم = أطول اسم + هامش (auto يأخذ الباقي)،
+     وفائض العرض يُوزَّع على أعمدة الأيام السبعة (لا على الاسم) → لا فراغات جانبية ولا قصّ.
+   - سطح المكتب: بطاقة متوسّطة بعرض محسوب = مجموع الأعمدة + أطول اسم → بلا تمدد مبالغ. */
 function fitWorkersTableToNames() {
     try {
         const tbody = document.getElementById("workersTableBody");
         const tblEl = tbody && tbody.closest('table');
         const wrapEl = tblEl && tblEl.closest('.workers-table-wrapper');
-        if (!wrapEl) return;
+        if (!wrapEl || !tblEl) return;
+        const ths = tblEl.querySelectorAll('thead th');
         const cells = tbody.querySelectorAll('.name-cell');
-        if (!cells.length) { wrapEl.style.maxWidth = ''; return; }
+        if (!cells.length) {
+            ths.forEach(t => { t.style.width = ''; });
+            wrapEl.style.maxWidth = '';
+            tblEl.classList.remove('name-clip');
+            return;
+        }
         let longest = 0;
         const rg = document.createRange();
         cells.forEach(c => {
@@ -1622,15 +1633,38 @@ function fitWorkersTableToNames() {
             const w = Math.ceil(rg.getBoundingClientRect().width);
             if (w > longest) longest = w;
         });
-        const nameTh = tblEl.querySelector('thead th:nth-child(2)');
-        const nameW = nameTh ? nameTh.getBoundingClientRect().width : 0;
-        const fixedSum = Math.round(tblEl.getBoundingClientRect().width - nameW);
-        const parent = wrapEl.parentElement;
-        const avail = parent ? parent.clientWidth : 1000;
-        const wanted = Math.min(Math.max(fixedSum + longest + 20, 240), avail);
-        wrapEl.style.maxWidth = Math.round(wanted) + 'px';
+        const isMobile = window.matchMedia('(max-width: 700px)').matches;
+        if (isMobile) {
+            ths.forEach(t => { t.style.width = ''; });   // نظّف أي عروض سابقة
+            wrapEl.style.maxWidth = '';                  // عرض كامل = 100%
+            const availInner = wrapEl.clientWidth;        // عرض المحتوى داخل الحاوية
+            const totalW = 52;                            // عمود المجموع على الهاتف
+            const nameNeed = longest + 20;                // الاسم يحتاج أطول اسم + هامش
+            let dayW = Math.floor((availInner - totalW - nameNeed) / 7);
+            if (dayW < 22) dayW = 22;                     // حد أدنى لخانة الإشارة
+            for (let i = 2; i <= 8; i++) { if (ths[i]) ths[i].style.width = dayW + 'px'; }
+            if (ths[9]) ths[9].style.width = totalW + 'px';
+            // عمود الاسم (ths[1]) يبقى auto فيلتقط الباقي بالضبط → بلا فراغ زائد
+        } else {
+            ths.forEach(t => { t.style.width = ''; });
+            const nameTh = ths[1];
+            const nameW = nameTh ? nameTh.getBoundingClientRect().width : 0;
+            const fixedSum = Math.round(tblEl.getBoundingClientRect().width - nameW);
+            const parent = wrapEl.parentElement;
+            const avail = parent ? parent.clientWidth : 1000;
+            wrapEl.style.maxWidth = Math.round(Math.min(Math.max(fixedSum + longest + 20, 240), avail)) + 'px';
+        }
+        /* قياس نهائي: إن كان أطول اسم أكبر من عمود الاسم → محاذاة يمنى ليظهر … بدل قصّ الطرفين */
+        const finalNameW = ths[1] ? ths[1].getBoundingClientRect().width : 0;
+        tblEl.classList.toggle('name-clip', longest > finalNameW);
     } catch (e) {}
 }
+/* إعادة الملاءمة عند تغيير حجم النافذة (هاتف ↔ سطح مكتب) */
+let _fitWorkersTimer = null;
+window.addEventListener('resize', function() {
+    clearTimeout(_fitWorkersTimer);
+    _fitWorkersTimer = setTimeout(fitWorkersTableToNames, 150);
+});
 
 window.renderWorkersTable = function() {
     let tbody = document.getElementById("workersTableBody");
