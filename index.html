@@ -123,6 +123,9 @@
         .btn-loc:active { transform: scale(0.95); }
         .btn-loc.saved { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 2px 6px rgba(16,185,129,0.3); }
         .btn-discount { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; padding: 6px 14px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; }
+        .btn-extra-exp { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border: none; padding: 6px 14px; border-radius: 30px; color: white; font-size: 0.7rem; cursor: pointer; font-weight: bold; transition: transform 0.2s; box-shadow: 0 2px 6px rgba(185,28,28,0.3); }
+        .btn-extra-exp:hover { transform: translateY(-1px); }
+        .extra-exp-table th { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); color: #991b1b; padding: 6px 4px; font-size: 0.65rem; border-bottom: 1px solid #fecaca; }
         .project-completed { opacity: 0.7; position: relative; }
         .project-completed::after { content: '✅ مكتمل'; position: absolute; top: 8px; left: 8px; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; }
         .payment-progress { background: #e2e8f0; border-radius: 20px; height: 8px; margin: 8px 0; overflow: hidden; }
@@ -522,6 +525,7 @@
                         <div class="summary-row"><span>💰 مجموع الدفعات:</span><span id="totalPayments">0.00</span> د.ع</div>
                         <div class="summary-row"><span>🏷️ الخصومات:</span><span id="totalDiscounts">0.00</span> د.ع</div>
                         <div class="summary-row"><span>📦 تكلفة البضاعة:</span><span id="totalGoodsCostSum">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>🧾 مصاريف إضافية:</span><span id="projectExtraExpensesSum" style="color:#dc2626;">0.00</span> د.ع</div>
                         <div class="summary-row"><span>📐 مساحة المشروع:</span><span id="projectTotalArea">0.00</span> م²</div>
                         <div class="summary-row total"><span>📊 أرباح المشروع:</span><span id="projectProfitSum">0.00</span> د.ع</div>
                         <div class="summary-row"><span>⏳ المتبقي:</span><span id="remainingAmount">0.00</span> د.ع</div>
@@ -574,6 +578,7 @@
                     </div>
 
                     <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                        <button id="extraExpensesBtn" class="btn-extra-exp" onclick="window.openExtraExpenses()" title="مصاريف إضافية: تُضاف على إجمالي المشروع وتُسجَّل في المحاسبة">🧾 مصاريف إضافية</button>
                         <button id="saveProjectData" class="btn-secondary">💾 حفظ</button>
                         <button id="shareProjectBtn" class="btn-share" onclick="window.shareProjectData()" title="مشاركة فاتورة المشروع">📤 مشاركة</button>
                         <button id="saveLocationBtn" class="btn-loc" onclick="window.saveProjectLocation()" title="حفظ موقع المشروع">📍 حفظ الموقع</button>
@@ -671,6 +676,30 @@
             <button class="btn-danger" id="customerDetailDeleteBtn" style="flex:1;">🗑️ حذف</button>
             <button class="btn-outline" onclick="window.closeCustomerDetail()" style="flex:1;">✖ إغلاق</button>
         </div>
+    </div>
+</div>
+
+<!-- نافذة المصاريف الإضافية للمشروع -->
+<div id="extraExpensesModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:440px; margin:auto; padding:18px;">
+        <h3 style="text-align:center; margin-bottom:6px;">🧾 مصاريف إضافية</h3>
+        <div style="text-align:center; font-size:0.66rem; color:#64748b; margin-bottom:10px;">تُضاف على إجمالي المشروع وتُسجَّل في المحاسبة كمصروف (أحمر 💸)</div>
+        <div style="overflow:auto; max-height:42vh; border:1px solid #ffe4e6; border-radius:12px;">
+            <table class="extra-exp-table" style="width:100%; border-collapse:collapse; font-size:0.72rem;">
+                <thead><tr><th style="width:110px;">القيمة</th><th>ملاحظة</th><th style="width:44px;"></th></tr></thead>
+                <tbody id="extraExpensesBody"></tbody>
+            </table>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding:8px 10px; background:#fef2f2; border-radius:12px; font-size:0.78rem; font-weight:800; color:#b91c1c;">
+            <span>🧾 إجمالي المصاريف</span>
+            <span id="extraExpTotal">0.00</span>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+            <input type="number" id="newExpAmount" step="0.01" min="0" placeholder="القيمة" style="flex:0 0 100px; padding:9px 8px; border:1px solid #fecaca; border-radius:12px; font-size:0.75rem; text-align:center;">
+            <input type="text" id="newExpNote" placeholder="📝 ملاحظة" style="flex:1; min-width:0; padding:9px 8px; border:1px solid #fecaca; border-radius:12px; font-size:0.75rem;">
+            <button class="btn-primary" onclick="window.addExtraExpense()" style="padding:9px 14px;" title="إضافة المصروف">➕</button>
+        </div>
+        <button class="btn-outline" onclick="window.closeExtraExpenses()" style="width:100%; margin-top:10px;">✖ إغلاق</button>
     </div>
 </div>
 
@@ -2920,7 +2949,8 @@ function getClassIcon(cls) { const icons = { good: '😊', hard: '😤', bad: '�
 function getCustomerRemaining(cust) {
     let remaining = 0;
     (cust.projects || []).forEach(p => {
-        let totalPrice = (p.rooms || []).reduce((s, r) => s + (r.totalCost || 0), 0);
+        let totalPrice = (p.rooms || []).reduce((s, r) => s + (r.totalCost || 0), 0)
+            + (p.extraExpenses || []).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
         let discount = (p.payments || []).filter(x => x.type === 'discount').reduce((s, x) => s + (x.amount || 0), 0);
         let paid = (p.payments || []).filter(x => x.type !== 'discount').reduce((s, x) => s + (x.amount || 0), 0);
         remaining += totalPrice - discount - paid;
@@ -2994,6 +3024,7 @@ window.showCustomerDetail = function(custId) {
     let totalDeals = 0;
     (cust.projects||[]).forEach(p => {
         totalDeals += (p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0);
+        totalDeals += (p.extraExpenses||[]).reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
         (p.payments||[]).forEach(x => { if(x.type !== 'discount') totalDeals += x.amount||0; });
     });
     document.getElementById('customerDetailTotal').textContent = totalDeals.toFixed(2) + ' دينار';
@@ -3107,6 +3138,126 @@ function renderPaymentsTable(proj){
     });
 }
 
+// ==================== المصاريف الإضافية للمشروع ====================
+// تُضاف على إجمالي المشروع، وتُسجَّل في المحاسبة كمصروف (أحمر 💸) بنفس القيمة والملاحظة
+// ويرتبط كل مصروف بصفّ المحاسبة عبر refId = 'px_<projectId>_<expenseId>' للمزامنة عند التعديل/الحذف
+function getExtraExpenses(proj) {
+    if (!proj) return [];
+    if (!Array.isArray(proj.extraExpenses)) proj.extraExpenses = [];
+    return proj.extraExpenses;
+}
+function sumExtraExpenses(proj) {
+    return getExtraExpenses(proj).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+}
+function projExpRefId(projId, expId) { return 'px_' + projId + '_' + expId; }
+
+function syncExpenseToAccounting(proj, exp) {
+    if (!userData.accountingRows) userData.accountingRows = [];
+    let cust = userData.customers.find(c => (c.projects || []).includes(proj));
+    let refId = projExpRefId(proj.id, exp.id);
+    let today = exp.date || getEnglishDate();
+    let note = `🧾 مصروف إضافي: ${String(exp.note || '').trim() || 'بدون ملاحظة'} — مشروع "${proj.name}"${cust ? ` — عميل "${cust.name}"` : ''} — ${today}`;
+    let amt = parseFloat(exp.amount) || 0;
+    let row = userData.accountingRows.find(r => r && r.source === 'project_expense' && r.refId === refId);
+    if (row) {
+        row.expense = amt; row.revenue = 0; row.type = 'expense'; row.note = note;
+        row.timestamp = exp.timestamp || row.timestamp || Date.now();
+    } else {
+        userData.accountingRows.unshift({ expense: amt, revenue: 0, note: note, type: 'expense', source: 'project_expense', refId: refId, timestamp: exp.timestamp || Date.now() });
+    }
+    exp.accRef = refId;
+    if (document.getElementById('accountingTab')?.classList.contains('active')) window.renderAccountingTable();
+}
+
+function removeExpenseFromAccounting(proj, exp) {
+    if (!Array.isArray(userData.accountingRows)) return;
+    let refId = projExpRefId(proj.id, exp.id);
+    let before = userData.accountingRows.length;
+    userData.accountingRows = userData.accountingRows.filter(r => !(r && r.source === 'project_expense' && r.refId === refId));
+    if (userData.accountingRows.length !== before && document.getElementById('accountingTab')?.classList.contains('active')) window.renderAccountingTable();
+}
+
+function renderExtraExpensesList() {
+    let cust = userData.customers.find(c => c.id === currentCustomerId);
+    let proj = cust?.projects.find(p => p.id === currentProjectId);
+    let tbody = document.getElementById('extraExpensesBody');
+    if (!tbody || !proj) return;
+    let rows = getExtraExpenses(proj);
+
+    tbody.innerHTML = rows.length ? rows.map((e, i) => `
+        <tr data-i="${i}" style="border-bottom:1px solid #ffe4e6;">
+            <td style="padding:4px;"><input type="number" step="0.01" min="0" class="ee-amount" data-i="${i}" value="${parseFloat(e.amount) || 0}" style="width:96px; padding:5px 4px; border:1px solid #fecaca; border-radius:8px; font-size:0.72rem; text-align:center; color:#b91c1c; font-weight:700;"></td>
+            <td style="padding:4px;"><input type="text" class="ee-note" data-i="${i}" value="${escapeHtml(e.note || '')}" placeholder="📝 ملاحظة" style="width:100%; box-sizing:border-box; padding:5px 6px; border:1px solid #fecaca; border-radius:8px; font-size:0.72rem;"></td>
+            <td style="padding:4px; text-align:center;"><button class="ee-del btn-danger" data-i="${i}" style="padding:3px 8px;" title="حذف المصروف">🗑️</button></td>
+        </tr>`).join('') : '<tr><td colspan="3" class="empty-message" style="padding:18px 10px;">لا توجد مصاريف إضافية</td></tr>';
+
+    let totalEl = document.getElementById('extraExpTotal');
+    if (totalEl) totalEl.textContent = sumExtraExpenses(proj).toFixed(2);
+
+    tbody.querySelectorAll('.ee-amount').forEach(inp => {
+        inp.oninput = () => {
+            let i = parseInt(inp.dataset.i); let e = rows[i]; if (!e) return;
+            e.amount = parseFloat(inp.value) || 0;
+            syncExpenseToAccounting(proj, e);
+            if (totalEl) totalEl.textContent = sumExtraExpenses(proj).toFixed(2);
+            updateProjectTotal(proj);
+            autoSave();
+        };
+    });
+    tbody.querySelectorAll('.ee-note').forEach(inp => {
+        inp.onchange = () => {
+            let i = parseInt(inp.dataset.i); let e = rows[i]; if (!e) return;
+            e.note = inp.value.trim();
+            syncExpenseToAccounting(proj, e);   // تحديث ملاحظة صف المحاسبة بنفس القيمة
+            autoSave();
+        };
+    });
+    tbody.querySelectorAll('.ee-del').forEach(btn => {
+        btn.onclick = () => {
+            let i = parseInt(btn.dataset.i); let e = rows[i]; if (!e) return;
+            if (!confirm('🗑️ حذف هذا المصروف؟ سيُحذف صفّه من المحاسبة أيضاً.')) return;
+            removeExpenseFromAccounting(proj, e);
+            rows.splice(i, 1);
+            renderExtraExpensesList();
+            updateProjectTotal(proj);
+            autoSave();
+            showToast('🗑️ تم حذف المصروف');
+        };
+    });
+}
+
+window.openExtraExpenses = function() {
+    renderExtraExpensesList();
+    document.getElementById('extraExpensesModal').style.display = 'flex';
+};
+window.closeExtraExpenses = function() { document.getElementById('extraExpensesModal').style.display = 'none'; };
+
+window.addExtraExpense = function() {
+    let cust = userData.customers.find(c => c.id === currentCustomerId);
+    let proj = cust?.projects.find(p => p.id === currentProjectId);
+    if (!proj) return;
+    let amtEl = document.getElementById('newExpAmount');
+    let noteEl = document.getElementById('newExpNote');
+    let amt = parseFloat(amtEl?.value) || 0;
+    if (amt <= 0) { alert('⚠️ أدخل قيمة صحيحة للمصروف'); amtEl?.focus(); return; }
+    let exp = {
+        id: (Date.now() % 100000000) + Math.floor(Math.random() * 1000),
+        amount: amt,
+        note: (noteEl?.value || '').trim(),
+        date: getEnglishDate(),
+        timestamp: Date.now()
+    };
+    getExtraExpenses(proj).push(exp);
+    syncExpenseToAccounting(proj, exp);
+    if (amtEl) amtEl.value = '';
+    if (noteEl) noteEl.value = '';
+    renderExtraExpensesList();
+    updateProjectTotal(proj);
+    autoSave();
+    showToast('🧾 أُضيف المصروف وسُجَّل في المحاسبة');
+    if (amtEl) amtEl.focus();
+};
+
 // أنواع الغرف: غرفة = مساحة (طول×عرض) — حمام وممر = محيط ((طول+عرض)×2)
 function getRoomCalcMode(r) {
     if (r.type === 'bath' || r.type === 'corridor') return 'perimeter';
@@ -3171,8 +3322,12 @@ function updateProjectTotal(proj){
     proj.rooms.forEach(r=>{
         r.totalCost=getRoomMeters(r)*price;
     });
-    let grand = proj.rooms.reduce((s,r)=>s+r.totalCost,0);
+    let grandRooms = proj.rooms.reduce((s,r)=>s+r.totalCost,0);
+    let extraExp = sumExtraExpenses(proj);              // المصاريف الإضافية تُضاف على السعر الجمالي
+    let grand = grandRooms + extraExp;
     document.getElementById("projectGrandTotal").innerHTML=grand.toFixed(2);
+    let extraEl = document.getElementById("projectExtraExpensesSum");
+    if (extraEl) { extraEl.textContent = extraExp.toFixed(2); extraEl.style.color = extraExp > 0 ? '#dc2626' : '#94a3b8'; }
     let totalPaid = proj.payments?.filter(p=>p.type!=='discount').reduce((s,p)=>s+p.amount,0)||0;
     let totalDiscount = proj.payments?.filter(p=>p.type==='discount').reduce((s,p)=>s+p.amount,0)||0;
     let effectiveTotal = grand - totalDiscount;
@@ -3247,7 +3402,9 @@ function buildProjectInvoiceText() {
     if (!cust || !proj) return '';
 
     let totalArea = (proj.rooms || []).reduce((s, r) => s + getRoomMeters(r), 0);
-    let totalPrice = (proj.rooms || []).reduce((s, r) => s + (r.totalCost || 0), 0);
+    let extraExpenses = (proj.extraExpenses || []);
+    let extraExpSum = extraExpenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    let totalPrice = (proj.rooms || []).reduce((s, r) => s + (r.totalCost || 0), 0) + extraExpSum;
     let payments = (proj.payments || []).filter(p => p.type !== 'discount');
     let discounts = (proj.payments || []).filter(p => p.type === 'discount');
     let totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
@@ -3262,6 +3419,13 @@ function buildProjectInvoiceText() {
     lines.push('');
     lines.push('📐 إجمالي المساحة: ' + totalArea.toFixed(2) + ' م²');
     lines.push('💰 إجمالي السعر: ' + totalPrice.toFixed(2) + ' د.ع');
+    if (extraExpSum > 0) {
+        lines.push('   ├ سعر الغرف: ' + (totalPrice - extraExpSum).toFixed(2) + ' د.ع');
+        lines.push('   └ 🧾 مصاريف إضافية: ' + extraExpSum.toFixed(2) + ' د.ع');
+        extraExpenses.forEach(e => {
+            lines.push('      • ' + (parseFloat(e.amount) || 0).toFixed(2) + (e.note ? ' — ' + e.note : ''));
+        });
+    }
     lines.push('');
     lines.push('💳 الدفعات المفصلة:');
     if ((proj.payments || []).length) {
@@ -3862,6 +4026,10 @@ window.goBack = function() {
     // 5) نافذة معلومات العميل
     else if (document.getElementById('customerDetailModal')?.style.display === 'flex') {
         window.closeCustomerDetail(); wentBack = true;
+    }
+    // 5.5) نافذة المصاريف الإضافية → صفحة المشروع
+    else if (document.getElementById('extraExpensesModal')?.style.display === 'flex') {
+        window.closeExtraExpenses(); wentBack = true;
     }
     // 6) صفحة تفاصيل العامل → قائمة العمال
     else if (document.getElementById('workerDetailPage')?.style.display === 'block') {
@@ -4480,6 +4648,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     });
     document.getElementById("workerInvoiceModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerInvoiceModal') window.closeWorkerInvoice(); });
     document.getElementById("customerDetailModal")?.addEventListener("click",(e)=>{ if(e.target.id==='customerDetailModal') window.closeCustomerDetail(); });
+    document.getElementById("extraExpensesModal")?.addEventListener("click",(e)=>{ if(e.target.id==='extraExpensesModal') window.closeExtraExpenses(); });
+    ['newExpAmount','newExpNote'].forEach(id=>{ document.getElementById(id)?.addEventListener("keydown",(e)=>{ if(e.key==='Enter'){ e.preventDefault(); window.addExtraExpense(); } }); });
     document.getElementById("workerPaymentsModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerPaymentsModal') window.closeWorkerPayments(); });
     document.getElementById("weekEditModal")?.addEventListener("click",(e)=>{ if(e.target.id==='weekEditModal') window.closeWeekEditor(); });
 });
