@@ -500,6 +500,9 @@
         <div id="projectsTab" class="tab-content active">
             <div id="customersScreen">
                 <div style="margin-bottom:10px;"><button id="addCustomerBtn" class="btn-primary" style="width:100%;">➕ عميل جديد</button></div>
+                <div style="margin-bottom:8px;">
+                    <input type="text" id="customerSearchInput" class="wk-search" placeholder="🔍 بحث باسم العميل..." oninput="window.filterCustomers()">
+                </div>
                 <div id="customersGrid" class="customers-grid"></div>
             </div>
             <div id="projectsScreen" style="display:none;">
@@ -2957,6 +2960,7 @@ window.renderCustomersScreen = function() {
     let grid=document.getElementById("customersGrid");
     if(!grid) return;
     if(!userData.customers.length){ grid.innerHTML='<div class="empty-message">📭 لا يوجد عملاء</div>'; return; }
+    let search = (document.getElementById("customerSearchInput")?.value || '').trim().toLowerCase();
     // الترتيب: من تبقى عليه أكثر من 200 يصعد لأعلى القائمة، ثم الأحدث في الأعلى دائماً
     let sorted = userData.customers
         .map((c, idx) => ({ c: c, idx: idx, owed: getCustomerRemaining(c) }))
@@ -2965,6 +2969,17 @@ window.renderCustomersScreen = function() {
             if (aTop !== bTop) return bTop - aTop;      // المديونون أولاً (>200)
             return b.idx - a.idx;                        // الأحدث في الأعلى
         });
+    // ترشيح بالبحث (الاسم + رقم الهاتف) — لا يغيّر الترتيب الأصلي
+    if (search) {
+        sorted = sorted.filter(({c}) =>
+            String(c.name || '').toLowerCase().includes(search) ||
+            String(c.phone || '').toLowerCase().includes(search)
+        );
+        if (!sorted.length) {
+            grid.innerHTML = '<div class="empty-message">🔍 لا توجد نتائج مطابقة للبحث</div>';
+            return;
+        }
+    }
     grid.innerHTML = sorted.map(({c, owed}) => {
         let owedLine = owed > 200
             ? `<div style="font-size:0.68rem; color:#dc2626; font-weight:700;">⏳ متبقي ${owed.toFixed(2)} د.ع</div>`
@@ -2973,6 +2988,8 @@ window.renderCustomersScreen = function() {
     }).join('');
     document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>window.openCustomerProjects(parseInt(el.dataset.id))));
 };
+
+window.filterCustomers = function() { window.renderCustomersScreen(); };
 
 window.openCustomerProjects = function(custId) {
     currentCustomerId=custId;
