@@ -222,6 +222,21 @@
         .wk-search { width: 100%; padding: 10px 16px; border-radius: 999px; border: 1px solid #e2e8f0; font-size: 0.78rem; background: #fff; box-shadow: 0 2px 8px rgba(15,23,42,0.05); }
         .wk-search:focus { outline: none; border-color: #a5b4fc; box-shadow: 0 0 0 4px rgba(102,126,234,0.12); }
 
+        /* حقل رقم الهاتف مع زر صغير لاختيار رقم مخزّن */
+        .pf-wrap { position: relative; margin-top: 4px; }
+        .pf-input { width: 100%; padding: 10px 12px 10px 46px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 0.9rem; box-sizing: border-box; background: #fff; }
+        .pf-input:focus { outline: none; border-color: #a5b4fc; box-shadow: 0 0 0 4px rgba(102,126,234,0.12); }
+        .pf-btn { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); width: 34px; height: 32px; padding: 0; border: none; border-radius: 9px; background: linear-gradient(135deg, #eef2ff, #e0e7ff); color: #4f46e5; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(79,70,229,0.25); }
+        .pf-btn:active { transform: translateY(-50%) scale(0.93); }
+        .pf-drop { position: absolute; top: calc(100% + 5px); right: 0; left: 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 10px 30px rgba(15,23,42,0.20); max-height: 230px; overflow-y: auto; display: none; z-index: 6000; }
+        .pf-item { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .pf-item:last-child { border-bottom: none; }
+        .pf-item:hover { background: #f8fafc; }
+        .pf-item .pf-num { font-weight: 800; color: #4f46e5; direction: ltr; unicode-bidi: embed; white-space: nowrap; }
+        .pf-item .pf-lbl { color: #64748b; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pf-native { background: linear-gradient(135deg, #eef2ff, #e0e7ff); color: #4338ca; font-weight: 800; }
+        .pf-empty { padding: 14px 10px; font-size: 0.75rem; color: #94a3b8; text-align: center; }
+
         /* ===== شاشة العمال: الجدول ===== */
         /* الحاوية بعرض محسوب = عرض الأعمدة (602px) ليتطابق الرأس الداكن مع حواف البطاقة */
         .workers-table-wrapper { margin: 8px auto; max-width: 602px; max-height: 62vh; overflow: auto; border-radius: 18px; background: white; box-shadow: 0 6px 20px rgba(15,23,42,0.08); border: 1px solid #eef2f7; scrollbar-width: none; -ms-overflow-style: none; }
@@ -1795,6 +1810,12 @@ window.addNewWorker = function() {
                     style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:10px; font-size:0.9rem; box-sizing:border-box; margin-top:4px;">
             </div>
 
+            <div style="margin-top:12px;">
+                <label style="font-size:0.75rem; color:#64748b;">📱 رقم الهاتف (اختياري):</label>
+                <input type="tel" id="newWorkerPhone" placeholder="اضغط 📇 لاختيار رقم مخزّن"
+                    style="margin-top:4px;" inputmode="tel" autocomplete="off">
+            </div>
+
             <div style="display:flex; gap:8px; margin-top:16px;">
                 <button id="confirmAddWorkerBtn" class="btn-primary" style="flex:1;">✅ إضافة</button>
                 <button id="cancelAddWorkerBtn" class="btn-outline" style="flex:1;">❌ إلغاء</button>
@@ -1806,6 +1827,8 @@ window.addNewWorker = function() {
     let nameInput = document.getElementById('newWorkerNameInput');
     let suggestionsDiv = document.getElementById('nameSuggestions');
     let selectedWorkerId = null;
+
+    window.attachPhonePicker('newWorkerPhone');   // زر 📇 داخل مربع الهاتف
 
     nameInput.focus();
 
@@ -1856,6 +1879,7 @@ window.addNewWorker = function() {
         }
 
         let price = parseFloat(document.getElementById('newWorkerPrice').value) || 0;
+        let phone = (document.getElementById('newWorkerPhone')?.value || '').trim();
 
         // الأسبوع المعروض: الأرشيف ← يُضاف للجدول المعروض فقط، الحالي ← للعمال الأحياء
         let roster = isArchiveWeek ? displayedWorkers : userData.workers;
@@ -1885,12 +1909,19 @@ window.addNewWorker = function() {
             id: newId,
             name: name,
             price: price,
+            phone: phone,
             expense: 0,
             expenseRaw: '',
             days: {sat:0,sun:0,mon:0,tue:0,wed:0,thu:0,fri:0},
             previousBalance: 0,
             previousBalanceNote: ''
         };
+
+        // اختيار عامل قائم: حدّث رقمه إن أُدخل رقم جديد (حتى يظهر في قائمة الأرقام المخزّنة)
+        if (selectedWorkerId && phone) {
+            let live = userData.workers.find(x => x.id === selectedWorkerId);
+            if (live) live.phone = phone;
+        }
 
         roster.push(newWorker);
         window.renderWorkersTable();
@@ -2991,6 +3022,85 @@ window.renderCustomersScreen = function() {
 
 window.filterCustomers = function() { window.renderCustomersScreen(); };
 
+// ==================== اختيار رقم هاتف مخزّن ====================
+// زر صغير داخل مربع الإدخال: يعرض أرقام العملاء والعمال المخزّنة في التطبيق لاختيار الرقم المناسب.
+// (على الأجهزة الداعمة يُضاف أيضًا زر لجهات الاتصال في الهاتف عبر Contact Picker API)
+function collectStoredPhones() {
+    let seen = new Map();
+    (userData.customers || []).forEach(c => {
+        let p = String(c.phone || '').replace(/\s+/g, '').trim();
+        if (p && !seen.has(p)) seen.set(p, { phone: p, label: c.name || '', kind: '👤' });
+    });
+    (userData.workers || []).forEach(w => {
+        let p = String(w.phone || '').replace(/\s+/g, '').trim();
+        if (p && !seen.has(p)) seen.set(p, { phone: p, label: w.name || '', kind: '👷' });
+    });
+    return Array.from(seen.values());
+}
+
+window.attachPhonePicker = function(inputId) {
+    let input = document.getElementById(inputId);
+    if (!input || input.dataset.pfBound) return;
+    input.dataset.pfBound = '1';
+    input.classList.add('pf-input');   // تنسيق الحقل: حشوة يسار للزر 📇
+
+    let wrap = document.createElement('div');
+    wrap.className = 'pf-wrap';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+
+    let btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pf-btn';
+    btn.title = 'اختيار رقم مخزّن';
+    btn.innerHTML = '📇';
+    wrap.appendChild(btn);
+
+    let drop = document.createElement('div');
+    drop.className = 'pf-drop';
+    wrap.appendChild(drop);
+
+    const close = () => { drop.style.display = 'none'; };
+    const open = () => {
+        let list = collectStoredPhones();
+        let html = '';
+        if (navigator.contacts && navigator.contacts.select) {
+            html += '<div class="pf-item pf-native" data-act="contacts">📱 جهات الاتصال في الهاتف</div>';
+        }
+        html += list.length
+            ? list.map(x => `<div class="pf-item" data-phone="${escapeHtml(x.phone)}"><span class="pf-lbl">${x.kind} ${escapeHtml(x.label)}</span><span class="pf-num">${escapeHtml(x.phone)}</span></div>`).join('')
+            : '<div class="pf-empty">لا توجد أرقام مخزّنة بعد</div>';
+        drop.innerHTML = html;
+        drop.style.display = 'block';
+
+        drop.querySelectorAll('.pf-item[data-phone]').forEach(it => {
+            it.onclick = () => {
+                input.value = it.dataset.phone;
+                close();
+                input.focus();
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+            };
+        });
+        let nat = drop.querySelector('[data-act="contacts"]');
+        if (nat) nat.onclick = async () => {
+            close();
+            try {
+                let res = await navigator.contacts.select(['name', 'tel'], { multiple: false });
+                let tel = res && res[0] && res[0].tel && res[0].tel[0];
+                if (tel) {
+                    input.value = String(tel).replace(/\s+/g, '');
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            } catch (e) { /* ألغى المستخدم */ }
+        };
+    };
+
+    btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); drop.style.display === 'block' ? close() : open(); };
+    document.addEventListener('click', (e) => { if (!wrap.contains(e.target)) close(); });
+};
+
 window.openCustomerProjects = function(custId) {
     currentCustomerId=custId;
     let cust=userData.customers.find(c=>c.id===custId);
@@ -3068,16 +3178,62 @@ window.editCustomerFromDetail = function() {
 };
 
 window.addNewCustomer = function(){
-    let name=prompt("👤 اسم العميل:");
-    if(!name || !name.trim()) return;
-    let newCust = {id:userData.nextCustId++, name:name.trim(), phone:'', workplace:'', classification:'', projects:[]};
-    let phone = prompt("📱 رقم الهاتف (اختياري):", '');
-    if(phone !== null) newCust.phone = phone.trim();
-    let workplace = prompt("🏢 مكان العمل (اختياري):", '');
-    if(workplace !== null) newCust.workplace = workplace.trim();
-    userData.customers.push(newCust);
-    window.renderCustomersScreen();
-    autoSave();
+    let modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.zIndex = '4500';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:400px; margin:auto; padding:20px;">
+            <h3 style="text-align:center; margin-bottom:16px;">👤 عميل جديد</h3>
+
+            <label style="font-size:0.75rem; color:#64748b;">الاسم:</label>
+            <input type="text" id="ncName" placeholder="اسم العميل"
+                style="width:100%; padding:10px; border:2px solid #667eea; border-radius:12px; font-size:0.9rem; box-sizing:border-box; margin-top:4px;">
+
+            <label style="font-size:0.75rem; color:#64748b; display:block; margin-top:12px;">رقم الهاتف (اختياري):</label>
+            <input type="tel" id="ncPhone" placeholder="📱 اضغط 📇 لاختيار رقم مخزّن"
+                style="margin-top:4px;" inputmode="tel" autocomplete="off">
+
+            <label style="font-size:0.75rem; color:#64748b; display:block; margin-top:12px;">مكان العمل (اختياري):</label>
+            <input type="text" id="ncWorkplace" placeholder="🏢 مكان العمل"
+                style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:12px; font-size:0.9rem; box-sizing:border-box; margin-top:4px;">
+
+            <div style="display:flex; gap:8px; margin-top:18px;">
+                <button id="ncConfirm" class="btn-primary" style="flex:1;">✅ إضافة</button>
+                <button id="ncCancel" class="btn-outline" style="flex:1;">❌ إلغاء</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    let nameInp = document.getElementById('ncName');
+    window.attachPhonePicker('ncPhone');   // زر 📇 داخل مربع الهاتف
+    nameInp.focus();
+
+    const close = () => modal.remove();
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.getElementById('ncCancel').onclick = close;
+
+    const doAdd = () => {
+        let name = nameInp.value.trim();
+        if (!name) { nameInp.style.borderColor = '#ef4444'; nameInp.focus(); return; }
+        let newCust = {
+            id: userData.nextCustId++,
+            name: name,
+            phone: (document.getElementById('ncPhone').value || '').trim(),
+            workplace: (document.getElementById('ncWorkplace').value || '').trim(),
+            classification: '',
+            projects: []
+        };
+        userData.customers.push(newCust);
+        close();
+        window.renderCustomersScreen();
+        autoSave();
+        showToast(`✅ تمت إضافة "${newCust.name}"`);
+    };
+    document.getElementById('ncConfirm').onclick = doAdd;
+    [nameInp, document.getElementById('ncPhone'), document.getElementById('ncWorkplace')].forEach(el => {
+        el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } });
+    });
 };
 
 let _payEditIdx = -1, _payEditProjId = null;
