@@ -220,16 +220,20 @@
         .wk-search:focus { outline: none; border-color: #a5b4fc; box-shadow: 0 0 0 4px rgba(102,126,234,0.12); }
 
         /* ===== شاشة العمال: الجدول ===== */
-        .workers-table-wrapper { margin: 8px 0; max-height: 62vh; overflow: auto; border-radius: 18px; background: white; box-shadow: 0 6px 20px rgba(15,23,42,0.08); border: 1px solid #eef2f7; }
-        /* تخطيط ثابت: عرض محسوب (620px) متوسّط على الشاشات الكبيرة — بلا تمدد أفقي مبالغ */
-        .workers-table { table-layout: fixed; width: 620px; max-width: 100%; margin: 0 auto; border-collapse: separate; border-spacing: 0; font-size: 0.75rem; background: white; }
+        /* الحاوية بعرض محسوب = عرض الأعمدة (602px) ليتطابق الرأس الداكن مع حواف البطاقة */
+        .workers-table-wrapper { margin: 8px auto; max-width: 602px; max-height: 62vh; overflow: auto; border-radius: 18px; background: white; box-shadow: 0 6px 20px rgba(15,23,42,0.08); border: 1px solid #eef2f7; scrollbar-width: none; -ms-overflow-style: none; }
+        /* بلا شريط تمرير مرئي: يمنع انزياح الرأس 15px جهة اليسار (RTL) فتتطابق الحواف تمامًا */
+        .workers-table-wrapper::-webkit-scrollbar { width: 0; height: 0; display: none; }
+        /* تخطيط ثابت: الجدول = 100% من الحاوية، والاسم يتلقّى الفائض المحدود فقط */
+        .workers-table { table-layout: fixed; width: 100%; max-width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; font-size: 0.75rem; background: white; }
         .workers-table th { background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%); color: #e2e8f0; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; position: sticky; top: 0; z-index: 10; padding: 10px 3px; }
         .workers-table th:nth-child(1) { width: 24px; }
-        .workers-table th:nth-child(2) { width: 150px; text-align: left; padding-left: 6px; }
+        .workers-table th:nth-child(2) { text-align: center; }
         .workers-table th:nth-child(n+3):nth-child(-n+9) { width: 52px; text-align: center; }
         .workers-table th:nth-child(10) { width: 82px; text-align: center; }
-        .workers-table th:first-child { border-top-left-radius: 18px; }
-        .workers-table th:last-child { border-top-right-radius: 18px; }
+        /* اتجاه RTL: أول عمود (#) يمين visually، وآخر عمود (المجموع) يسار */
+        .workers-table th:first-child { border-top-right-radius: 18px; }
+        .workers-table th:last-child { border-top-left-radius: 18px; }
         .workers-table td { padding: 7px 4px; text-align: center; border-bottom: 1px solid #f1f5f9; }
         .workers-table tbody tr { transition: background 0.15s; }
         .workers-table tbody tr:nth-child(even) { background: #fafcff; }
@@ -237,7 +241,7 @@
         .workers-table tbody tr:last-child td { border-bottom: none; }
         .wk-idx { color: #cbd5e1; font-weight: 700; font-size: 0.68rem; }
         .attendance-check { width: 17px; height: 17px; cursor: pointer; accent-color: #10b981; }
-        .name-cell { font-weight: 700; font-size: 0.75rem; text-align: left !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; padding-left: 6px !important; }
+        .name-cell { font-weight: 700; font-size: 0.75rem; text-align: center !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; }
         .wk-avatar { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 5px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; font-size: 0.6rem; font-weight: 800; vertical-align: middle; }
         .week-total-cell { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); font-weight: 800; color: #065f46; border-radius: 12px; font-size: 0.7rem; box-shadow: inset 0 0 0 1px rgba(16,185,129,0.25); }
         .empty-message { text-align: center; padding: 26px 20px; color: #94a3b8; font-size: 0.85rem; }
@@ -395,16 +399,17 @@
 
         @media (max-width: 700px) {
             .search-box input { width: 100%; }
-            /* جدول العمال على الهاتف: عرض 100% + أعمدة مضغوطة → بلا تمرير أفقي */
+            /* جدول العمال: حاوية مضغوطة (≤360px) متوسّطة + أعمدة صغيرة → بلا تمرير أفقي */
+            .workers-table-wrapper { max-width: 360px; margin: 8px auto; }
             .workers-table { width: 100%; font-size: 0.7rem; }
             .workers-table th, .workers-table td { padding: 5px 2px; }
             .workers-table th { font-size: 0.55rem; padding: 8px 2px; letter-spacing: 0; }
-            .workers-table th:nth-child(1) { width: 16px; }
-            .workers-table th:nth-child(2) { width: auto; text-align: left; padding-left: 4px; }
-            .workers-table th:nth-child(n+3):nth-child(-n+9) { width: 25px; }
-            .workers-table th:nth-child(10) { width: 56px; }
+            .workers-table th:nth-child(1), .workers-table td.wk-idx { display: none; }
+            .workers-table th:nth-child(2) { width: auto; text-align: center; border-top-right-radius: 18px; }
+            .workers-table th:nth-child(n+3):nth-child(-n+9) { width: 24px; }
+            .workers-table th:nth-child(10) { width: 52px; }
             .wk-avatar { display: none; }
-            .name-cell { font-size: 0.7rem; padding-left: 4px !important; }
+            .name-cell { font-size: 0.7rem; padding: 0 3px !important; }
             .attendance-check { width: 16px; height: 16px; }
             .week-total-cell { font-size: 0.64rem; border-radius: 8px; }
         }
@@ -1600,6 +1605,33 @@ window.initEmptyWeek = function() {
     showToast('➕ تم إنشاء جدول لهذا الأسبوع — ابدأ بتسجيل الحضور');
 };
 
+/* ملاءمة عرض الجدول مع أطول اسم: عمود الاسم = أطول اسم + هامش، والباقي أعمدة ثابتة
+   → لا قصّ للأسماء، وفراغات متساوية صغيرة من الجانبين، وبلا تمرير أفقي */
+function fitWorkersTableToNames() {
+    try {
+        const tbody = document.getElementById("workersTableBody");
+        const tblEl = tbody && tbody.closest('table');
+        const wrapEl = tblEl && tblEl.closest('.workers-table-wrapper');
+        if (!wrapEl) return;
+        const cells = tbody.querySelectorAll('.name-cell');
+        if (!cells.length) { wrapEl.style.maxWidth = ''; return; }
+        let longest = 0;
+        const rg = document.createRange();
+        cells.forEach(c => {
+            rg.selectNodeContents(c);
+            const w = Math.ceil(rg.getBoundingClientRect().width);
+            if (w > longest) longest = w;
+        });
+        const nameTh = tblEl.querySelector('thead th:nth-child(2)');
+        const nameW = nameTh ? nameTh.getBoundingClientRect().width : 0;
+        const fixedSum = Math.round(tblEl.getBoundingClientRect().width - nameW);
+        const parent = wrapEl.parentElement;
+        const avail = parent ? parent.clientWidth : 1000;
+        const wanted = Math.min(Math.max(fixedSum + longest + 20, 240), avail);
+        wrapEl.style.maxWidth = Math.round(wanted) + 'px';
+    } catch (e) {}
+}
+
 window.renderWorkersTable = function() {
     let tbody = document.getElementById("workersTableBody");
     if(!tbody) return;
@@ -1618,6 +1650,7 @@ window.renderWorkersTable = function() {
         } else {
             tbody.innerHTML='<tr><td colspan="10" class="empty-message">لا يوجد عمال</td></tr>';
         }
+        fitWorkersTableToNames();
         updateWorkersStats();
         return;
     }
@@ -1632,6 +1665,7 @@ window.renderWorkersTable = function() {
             <td class="week-total-cell">${calculateWorkerTotal(w).toFixed(2)}</td>
         </tr>`;
     }).join('');
+    fitWorkersTableToNames();
 
     document.querySelectorAll('.attendance-check').forEach(cb=>{
         cb.onchange=()=>{
