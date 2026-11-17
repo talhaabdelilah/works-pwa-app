@@ -1241,11 +1241,16 @@ window.deleteAccountingUser = function(id) {
 };
 
 // ==================== Week Key Helpers ====================
+// مرساة الأسبوع = السبت (يُطرح منه حتى السبت السابق): السبت نفسه، الأحد -1، الاثنين -2 ... الجمعة -6
+// (الصيغة القديمة `dayOfWeek-1` كانت ترسو على الاثنين بدل السبت ← تواريخ مزاحة يومين، وفي الأحد تُرجع مفتاح الأسبوع السابق)
+function getWeekAnchor(d) {
+    let a = new Date(d);
+    a.setDate(d.getDate() - ((d.getDay() + 1) % 7));
+    return a;
+}
+
 function getWeekKeyFromDate(d) {
-    let dayOfWeek = d.getDay();
-    let lastSaturday = new Date(d);
-    if(dayOfWeek === 6) lastSaturday = new Date(d);
-    else lastSaturday.setDate(d.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    let lastSaturday = getWeekAnchor(d);
     let year = lastSaturday.getFullYear();
     let start = new Date(year,0,1);
     let days = Math.floor((lastSaturday - start)/(24*60*60*1000));
@@ -1294,10 +1299,7 @@ function sameWorkersLite(a, b) {
 function getWeekDateRange(offset) {
     let d = new Date();
     d.setDate(d.getDate() + (offset * 7));
-    let dayOfWeek = d.getDay();
-    let saturday = new Date(d);
-    if(dayOfWeek === 6) saturday = new Date(d);
-    else saturday.setDate(d.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    let saturday = getWeekAnchor(d);
     let friday = new Date(saturday);
     friday.setDate(saturday.getDate() + 6);
     return saturday.getDate() + '-' + friday.getDate() + '/' + (saturday.getMonth() + 1) + '/' + saturday.getFullYear();
