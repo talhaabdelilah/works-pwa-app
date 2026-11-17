@@ -325,6 +325,12 @@
         .wd-chip.info { background: #3b82f6; }
         .wd-chip.edit { background: #10b981; }
         .wd-chip.danger { background: #ef4444; }
+        /* 🔊 اتصال مباشر: ضغطة واحدة على الرقم تفتح هاتف الجهاز (tel:) */
+        .call-link { display: inline-flex; align-items: center; gap: 6px; direction: ltr; background: #ecfeff; color: #0369a1; border: 1px solid #a5f3fc; padding: 6px 12px; border-radius: 999px; font-weight: 800; font-size: 0.82rem; text-decoration: none; cursor: pointer; transition: transform 0.12s, background 0.15s; }
+        .call-link:active { transform: scale(0.96); background: #cffafe; }
+        .wd-phone { margin-top: 3px; font-size: 0.74rem; font-weight: 700; }
+        .wd-phone .call-link { background: rgba(6,182,212,0.16); border-color: rgba(125,211,252,0.45); color: #7dd3fc; padding: 4px 10px; font-size: 0.78rem; }
+        .wd-phone .none { color: #94a3b8; font-weight: 600; }
         .wd-section { background: #fff; margin: 12px 12px 0; border-radius: 18px; padding: 12px; box-shadow: 0 4px 14px rgba(15,23,42,0.06); border: 1px solid #eef2f7; }
         .wd-section-title { font-size: 0.78rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
         .worker-detail-row { background: #f8fafc; padding: 9px 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; border: 1px solid #eef2f7; }
@@ -351,6 +357,10 @@
         .wd-act.debt { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 12px rgba(245,158,11,0.35); }
         .wd-act.price { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 4px 12px rgba(59,130,246,0.35); }
         .wd-act.share { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 4px 12px rgba(139,92,246,0.35); }
+        .wd-act.pdf { background: linear-gradient(135deg, #0ea5e9, #0284c7); box-shadow: 0 4px 12px rgba(14,165,233,0.35); }
+        .btn-pdf { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); border: none; padding: 6px 14px; border-radius: 30px; color: #fff; font-size: 0.7rem; cursor: pointer; font-weight: bold; box-shadow: 0 2px 6px rgba(2,132,199,0.3); }
+        .pdf-week-row { display: flex; align-items: center; gap: 8px; padding: 9px 8px; border-radius: 10px; cursor: pointer; }
+        .pdf-week-row:hover { background: #f1f5f9; }
 
         /* لوحات الإدخال المنبثقة */
         .wd-box { margin: 0 12px 4px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 14px rgba(15,23,42,0.08); }
@@ -602,6 +612,7 @@
                         <button id="extraExpensesBtn" class="btn-extra-exp" onclick="window.openExtraExpenses()" title="مصاريف إضافية: تُضاف على إجمالي المشروع وتُسجَّل في المحاسبة">🧾 مصاريف إضافية</button>
                         <button id="saveProjectData" class="btn-secondary">💾 حفظ</button>
                         <button id="shareProjectBtn" class="btn-share" onclick="window.shareProjectData()" title="مشاركة فاتورة المشروع">📤 مشاركة</button>
+                        <button id="shareProjectPdfBtn" class="btn-pdf" onclick="window.shareProjectPdf()" title="إرسال بيانات المشروع كملف PDF عبر واتساب">📄 PDF واتساب</button>
                         <button id="saveLocationBtn" class="btn-loc" onclick="window.saveProjectLocation()" title="حفظ موقع المشروع">📍 حفظ الموقع</button>
                         <button id="shareLocationBtn" class="btn-loc" onclick="window.shareProjectLocation()" title="مشاركة الموقع — واتساب، مسنجر،...">🌐 مشاركة الموقع</button>
                         <button id="deleteProjectBtn" class="btn-danger">🗑️ حذف</button>
@@ -689,10 +700,11 @@
             <div class="customer-info-row"><span class="icon">🏢</span><div class="text"><div class="label">مكان العمل</div><div class="value" id="customerDetailWorkplace"></div></div></div>
             <div class="customer-info-row"><span class="icon">💰</span><div class="text"><div class="label">مجموع المعاملات</div><div class="value" id="customerDetailTotal" style="color:#10b981; font-weight:bold;"></div></div></div>
         </div>
-        <div class="customer-detail-actions" style="display:flex; gap:8px; margin-top:16px;">
-            <button class="btn-primary" onclick="window.editCustomerFromDetail()" style="flex:1;">✏️ تعديل</button>
-            <button class="btn-danger" id="customerDetailDeleteBtn" style="flex:1;">🗑️ حذف</button>
-            <button class="btn-outline" onclick="window.closeCustomerDetail()" style="flex:1;">✖ إغلاق</button>
+        <div class="customer-detail-actions" style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;">
+            <button class="btn-pdf" onclick="window.shareCustomerPdf()" style="flex:1 1 100%; padding:10px; font-size:0.78rem;" title="إرسال بيانات كل مشاريع العميل كملف PDF عبر واتساب">📄 إرسال البيانات PDF عبر واتساب</button>
+            <button class="btn-primary" onclick="window.editCustomerFromDetail()" style="flex:1 1 40%;">✏️ تعديل</button>
+            <button class="btn-danger" id="customerDetailDeleteBtn" style="flex:1 1 40%;">🗑️ حذف</button>
+            <button class="btn-outline" onclick="window.closeCustomerDetail()" style="flex:1 1 40%;">✖ إغلاق</button>
         </div>
     </div>
 </div>
@@ -728,7 +740,10 @@
         <div class="wd-hero">
             <button class="wd-back" onclick="window.goBack()">🔙 رجوع</button>
             <div class="wd-avatar" id="workerDetailAvatar">؟</div>
-            <div class="wd-title" id="workerDetailName"></div>
+            <div class="wd-title">
+                <div id="workerDetailName"></div>
+                <div class="wd-phone" id="workerDetailPhone"></div>
+            </div>
             <div class="wd-actions">
                 <button class="wd-chip edit" onclick="window.openWorkerEdit()" title="تعديل اسم العامل ورقم هاتفه">✏️</button>
                 <button class="wd-chip info" onclick="window.showWorkerInvoice()" title="كشف حساب">📋</button>
@@ -737,12 +752,13 @@
             </div>
         </div>
 
-        <!-- الأزرار: دفعة | دين سابق | السعر | مشاركة البيانات -->
+        <!-- الأزرار: دفعة | دين سابق | السعر | مشاركة البيانات | PDF واتساب -->
         <div class="wd-actionsbar">
             <button class="wd-act pay" onclick="window.addPaymentFromWorkerDetail()">💰 دفعة</button>
             <button class="wd-act debt" onclick="window.toggleWdBox('wdPrevBox')">📌 دين سابق</button>
             <button class="wd-act price" onclick="window.toggleWdBox('wdPriceBox')">💵 السعر</button>
             <button class="wd-act share" onclick="window.shareWorkerData()">📤 مشاركة البيانات</button>
+            <button class="wd-act pdf" style="grid-column: span 2;" onclick="window.openWorkerPdfShare()" title="إرسال بيانات الأسابيع كملف PDF عبر واتساب — مع اختيار أسبوع أو أكثر">📄 إرسال PDF عبر واتساب</button>
         </div>
 
         <!-- لوحة تعديل السعر -->
@@ -898,6 +914,16 @@ const dayNames = ['سبت', 'أحد', 'إثن', 'ثلاث', 'أربع', 'خمي�
 function getDeviceId() { let id = localStorage.getItem('device_id'); if(!id) { id = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2,9); localStorage.setItem('device_id', id); } return id; }
 const deviceId = getDeviceId();
 function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+// 🔊 اتصال مباشر: تحويل الرقم إلى رابط tel: يفتح هاتف الجهاز بضغطة واحدة
+function telHref(phone){
+    const p = String(phone || '').replace(/[^\d+]/g, '');
+    return p.length >= 3 ? 'tel:' + p : '';
+}
+function callLinkHtml(phone, icon){
+    const href = telHref(phone);
+    if (!href) return '';
+    return `<a class="call-link" href="${href}" onclick="event.stopPropagation();" title="اضغط للاتصال المباشر">${icon || '📞'}<span>${escapeHtml(String(phone).trim())}</span></a>`;
+}
 function updateHeaderSync(status) { let el = document.getElementById("syncStatusHeader"); if(el) { el.innerHTML = status === 'online' ? '☁️ سحابي' : '💾 محلي'; el.className = 'sync-badge ' + (status === 'online' ? '' : 'offline'); } }
 // عرض اسم الحساب (الجيمايل المربوط) في مكان "المدير الرئيسي" أعلى القائمة
 function updateHeaderUserName() {
@@ -1967,6 +1993,13 @@ window.showWorkerDetail = function(workerId) {
 
     window._currentDetailWorkerId = workerId;
     document.getElementById('workerDetailName').textContent = w.name;
+    // 🔊 الرقم تحت الاسم: ضغطة واحدة تفتح هاتف الجهاز للاتصال المباشر
+    const wdPhone = document.getElementById('workerDetailPhone');
+    if (wdPhone) {
+        wdPhone.innerHTML = w.phone
+            ? callLinkHtml(w.phone)
+            : '<span class="none">📱 لا يوجد رقم مسجّل — أضِفه بـ ✏️</span>';
+    }
     let avEl = document.getElementById('workerDetailAvatar');
     if (avEl) avEl.textContent = (w.name || '؟').trim().charAt(0);
     updateWorkerHideBtn();
@@ -2079,6 +2112,10 @@ window.openWorkerEdit = function() {
         if (heroName) heroName.textContent = name;
         const heroAvatar = document.getElementById('workerDetailAvatar');
         if (heroAvatar) heroAvatar.textContent = name.charAt(0);
+        const wdPhone = document.getElementById('workerDetailPhone');
+        if (wdPhone) {
+            wdPhone.innerHTML = phone ? callLinkHtml(phone) : '<span class="none">📱 لا يوجد رقم مسجّل — أضِفه بـ ✏️</span>';
+        }
         window.renderWorkersTable();
         autoSave();
         showToast('✅ تم تحديث بطاقة "' + name + '"');
@@ -3091,7 +3128,11 @@ window.renderCustomersScreen = function() {
         let owedLine = owed > 200
             ? `<div style="font-size:0.68rem; color:#dc2626; font-weight:700;">⏳ متبقي ${owed.toFixed(2)} د.ع</div>`
             : '';
-        return `<div class="customer-folder class-${c.classification||'none'}" data-id="${c.id}"><div class="folder-icon">📂</div><div style="flex:1;"><div class="customer-name">${escapeHtml(c.name)}</div><div style="font-size:0.7rem; color:#64748b;">📁 ${c.projects?.length||0} مشروع</div>${owedLine}</div><span class="customer-class-badge ${c.classification||'none'}">${getClassIcon(c.classification)} ${getClassLabel(c.classification)}</span></div>`;
+        // 🔊 الرقم داخل البطاقة: ضغطة واحدة تفتح الهاتف (يتوقف النقر عن فتح صفحة المشاريع)
+        let phoneLine = c.phone
+            ? `<div style="margin-top:5px;">${callLinkHtml(c.phone)}</div>`
+            : '';
+        return `<div class="customer-folder class-${c.classification||'none'}" data-id="${c.id}"><div class="folder-icon">📂</div><div style="flex:1;"><div class="customer-name">${escapeHtml(c.name)}</div><div style="font-size:0.7rem; color:#64748b;">📁 ${c.projects?.length||0} مشروع</div>${phoneLine}${owedLine}</div><span class="customer-class-badge ${c.classification||'none'}">${getClassIcon(c.classification)} ${getClassLabel(c.classification)}</span></div>`;
     }).join('');
     document.querySelectorAll('.customer-folder').forEach(el=>el.addEventListener('click',()=>window.openCustomerProjects(parseInt(el.dataset.id))));
 };
@@ -3379,7 +3420,10 @@ window.showCustomerDetail = function(custId) {
     if(!cust) return;
     currentCustomerId = custId;
     document.getElementById('customerDetailFullName').textContent = cust.name;
-    document.getElementById('customerDetailPhone').textContent = cust.phone || 'غير مسجل';
+    const cdPhone = document.getElementById('customerDetailPhone');
+    cdPhone.innerHTML = cust.phone
+        ? callLinkHtml(cust.phone)
+        : '<span style="color:#94a3b8;">غير مسجل</span>';
     document.getElementById('customerDetailWorkplace').textContent = cust.workplace || 'غير مسجل';
     let totalDeals = 0;
     (cust.projects||[]).forEach(p => {
@@ -3935,6 +3979,572 @@ function downloadProjectText(text, name) {
         showToast('⬇️ تم تنزيل الفاتورة');
     } catch (e) { console.error(e); }
 }
+
+// ==================== 📄 إرسال البيانات كملف PDF عبر واتساب ====================
+// بدون أي مكتبة خارجية (تعمل حتى بدون إنترنت): نرسم التقرير على canvas ثم
+// نضعه داخل ملف PDF كصورة JPEG — الصورة تمنع مشكلة تضمين الخطوط العربية.
+const PDF_W_PT = 595, PDF_H_PT = 842;      // مقاس A4 بالنقاط
+const PDF_SCALE = 2;                       // 2 بكسل لكل نقطة (دقة طباعة جيدة)
+const PDF_W = PDF_W_PT * PDF_SCALE;        // 1190
+const PDF_H = PDF_H_PT * PDF_SCALE;        // 1684
+const PDF_M = 58;                          // الهامش الجانبي
+const PDF_CW = PDF_W - PDF_M * 2;          // عرض المحتوى
+
+function pdfFont(size, weight) {
+    return (weight || 600) + ' ' + size + 'px "Segoe UI", Tahoma, "Noto Sans Arabic", "Droid Arabic Naskh", sans-serif';
+}
+// تصغير الخط حتى يناسب العرض المتاح
+function pdfFitFont(ctx, str, maxW, weight, size, minSize) {
+    minSize = minSize || 15;
+    let s = size;
+    for (; s > minSize; s--) {
+        ctx.font = pdfFont(s, weight);
+        if (ctx.measureText(str).width <= maxW) return s;
+    }
+    ctx.font = pdfFont(minSize, weight);
+    return minSize;
+}
+// اقتطاع النص بنقاط إن كان أعرض من العمود
+function pdfClip(ctx, str, maxW) {
+    str = String(str == null ? '' : str);
+    if (ctx.measureText(str).width <= maxW) return str;
+    let t = str;
+    while (t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+    return t + '…';
+}
+
+// رسام التقرير: يبني canvas طويلًا ثم يقصّه إلى صفحات A4
+function createPdfReport() {
+    let cv = document.createElement('canvas');
+    cv.width = PDF_W; cv.height = PDF_H;
+    let ctx = cv.getContext('2d');
+    ctx.direction = 'rtl';
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, PDF_W, PDF_H);
+    let y = 0;
+
+    // تكبير اللوحة عند الحاجة مع الحفاظ على المحتوى المرسوم
+    const ensure = (h) => {
+        if (y + h <= cv.height) return;
+        const nc = document.createElement('canvas');
+        nc.width = cv.width;
+        nc.height = Math.ceil((y + h) * 1.25);
+        const nx = nc.getContext('2d');
+        nx.fillStyle = '#fff'; nx.fillRect(0, 0, nc.width, nc.height);
+        nx.drawImage(cv, 0, 0);
+        cv = nc; ctx = nx; ctx.direction = 'rtl';
+    };
+    const box = (x, yy, w, h, r) => {
+        ctx.beginPath();
+        if (typeof ctx.roundRect === 'function') ctx.roundRect(x, yy, w, h, r);
+        else ctx.rect(x, yy, w, h);
+        ctx.fill();
+    };
+
+    const api = {
+        gap(h) { ensure(h); y += h; },
+
+        band(title, sub) {
+            const h = sub ? 148 : 116;
+            ensure(h + 18);
+            ctx.fillStyle = '#0f172a';
+            box(PDF_M - 18, y, PDF_CW + 36, h, 26);
+            ctx.direction = 'rtl';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = '#fff';
+            ctx.font = pdfFont(40, 800);
+            ctx.fillText(pdfClip(ctx, title, PDF_CW), PDF_M + PDF_CW, y + (sub ? 64 : 73));
+            if (sub) {
+                ctx.fillStyle = '#a5b4fc';
+                ctx.font = pdfFont(26, 700);
+                ctx.fillText(pdfClip(ctx, sub, PDF_CW), PDF_M + PDF_CW, y + 114);
+            }
+            y += h + 24;
+        },
+
+        heading(text, color) {
+            ensure(60);
+            ctx.fillStyle = color || '#4f46e5';
+            box(PDF_M, y + 8, 8, 34, 4);
+            ctx.direction = 'rtl';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = '#0f172a';
+            ctx.font = pdfFont(28, 800);
+            ctx.fillText(pdfClip(ctx, text, PDF_CW - 24), PDF_M + PDF_CW, y + 38);
+            y += 60;
+        },
+
+        kv(label, value, opt) {
+            opt = opt || {};
+            const h = 54;
+            ensure(h + 10);
+            ctx.fillStyle = opt.bg || '#f8fafc';
+            box(PDF_M, y, PDF_CW, h, 12);
+            ctx.direction = 'rtl';
+            ctx.textBaseline = 'alphabetic';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = opt.valueColor || '#0f172a';
+            const vs = pdfFitFont(ctx, String(value == null ? '' : value), PDF_CW * 0.6, 800, 25, 15);
+            ctx.fillText(pdfClip(ctx, String(value == null ? '' : value), PDF_CW * 0.6), PDF_M + 16, y + h / 2 + vs * 0.36);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#64748b';
+            ctx.font = pdfFont(24, 600);
+            ctx.fillText(pdfClip(ctx, label, PDF_CW * 0.36), PDF_M + PDF_CW - 16, y + h / 2 + 8);
+            y += h + 10;
+        },
+
+        boxes(items, perRow) {
+            perRow = perRow || 2;
+            const gapX = 14, gapY = 14, bh = 98;
+            const bw = (PDF_CW - gapX * (perRow - 1)) / perRow;
+            for (let i = 0; i < items.length; i += perRow) {
+                const chunk = items.slice(i, i + perRow);
+                ensure(bh + gapY + 6);
+                chunk.forEach((it, j) => {
+                    const x = PDF_M + PDF_CW - bw - j * (bw + gapX);   // أول عنصر في اليمين
+                    ctx.fillStyle = it.bg || '#eff6ff';
+                    box(x, y, bw, bh, 16);
+                    ctx.direction = 'rtl';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = pdfFont(22, 700);
+                    ctx.fillText(pdfClip(ctx, it.k, bw - 24), x + bw / 2, y + 38);
+                    ctx.fillStyle = it.color || '#0f172a';
+                    ctx.font = pdfFont(31, 800);
+                    ctx.fillText(pdfClip(ctx, it.v, bw - 24), x + bw / 2, y + 80);
+                });
+                y += bh + gapY;
+            }
+            y += 6;
+        },
+
+        table(head, rows, weights) {
+            if (!rows || !rows.length) { api.note('لا توجد بيانات'); return; }
+            const total = weights.reduce((a, b) => a + b, 0);
+            const colW = weights.map(w => PDF_CW * w / total);
+            const colX = [];
+            let xr = PDF_M + PDF_CW;
+            for (let i = 0; i < colW.length; i++) { xr -= colW[i]; colX.push(xr); }
+            const padX = 9, headH = 52, rowH = 50;
+
+            ensure(headH + rowH + 10);
+            ctx.fillStyle = '#0f172a';
+            box(PDF_M, y, PDF_CW, headH, 12);
+            ctx.direction = 'rtl';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = '#fff';
+            head.forEach((hh, i) => {
+                ctx.font = pdfFont(23, 800);
+                ctx.fillText(pdfClip(ctx, hh, colW[i] - padX * 2), colX[i] + colW[i] / 2, y + 34);
+            });
+            y += headH;
+
+            rows.forEach((r, ri) => {
+                ensure(rowH + 8);
+                ctx.fillStyle = ri % 2 ? '#f8fafc' : '#ffffff';
+                ctx.fillRect(PDF_M, y, PDF_CW, rowH);
+                ctx.fillStyle = '#e2e8f0';
+                ctx.fillRect(PDF_M, y + rowH - 1, PDF_CW, 1);
+                ctx.direction = 'rtl';
+                r.forEach((cell, ci) => {
+                    const c = (cell && typeof cell === 'object') ? cell : { v: cell };
+                    const txt = String(c.v == null ? '' : c.v);
+                    const wgt = c.bold === false ? 600 : 700;
+                    const size = pdfFitFont(ctx, txt, colW[ci] - padX * 2, wgt, 24, 15);
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+                    ctx.fillStyle = c.color || '#1e293b';
+                    ctx.fillText(pdfClip(ctx, txt, colW[ci] - padX * 2), colX[ci] + colW[ci] / 2, y + rowH / 2 + size * 0.36);
+                });
+                y += rowH;
+            });
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(PDF_M, y, PDF_CW, 2);
+            y += 18;
+        },
+
+        note(text, color) {
+            ensure(44);
+            ctx.direction = 'rtl';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = color || '#94a3b8';
+            ctx.font = pdfFont(21, 600);
+            ctx.fillText(pdfClip(ctx, text, PDF_CW), PDF_M + PDF_CW, y + 26);
+            y += 44;
+        },
+
+        // قصّ اللوحة إلى الارتفاع الفعلي ثم تقطيعها إلى صفحات A4 مع تذييل لكل صفحة
+        finish(footer) {
+            const h = Math.max(y + 26, PDF_H);
+            const fin = document.createElement('canvas');
+            fin.width = PDF_W; fin.height = h;
+            const fx = fin.getContext('2d');
+            fx.fillStyle = '#fff'; fx.fillRect(0, 0, PDF_W, h);
+            fx.drawImage(cv, 0, 0);
+
+            const pages = [];
+            const count = Math.ceil(h / PDF_H);
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('canvas');
+                p.width = PDF_W; p.height = PDF_H;
+                const px = p.getContext('2d');
+                px.fillStyle = '#fff'; px.fillRect(0, 0, PDF_W, PDF_H);
+                const sy = i * PDF_H, sh = Math.min(PDF_H, h - sy);
+                px.drawImage(fin, 0, sy, PDF_W, sh, 0, 0, PDF_W, sh);
+                px.direction = 'rtl';
+                px.fillStyle = '#e2e8f0';
+                px.fillRect(PDF_M, PDF_H - 64, PDF_CW, 2);
+                px.textBaseline = 'alphabetic';
+                px.fillStyle = '#94a3b8';
+                px.font = pdfFont(19, 600);
+                px.textAlign = 'right';
+                px.fillText(pdfClip(px, footer || 'نظام إدارة المشاريع', PDF_CW - 170), PDF_M + PDF_CW, PDF_H - 30);
+                px.textAlign = 'left';
+                px.fillText('صفحة ' + (i + 1) + ' من ' + count, PDF_M, PDF_H - 30);
+                pages.push(p);
+            }
+            return pages;
+        }
+    };
+    return api;
+}
+
+// تجميع صفحات canvas في ملف PDF صحيح (كتلة كائنات + جدول xref)
+function buildPdfFromCanvases(canvases) {
+    const enc = new TextEncoder();
+    const parts = [];
+    let off = 0;
+    const offsets = [];
+    const push = (d) => {
+        const b = (typeof d === 'string') ? enc.encode(d) : d;
+        parts.push(b); off += b.length;
+    };
+    const beginObj = (n) => { offsets[n] = off; push(n + ' 0 obj\n'); };
+
+    push('%PDF-1.4\n');
+    const n = canvases.length;
+    const jpgs = canvases.map(c => {
+        const du = c.toDataURL('image/jpeg', 0.86);
+        const bin = atob(du.slice(du.indexOf(',') + 1));
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return arr;
+    });
+
+    beginObj(1);
+    push('<</Type/Catalog/Pages 2 0 R>>\nendobj\n');
+
+    const kids = [];
+    for (let i = 0; i < n; i++) kids.push((3 + i * 3) + ' 0 R');
+    beginObj(2);
+    push('<</Type/Pages/Kids[' + kids.join(' ') + ']/Count ' + n + '>>\nendobj\n');
+
+    for (let i = 0; i < n; i++) {
+        const pN = 3 + i * 3, iN = pN + 1, cN = pN + 2;
+        const img = jpgs[i], c = canvases[i];
+        beginObj(pN);
+        push('<</Type/Page/Parent 2 0 R/MediaBox[0 0 ' + PDF_W_PT + ' ' + PDF_H_PT +
+            ']/Resources<</XObject<</Im0 ' + iN + ' 0 R>>>>/Contents ' + cN + ' 0 R>>\nendobj\n');
+        beginObj(iN);
+        push('<</Type/XObject/Subtype/Image/Width ' + c.width + '/Height ' + c.height +
+            '/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length ' + img.length + '>>\nstream\n');
+        push(img);
+        push('\nendstream\nendobj\n');
+        const content = 'q ' + PDF_W_PT + ' 0 0 ' + PDF_H_PT + ' 0 0 cm /Im0 Do Q\n';
+        beginObj(cN);
+        push('<</Length ' + enc.encode(content).length + '>>\nstream\n' + content + 'endstream\nendobj\n');
+    }
+
+    const totalObjs = 2 + 3 * n;
+    const xrefAt = off;
+    let xref = 'xref\n0 ' + (totalObjs + 1) + '\n0000000000 65535 f\r\n';
+    for (let k = 1; k <= totalObjs; k++) {
+        xref += String(offsets[k] || 0).padStart(10, '0') + ' 00000 n\r\n';
+    }
+    push(xref);
+    push('trailer\n<</Size ' + (totalObjs + 1) + '/Root 1 0 R>>\nstartxref\n' + xrefAt + '\n%%EOF\n');
+
+    let size = 0;
+    parts.forEach(p => size += p.length);
+    const out = new Uint8Array(size);
+    let pos = 0;
+    parts.forEach(p => { out.set(p, pos); pos += p.length; });
+    return out;
+}
+
+function pdfFileName(base) {
+    return String(base || 'تقرير').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim() + '.pdf';
+}
+function downloadPdfBlob(blob, name) {
+    try {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { try { document.body.removeChild(a); URL.revokeObjectURL(a.href); } catch (_) {} }, 5000);
+        return true;
+    } catch (e) { console.error(e); return false; }
+}
+
+// المشاركة: واتساب/أي تطبيق يستقبل الملفات — وإن تعذّرت فتنزيل الملف
+async function sharePdfBlob(blob, fileName, title, text) {
+    try {
+        const file = new File([blob], fileName, { type: 'application/pdf' });
+        if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: title, text: text });
+            return 'shared';
+        }
+    } catch (e) {
+        if (e && e.name === 'AbortError') return 'cancelled';   // ألغى المستخدم
+        console.warn('sharePdf:', e && e.message);
+    }
+    const ok = downloadPdfBlob(blob, fileName);
+    showToast(ok ? '⬇️ حُفظ الملف — افتح واتساب وأرفقه بالرسالة' : '⚠️ تعذّر إنشاء ملف PDF');
+    return ok ? 'downloaded' : 'failed';
+}
+
+async function makeAndSharePdf(report, fileNameBase, title, text) {
+    if (!report) { showToast('⚠️ لا توجد بيانات للإرسال'); return 'failed'; }
+    showToast('⏳ جاري إنشاء ملف PDF...');
+    await new Promise(r => setTimeout(r, 40));   // تحديث الواجهة قبل الرسم
+    const pages = report.R.finish('نظام إدارة المشاريع — ' + (report.name || ''));
+    const bytes = buildPdfFromCanvases(pages);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    return await sharePdfBlob(blob, pdfFileName(fileNameBase), title, text);
+}
+
+// إجماليات المشروع (مشتركة بين الفاتورة النصية وملف PDF)
+function calcProjectTotals(proj) {
+    const rooms = proj.rooms || [];
+    const extraExpenses = proj.extraExpenses || [];
+    const extraExpSum = extraExpenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    const roomsSum = rooms.reduce((s, r) => s + (r.totalCost || 0), 0);
+    const payments = (proj.payments || []).filter(p => p.type !== 'discount');
+    const discounts = (proj.payments || []).filter(p => p.type === 'discount');
+    const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
+    const totalDiscount = discounts.reduce((s, p) => s + (p.amount || 0), 0);
+    const totalPrice = roomsSum + extraExpSum;
+    return {
+        totalArea: rooms.reduce((s, r) => s + getRoomMeters(r), 0),
+        extraExpenses: extraExpenses, extraExpSum: extraExpSum, roomsSum: roomsSum,
+        totalPrice: totalPrice, payments: payments, discounts: discounts,
+        totalPaid: totalPaid, totalDiscount: totalDiscount,
+        remaining: totalPrice - totalDiscount - totalPaid
+    };
+}
+
+// ————— تقرير العامل: الأسابيع المختارة —————
+function buildWorkerPdfReport(workerId, weekKeys) {
+    const w = (getWorkersToDisplay() || []).find(x => x.id === workerId)
+        || (userData.workers || []).find(x => x.id === workerId);
+    if (!w) return null;
+    const byKey = {};
+    getWorkerLedger(workerId).forEach(r => byKey[r.weekKey] = r);
+    const chosen = (weekKeys || []).map(k => byKey[k]).filter(Boolean);
+    if (!chosen.length) return null;
+
+    const dayLetters = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'];
+    const R = createPdfReport();
+    R.band('تقرير بيانات العامل', w.name + (w.phone ? '  •  📞 ' + w.phone : ''));
+    R.boxes([
+        { k: 'الأجر اليومي (د.ع)', v: (parseFloat(w.price) || 0).toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
+        { k: 'الأسابيع المختارة', v: String(chosen.length), bg: '#f5f3ff', color: '#6d28d9' }
+    ], 2);
+    if (w.expense) R.kv('🧾 المصروفات', w.expense);
+    if (w.previousBalance) R.kv('📌 دين سابق', (parseFloat(w.previousBalance) || 0).toFixed(2) + ' د.ع');
+    if (w.previousBalanceNote) R.kv('ملاحظة الدين السابق', w.previousBalanceNote);
+    R.gap(6);
+    R.heading('📅 الأسابيع المختارة');
+    let td = 0, tp = 0;
+    const rows = chosen.map(r => {
+        td += r.due; tp += r.paid;
+        return [
+            { v: r.dateRange + (r.isCurrent ? ' (الحالي)' : ''), bold: false, color: r.isCurrent ? '#4f46e5' : '#1e293b' },
+            { v: r.days.map((on, i) => on ? dayLetters[i] : '·').join('') + ' (' + r.daysCount + '/7)' },
+            { v: r.due.toFixed(2), color: '#1d4ed8' },
+            { v: r.paid.toFixed(2), color: '#059669' },
+            { v: r.remain.toFixed(2), color: r.remain > 0 ? '#dc2626' : '#059669' }
+        ];
+    });
+    R.table(['الأسبوع', 'أيام العمل', 'المستحق', 'المدفوع', 'الباقي'], rows, [3.2, 2.4, 1.7, 1.7, 1.7]);
+    const rem = td - tp;
+    R.boxes([
+        { k: 'إجمالي المستحق', v: td.toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
+        { k: 'إجمالي المدفوع', v: tp.toFixed(2), bg: '#ecfdf5', color: '#059669' },
+        { k: 'الباقي', v: rem.toFixed(2), bg: rem > 0 ? '#fef2f2' : '#ecfdf5', color: rem > 0 ? '#dc2626' : '#059669' }
+    ], 3);
+    R.note('أُنشئ هذا التقرير في ' + getEnglishDate() + ' — جميع المبالغ بالدينار العراقي');
+    return { R: R, name: w.name };
+}
+
+// ————— تقرير مشروع واحد (بيانات المشروع للعميل) —————
+function buildProjectPdfReport(cust, proj) {
+    const t = calcProjectTotals(proj);
+    const R = createPdfReport();
+    R.band('فاتورة مشروع', proj.name);
+    R.kv('👤 العميل', cust.name);
+    if (cust.phone) R.kv('📱 هاتف العميل', cust.phone);
+    R.kv('📅 التاريخ', getEnglishDate());
+    R.gap(4);
+    R.heading('📊 ملخص المشروع');
+    R.boxes([
+        { k: 'إجمالي المساحة (م²)', v: t.totalArea.toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
+        { k: 'إجمالي السعر (د.ع)', v: t.totalPrice.toFixed(2), bg: '#f5f3ff', color: '#6d28d9' },
+        { k: 'المدفوع (د.ع)', v: t.totalPaid.toFixed(2), bg: '#ecfdf5', color: '#059669' },
+        { k: 'الباقي (د.ع)', v: t.remaining.toFixed(2), bg: t.remaining > 0 ? '#fef2f2' : '#ecfdf5', color: t.remaining > 0 ? '#dc2626' : '#059669' }
+    ], 2);
+    if (t.extraExpSum > 0) {
+        R.kv('🧾 سعر الغرف', t.roomsSum.toFixed(2) + ' د.ع');
+        R.kv('🧾 مصاريف إضافية', t.extraExpSum.toFixed(2) + ' د.ع');
+        if (t.extraExpenses.length) {
+            R.table(['القيمة', 'الملاحظة'], t.extraExpenses.map(e => [
+                { v: (parseFloat(e.amount) || 0).toFixed(2), color: '#dc2626' },
+                { v: e.note || '—', bold: false, color: '#64748b' }
+            ]), [1.4, 4]);
+        }
+    }
+    R.heading('💳 الدفعات والخصومات');
+    if ((proj.payments || []).length) {
+        R.table(['التاريخ', 'النوع', 'المبلغ', 'ملاحظة'], proj.payments.map(p => [
+            { v: p.date || '—', bold: false, color: '#64748b' },
+            { v: p.type === 'discount' ? '🏷️ خصم' : '💰 دفعة', color: p.type === 'discount' ? '#d97706' : '#059669' },
+            { v: (parseFloat(p.amount) || 0).toFixed(2), color: p.type === 'discount' ? '#dc2626' : '#1d4ed8' },
+            { v: p.note || '—', bold: false, color: '#64748b' }
+        ]), [1.6, 1.3, 1.4, 2.7]);
+    } else {
+        R.note('لا توجد دفعات مسجّلة');
+    }
+    if (t.totalDiscount > 0) R.kv('🏷️ إجمالي الخصومات', t.totalDiscount.toFixed(2) + ' د.ع', { bg: '#fffbeb', valueColor: '#b45309' });
+    R.note('أُنشئت هذه الفاتورة في ' + getEnglishDate());
+    return { R: R, name: proj.name };
+}
+
+// ————— تقرير العميل الكامل (كل مشاريعه) —————
+function buildCustomerPdfReport(cust) {
+    const projects = cust.projects || [];
+    const R = createPdfReport();
+    R.band('بيانات العميل', cust.name + (cust.phone ? '  •  📞 ' + cust.phone : ''));
+    if (cust.workplace) R.kv('🏢 مكان العمل', cust.workplace);
+    R.kv('📱 رقم الهاتف', cust.phone || 'غير مسجل');
+    let gt = 0, gp = 0, gr = 0;
+    projects.forEach(p => { const t = calcProjectTotals(p); gt += t.totalPrice; gp += t.totalPaid; gr += t.remaining; });
+    R.boxes([
+        { k: 'عدد المشاريع', v: String(projects.length), bg: '#f5f3ff', color: '#6d28d9' },
+        { k: 'إجمالي السعر (د.ع)', v: gt.toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
+        { k: 'المدفوع (د.ع)', v: gp.toFixed(2), bg: '#ecfdf5', color: '#059669' },
+        { k: 'الباقي (د.ع)', v: gr.toFixed(2), bg: gr > 0 ? '#fef2f2' : '#ecfdf5', color: gr > 0 ? '#dc2626' : '#059669' }
+    ], 2);
+
+    if (!projects.length) {
+        R.note('لا توجد مشاريع مسجّلة لهذا العميل');
+    } else {
+        projects.forEach((p, i) => {
+            const t = calcProjectTotals(p);
+            R.heading('📂 ' + (i + 1) + '. ' + p.name, '#0ea5e9');
+            R.table(['المساحة (م²)', 'السعر', 'المدفوع', 'الباقي'], [[
+                { v: t.totalArea.toFixed(2) },
+                { v: t.totalPrice.toFixed(2), color: '#1d4ed8' },
+                { v: t.totalPaid.toFixed(2), color: '#059669' },
+                { v: t.remaining.toFixed(2), color: t.remaining > 0 ? '#dc2626' : '#059669' }
+            ]], [1.5, 1.5, 1.5, 1.5]);
+            if ((p.payments || []).length) {
+                R.table(['التاريخ', 'النوع', 'المبلغ', 'ملاحظة'], p.payments.map(pm => [
+                    { v: pm.date || '—', bold: false, color: '#64748b' },
+                    { v: pm.type === 'discount' ? '🏷️ خصم' : '💰 دفعة', color: pm.type === 'discount' ? '#d97706' : '#059669' },
+                    { v: (parseFloat(pm.amount) || 0).toFixed(2), color: pm.type === 'discount' ? '#dc2626' : '#1d4ed8' },
+                    { v: pm.note || '—', bold: false, color: '#64748b' }
+                ]), [1.6, 1.3, 1.4, 2.7]);
+            }
+        });
+    }
+    R.note('أُنشئ هذا التقرير في ' + getEnglishDate());
+    return { R: R, name: cust.name };
+}
+
+// ————— نافذة اختيار الأسابيع للعامل —————
+window.openWorkerPdfShare = function() {
+    const workerId = window._currentDetailWorkerId;
+    const w = (getWorkersToDisplay() || []).find(x => x.id === workerId)
+        || (userData.workers || []).find(x => x.id === workerId);
+    if (!w) { showToast('⚠️ لم يتم تحديد العامل'); return; }
+    const ledger = getWorkerLedger(workerId);
+    if (!ledger.length) { showToast('📭 لا توجد أسابيع محفوظة لهذا العامل'); return; }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.zIndex = '4700';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:420px; margin:auto; padding:20px;">
+            <h3 style="text-align:center; margin-bottom:6px;">📄 إرسال بيانات العامل</h3>
+            <div style="text-align:center; font-size:0.74rem; color:#64748b; margin-bottom:12px; line-height:1.8;">
+                <b style="color:#0f172a;">${escapeHtml(w.name)}</b><br>
+                اختر أسبوعًا واحدًا أو أكثر ← أنشئ ملف PDF ← أرسله عبر واتساب
+            </div>
+            <div style="display:flex; gap:6px; margin-bottom:8px;">
+                <button id="pdfSelAll" class="btn-outline" style="flex:1; padding:7px; font-size:0.72rem;">✅ تحديد الكل</button>
+                <button id="pdfSelNone" class="btn-outline" style="flex:1; padding:7px; font-size:0.72rem;">⬜ إلغاء الكل</button>
+            </div>
+            <div id="pdfWeekList" style="max-height:42vh; overflow-y:auto; border:1px solid #e2e8f0; border-radius:12px; padding:5px; background:#fff;"></div>
+            <div style="display:flex; gap:8px; margin-top:16px;">
+                <button id="pdfGo" class="btn-primary" style="flex:2; padding:11px;">📄 إنشاء PDF ومشاركته</button>
+                <button id="pdfCancel" class="btn-outline" style="flex:1;">✖ إلغاء</button>
+            </div>
+        </div>`;
+    document.body.appendChild(modal);
+
+    const list = modal.querySelector('#pdfWeekList');
+    list.innerHTML = ledger.map(r => `
+        <label class="pdf-week-row" style="${r.isCurrent ? 'background:#eef2ff;' : ''}">
+            <input type="checkbox" class="pdf-wk" value="${escapeHtml(r.weekKey)}" ${r.isCurrent ? 'checked' : ''} style="width:18px; height:18px; accent-color:#4f46e5;">
+            <span style="flex:1; font-size:0.79rem; font-weight:700;">${escapeHtml(r.dateRange)}${r.isCurrent ? ' <span style="color:#4f46e5;">(الحالي)</span>' : ''}</span>
+            <span style="font-size:0.68rem; color:#64748b; white-space:nowrap;">${r.daysCount}/7 • ${r.due.toFixed(2)}</span>
+        </label>`).join('');
+
+    const close = () => modal.remove();
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+    modal.querySelector('#pdfCancel').onclick = close;
+    modal.querySelector('#pdfSelAll').onclick = () => list.querySelectorAll('.pdf-wk').forEach(c => { c.checked = true; });
+    modal.querySelector('#pdfSelNone').onclick = () => list.querySelectorAll('.pdf-wk').forEach(c => { c.checked = false; });
+
+    modal.querySelector('#pdfGo').onclick = async () => {
+        const keys = Array.from(list.querySelectorAll('.pdf-wk:checked')).map(c => c.value);
+        if (!keys.length) { showToast('⚠️ اختر أسبوعًا واحدًا على الأقل'); return; }
+        const btn = modal.querySelector('#pdfGo');
+        const old = btn.textContent;
+        btn.disabled = true; btn.textContent = '⏳ جاري الإنشاء...';
+        try {
+            const report = buildWorkerPdfReport(workerId, keys);
+            const res = await makeAndSharePdf(report, 'تقرير_' + w.name,
+                'تقرير بيانات العامل ' + w.name, 'تقرير أسابيع العامل ' + w.name + ' — ' + keys.length + ' أسبوع');
+            if (res !== 'failed') close();
+        } catch (e) {
+            console.error('pdf:', e);
+            showToast('⚠️ تعذّر إنشاء ملف PDF');
+        }
+        btn.disabled = false; btn.textContent = old;
+    };
+};
+
+// ————— زر المشروع: PDF بيانات المشروع —————
+window.shareProjectPdf = async function() {
+    const { cust, proj } = getCurrentProjectCtx();
+    if (!cust || !proj) { showToast('⚠️ لم يتم العثور على المشروع'); return; }
+    try {
+        const report = buildProjectPdfReport(cust, proj);
+        await makeAndSharePdf(report, 'فاتورة_' + proj.name, 'فاتورة ' + proj.name,
+            'فاتورة مشروع ' + proj.name + ' — ' + cust.name);
+    } catch (e) { console.error('pdf:', e); showToast('⚠️ تعذّر إنشاء ملف PDF'); }
+};
+
+// ————— زر العميل: PDF كل مشاريعه —————
+window.shareCustomerPdf = async function() {
+    const cust = (userData.customers || []).find(c => c.id === currentCustomerId);
+    if (!cust) { showToast('⚠️ لم يتم تحديد العميل'); return; }
+    try {
+        const report = buildCustomerPdfReport(cust);
+        await makeAndSharePdf(report, 'بيانات_' + cust.name, 'بيانات العميل ' + cust.name,
+            'بيانات العميل ' + cust.name);
+    } catch (e) { console.error('pdf:', e); showToast('⚠️ تعذّر إنشاء ملف PDF'); }
+};
 
 // ==================== موقع المشروع (حفظ + مشاركة ذكية) ====================
 function getCurrentProjectCtx() {
