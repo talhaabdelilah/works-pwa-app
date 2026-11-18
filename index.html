@@ -3151,6 +3151,14 @@ function deviceContactsAvailable() {
     } catch (e) { return false; }
 }
 
+// كشف أجهزة آبل: كل متصفحات iOS تستخدم WebKit، ولا تدعم Contact Picker ولا تنزيل blob موثوقًا
+function isAppleTouchDevice() {
+    try {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    } catch (e) { return false; }
+}
+
 function getDeviceContacts() {
     try {
         const arr = JSON.parse(localStorage.getItem(DEVICE_CONTACTS_KEY) || '[]');
@@ -3243,6 +3251,9 @@ window.attachPhonePicker = function(inputId) {
     if (!input || input.dataset.pfBound) return;
     input.dataset.pfBound = '1';
     input.classList.add('pf-input');   // تنسيق الحقل: حشوة يسار للزر 📇
+    // تحسين لوحة المفاتيح على الهواتف (خصوصًا آيفون): لوحة أرقام + اقتراح الرقم الشخصي
+    input.setAttribute('inputmode', 'tel');
+    if (!input.getAttribute('autocomplete')) input.setAttribute('autocomplete', 'tel');
 
     let wrap = document.createElement('div');
     wrap.className = 'pf-wrap';
@@ -3330,7 +3341,9 @@ window.attachPhonePicker = function(inputId) {
         let html = '';
 
         if (!nativeOK) {
-            html += '<div class="pf-hint">📇 جهات الاتصال في الهاتف غير متاحة في هذا المتصفح — تحتاج Chrome على أندرويد مع رابط آمن (HTTPS).</div>';
+            html += isAppleTouchDevice()
+                ? '<div class="pf-hint">📇 آيفون لا يسمح لأي موقع بقراءة جهات الاتصال (قيد من Apple في Safari).<br>استخدم «📂 استيراد جهات الاتصال (.vcf)» بعد تصديرها من تطبيق جهات الاتصال، أو اكتب الرقم يدويًا.</div>'
+                : '<div class="pf-hint">📇 جهات الاتصال في الهاتف غير متاحة في هذا المتصفح — تحتاج Chrome على أندرويد مع رابط آمن (HTTPS).</div>';
         }
         if (nativeOK) {
             html += '<div class="pf-item pf-native" data-act="contacts"><span class="pf-lbl">📱 جهات الاتصال في الهاتف</span><span class="pf-num">اختيار</span></div>';
@@ -4285,31 +4298,65 @@ function downloadPdfBlob(blob, name) {
     } catch (e) { console.error(e); return false; }
 }
 
-// المشاركة: واتساب/أي تطبيق يستقبل الملفات — وإن تعذّرت فتنزيل الملف
+// على iOS لا يعمل تنزيل blob موثوقًا (خصوصًا داخل PWA)، فنعرض رابطًا حقيقيًا
+// يفتح الملف في مشغّل PDF ثم يستخدم المستخدم زرّ المشاركة هناك
+function pdfOpenFallback(blob, fileName) {
+    let url = '';
+    try { url = URL.createObjectURL(blob); } catch (e) { console.error(e); }
+    if (!url) { showToast('⚠️ تعذّر إنشاء ملف PDF'); return 'failed'; }
+    const linkStyle = 'display:block;padding:12px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:800;text-decoration:none;margin-bottom:8px;';
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.zIndex = '4900';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width:370px;margin:auto;padding:20px;text-align:center;">
+            <h3 style="margin-bottom:8px;">📄 ملف PDF جاهز</h3>
+            <div style="font-size:0.72rem;color:#64748b;line-height:1.95;margin-bottom:14px;">
+                ${isAppleTouchDevice()
+                    ? 'على آيفون: اضغط «فتح الملف» ← ثم زر المشاركة ↗ أعلى الشاشة ← واتساب.'
+                    : 'اضغط «فتح الملف» أو «حفظ الملف» ثم أرفقه في واتساب.'}
+            </div>
+            <a href="${url}" target="_blank" rel="noopener" style="${linkStyle}">📂 فتح الملف</a>
+            <a href="${url}" download="${escapeHtml(fileName)}" style="${linkStyle}background:linear-gradient(135deg,#10b981,#059669);">💾 حفظ الملف</a>
+            <button class="btn-outline" id="pdfOpenClose" style="width:100%;padding:10px;">✖ إغلاق</button>
+        </div>`;
+    document.body.appendChild(modal);
+    const close = () => { modal.remove(); setTimeout(() => { try { URL.revokeObjectURL(url); } catch (_) {} }, 60000); };
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+    modal.querySelector('#pdfOpenClose').onclick = close;
+    return 'opened';
+}
+
+// المشاركة: واتساب/أي تطبيق يستقبل الملفات — وإن تعذّرت فبديل يعمل على آيفون
+// ⚠️ على iOS يجب استدعاء navigator.share أثناء إيماءة المستخدم نفسها:
+// أي await/مؤقت قبل الاستدعاء يُفقد الصلاحية ويرفض Safari المشاركة
 async function sharePdfBlob(blob, fileName, title, text) {
     try {
         const file = new File([blob], fileName, { type: 'application/pdf' });
-        if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+        const canFiles = typeof navigator.canShare === 'function'
+            ? navigator.canShare({ files: [file] })
+            : typeof navigator.share === 'function';
+        if (canFiles && typeof navigator.share === 'function') {
             await navigator.share({ files: [file], title: title, text: text });
             return 'shared';
         }
     } catch (e) {
-        if (e && e.name === 'AbortError') return 'cancelled';   // ألغى المستخدم
-        console.warn('sharePdf:', e && e.message);
+        if (e && e.name === 'AbortError') return 'cancelled';   // ألغى المستخدم بنفسه
+        console.warn('sharePdf:', e && e.name, e && e.message);
     }
+    if (isAppleTouchDevice()) return pdfOpenFallback(blob, fileName);
     const ok = downloadPdfBlob(blob, fileName);
     showToast(ok ? '⬇️ حُفظ الملف — افتح واتساب وأرفقه بالرسالة' : '⚠️ تعذّر إنشاء ملف PDF');
     return ok ? 'downloaded' : 'failed';
 }
 
-async function makeAndSharePdf(report, fileNameBase, title, text) {
-    if (!report) { showToast('⚠️ لا توجد بيانات للإرسال'); return 'failed'; }
-    showToast('⏳ جاري إنشاء ملف PDF...');
-    await new Promise(r => setTimeout(r, 40));   // تحديث الواجهة قبل الرسم
+// ⚠️ بلا async/await قبل المشاركة: الرسم كله متزامن لتبقى إيماءة المستخدم صالحة
+function makeAndSharePdf(report, fileNameBase, title, text) {
+    if (!report) { showToast('⚠️ لا توجد بيانات للإرسال'); return Promise.resolve('failed'); }
     const pages = report.R.finish('نظام إدارة المشاريع — ' + (report.name || ''));
     const bytes = buildPdfFromCanvases(pages);
     const blob = new Blob([bytes], { type: 'application/pdf' });
-    return await sharePdfBlob(blob, pdfFileName(fileNameBase), title, text);
+    return sharePdfBlob(blob, pdfFileName(fileNameBase), title, text);
 }
 
 // إجماليات المشروع (مشتركة بين الفاتورة النصية وملف PDF)
