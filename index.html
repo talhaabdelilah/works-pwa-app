@@ -157,6 +157,22 @@
         .price-field.linear label { color: #6d28d9; }
         .price-field.linear input { border-color: #c4b5fd; color: #6d28d9; }
 
+        /* ===== ملاحظة المشروع / الاتفاق مع الزبون ===== */
+        .project-note-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 16px; padding: 8px 10px; margin: 0 0 12px; }
+        .project-note-box label { display: block; font-size: 0.68rem; font-weight: 800; color: #92400e; margin-bottom: 4px; }
+        .project-note-box textarea {
+            width: 100%; box-sizing: border-box; resize: vertical; min-height: 52px; max-height: 160px;
+            border: 1px solid #fcd34d; border-radius: 10px; background: #fff; padding: 7px 9px;
+            font-family: inherit; font-size: 0.75rem; color: #1e293b; line-height: 1.5;
+        }
+        .project-note-box textarea:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,0.15); }
+        .project-note-preview { font-size: 0.66rem; color: #92400e; background: #fffbeb; border: 1px dashed #fcd34d; border-radius: 8px; padding: 3px 7px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+        /* لا تعطيل للكتابة: تحديد محتوى الحقل الرقمي تلقائيًا عند التركيز */
+        input[type="number"], input[inputmode="decimal"] { -moz-appearance: textfield; }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
         /* ===== جدول المصاريف الإضافية داخل صفحة المشروع ===== */
         .expenses-section { background: #fff1f2; border: 1px solid #fecdd3; }
         .expenses-section h4 { color: #9f1239; }
@@ -661,27 +677,34 @@
                     <button onclick="window.goBack()" class="nav-back">🔙 رجوع</button>
                 </div>
                 <div class="project-detail-card" id="projectDetailCard" style="background:white; border-radius:20px; padding:16px;">
+                    <div class="project-note-box">
+                        <label for="projectNoteInput">📝 ملاحظة المشروع / الاتفاق مع الزبون</label>
+                        <textarea id="projectNoteInput" rows="2" maxlength="2000" placeholder="اكتب هنا الاتفاق مع الزبون… (تُحفظ تلقائيًا)"></textarea>
+                    </div>
                     <div class="price-fields">
                         <div class="price-field">
                             <label>💰 سعر المتر:</label>
-                            <input type="number" id="globalPricePerMeter" step="0.01" value="50">
+                            <input type="number" id="globalPricePerMeter" step="0.01" inputmode="decimal" placeholder="0">
                         </div>
                         <div class="price-field linear">
                             <label>📏 سعر المتر الطولي:</label>
-                            <input type="number" id="globalLinearPricePerMeter" step="0.01" value="0">
+                            <input type="number" id="globalLinearPricePerMeter" step="0.01" inputmode="decimal" placeholder="0">
                         </div>
                     </div>
 
                     <div class="project-summary-box">
                         <h4>📊 ملخص المشروع</h4>
-                        <div class="summary-row"><span>💵 إجمالي المشروع:</span><span id="projectGrandTotal">0.00</span> د.ع</div>
-                        <div class="summary-row"><span>💰 مجموع الدفعات:</span><span id="totalPayments">0.00</span> د.ع</div>
-                        <div class="summary-row"><span>🏷️ الخصومات:</span><span id="totalDiscounts">0.00</span> د.ع</div>
-                        <div class="summary-row"><span>📏 الأمتار الطولية:</span><span id="projectLinearMeters">0.00</span> م</div>
-                        <div class="summary-row"><span>🧾 مصاريف إضافية:</span><span id="projectExtraExpensesSum" style="color:#dc2626;">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>💵 إجمالي المشروع:</span><span id="projectGrandTotal">0.00</span> د.ل</div>
+                        <div class="summary-row"><span>💰 مجموع الدفعات:</span><span id="totalPayments">0.00</span> د.ل</div>
+                        <div class="summary-row"><span>🏷️ الخصومات:</span><span id="totalDiscounts">0.00</span> د.ل</div>
+                        <div class="summary-row"><span>🛁 مجموع الحمامات:</span><span id="projectBathsSummary">0.00</span></div>
+                        <div class="summary-row"><span>💵 تكلفة الحمامات:</span><span id="projectBathsCost">0.00</span> د.ل</div>
+                        <div class="summary-row"><span>📏 مجموع المتر الطولي:</span><span id="projectLinearMeters">0.00</span> م</div>
+                        <div class="summary-row"><span>💵 تكلفة المتر الطولي:</span><span id="projectLinearCost">0.00</span> د.ل</div>
+                        <div class="summary-row"><span>🧾 مصاريف إضافية:</span><span id="projectExtraExpensesSum" style="color:#dc2626;">0.00</span> د.ل</div>
                         <div class="summary-row"><span>📐 مساحة المشروع:</span><span id="projectTotalArea">0.00</span> م²</div>
-                        <div class="summary-row total"><span>📊 أرباح المشروع:</span><span id="projectProfitSum">0.00</span> د.ع</div>
-                        <div class="summary-row"><span>⏳ المتبقي:</span><span id="remainingAmount">0.00</span> د.ع</div>
+                        <div class="summary-row total"><span>📊 أرباح المشروع:</span><span id="projectProfitSum">0.00</span> د.ل</div>
+                        <div class="summary-row"><span>⏳ المتبقي:</span><span id="remainingAmount">0.00</span> د.ل</div>
                         <div class="payment-progress"><div class="payment-progress-bar unpaid" id="paymentProgressBar" style="width:0%"></div></div>
                         <div class="payment-status-text unpaid" id="paymentStatusText">لم يتم الدفع</div>
                     </div>
@@ -721,7 +744,7 @@
                     <div class="section-box expenses-section">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
                             <h4 style="margin:0;">🧾 المصاريف الإضافية</h4>
-                            <span class="exp-total-badge">الإجمالي: <b id="projectExpensesTotal">0.00</b> د.ع</span>
+                            <span class="exp-total-badge">الإجمالي: <b id="projectExpensesTotal">0.00</b> د.ل</span>
                         </div>
                         <div class="exp-add-row">
                             <input type="date" id="projectExpDate" title="تاريخ المصروف">
@@ -2716,7 +2739,7 @@ function renderWePayments() {
     }
     box.innerHTML = pays.map((p, i) => `
         <div class="we-pay-row" data-i="${i}">
-            <input type="number" class="wp-amount" step="0.01" value="${p.amount || 0}" title="المبلغ">
+            <input type="number" class="wp-amount" step="0.01" value="${p.amount || ''}" title="المبلغ">
             <input type="text" class="wp-date" value="${escapeHtml(p.date || '')}" placeholder="يوم/شهر/سنة" title="التاريخ">
             <input type="text" class="wp-note" value="${escapeHtml(p.note || '')}" placeholder="ملاحظة" title="ملاحظة">
             <button class="we-pay-del" title="حذف الدفعة">🗑️</button>
@@ -2764,7 +2787,7 @@ function renderWePrevItems() {
     }
     box.innerHTML = items.map((it, i) => `
         <div class="we-pay-row" data-i="${i}">
-            <input type="number" class="wp-amount" step="0.01" value="${it.amount || 0}" title="المبلغ">
+            <input type="number" class="wp-amount" step="0.01" value="${it.amount || ''}" title="المبلغ">
             <input type="text" class="wp-date" value="${escapeHtml(it.date || '')}" placeholder="يوم/شهر/سنة" title="التاريخ">
             <input type="text" class="wp-note" value="${escapeHtml(it.note || '')}" placeholder="ملاحظة" title="ملاحظة">
             <button class="we-pay-del" title="حذف البند">🗑️</button>
@@ -2944,7 +2967,7 @@ function renderWbPrevBox() {
     }
     box.innerHTML = items.map((it, i) => `
         <div class="we-pay-row" data-i="${i}">
-            <input type="number" class="wp-amount" step="0.01" value="${it.amount || 0}" title="المبلغ">
+            <input type="number" class="wp-amount" step="0.01" value="${it.amount || ''}" title="المبلغ">
             <input type="text" class="wp-date" value="${escapeHtml(it.date || '')}" placeholder="يوم/شهر/سنة" title="التاريخ">
             <input type="text" class="wp-note" value="${escapeHtml(it.note || '')}" placeholder="ملاحظة" title="ملاحظة">
             <button class="we-pay-del" title="حذف البند">🗑️</button>
@@ -3470,7 +3493,7 @@ window.renderCustomersScreen = function() {
     }
     grid.innerHTML = sorted.map(({c, owed}) => {
         let owedLine = owed > 200
-            ? `<div style="font-size:0.68rem; color:#dc2626; font-weight:700;">⏳ متبقي ${owed.toFixed(2)} د.ع</div>`
+            ? `<div style="font-size:0.68rem; color:#dc2626; font-weight:700;">⏳ متبقي ${owed.toFixed(2)} د.ل</div>`
             : '';
         // 🔊 الرقم داخل البطاقة: ضغطة واحدة تفتح الهاتف (يتوقف النقر عن فتح صفحة المشاريع)
         let phoneLine = c.phone
@@ -3744,7 +3767,7 @@ window.openCustomerProjects = function(custId) {
     document.getElementById("currentCustomerNameSpan").innerText=cust.name;
     let grid=document.getElementById("projectsGrid");
     if(cust.projects?.length){
-        grid.innerHTML=cust.projects.map(p=>`<div class="project-card" data-id="${p.id}"><div style="flex:1;"><div class="project-name">🏢 ${escapeHtml(p.name)}${p.completed?' <span style="color:#10b981; font-size:0.7rem;">✅ مكتمل</span>':''}</div><div style="font-size:0.75rem; color:#64748b;">💰 ${(p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2)}</div></div></div>`).join('');
+        grid.innerHTML=cust.projects.map(p=>`<div class="project-card" data-id="${p.id}"><div style="flex:1;"><div class="project-name">🏢 ${escapeHtml(p.name)}${p.completed?' <span style="color:#10b981; font-size:0.7rem;">✅ مكتمل</span>':''}</div><div style="font-size:0.75rem; color:#64748b;">💰 ${(p.rooms?.reduce((s,r)=>s+(r.totalCost||0),0)||0).toFixed(2)}</div>${p.note ? `<div class="project-note-preview">📝 ${escapeHtml(p.note)}</div>` : ''}</div></div>`).join('');
         document.querySelectorAll('.project-card').forEach(el=>el.addEventListener('click',()=>window.openProjectDetail(custId,parseInt(el.dataset.id))));
     } else grid.innerHTML='<div class="empty-message">لا توجد مشاريع</div>';
     window.showProjectScreen('projects');
@@ -3758,8 +3781,10 @@ window.openProjectDetail = function(custId,projId) {
         if(!proj) return;
         document.getElementById("navCustomerName").innerText=cust.name;
         document.getElementById("navProjectName").innerText=proj.name;
-        document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50;
-        document.getElementById("globalLinearPricePerMeter").value=proj.globalLinearPricePerMeter||0;
+        document.getElementById("globalPricePerMeter").value = proj.globalPricePerMeter ? proj.globalPricePerMeter : '';
+        document.getElementById("globalLinearPricePerMeter").value = proj.globalLinearPricePerMeter ? proj.globalLinearPricePerMeter : '';
+        const pnEl = document.getElementById('projectNoteInput');
+        if (pnEl) pnEl.value = proj.note || '';
         let expDateEl = document.getElementById('projectExpDate');
         if(expDateEl) expDateEl.value = todayIsoDate();
         renderPaymentsTable(proj);
@@ -3938,7 +3963,7 @@ function renderPaymentsTable(proj){
         if (_payEditIdx === idx) {
             return `<tr class="pay-edit-row" data-idx="${idx}">
                 <td><input class="pe-date" type="text" value="${escapeHtml(p.date||'')}" placeholder="التاريخ"></td>
-                <td><input class="pe-amount" type="number" step="0.01" value="${p.amount||0}"></td>
+                <td><input class="pe-amount" type="number" step="0.01" value="${p.amount||''}"></td>
                 <td><select class="pe-type"><option value="payment" ${p.type!=='discount'?'selected':''}>💰 دفعة</option><option value="discount" ${p.type==='discount'?'selected':''}>🏷️ خصم</option></select></td>
                 <td><input class="pe-note" type="text" value="${escapeHtml(p.note||'')}" placeholder="📝 ملاحظة"></td>
                 <td style="white-space:nowrap;"><button class="pe-save ic-btn" title="حفظ">💾</button><button class="pe-cancel ic-btn" title="إلغاء">✖</button></td>
@@ -4045,7 +4070,7 @@ function renderExtraExpensesList() {
 
     tbody.innerHTML = rows.length ? rows.map((e, i) => `
         <tr data-i="${i}" style="border-bottom:1px solid #ffe4e6;">
-            <td style="padding:4px;"><input type="number" step="0.01" min="0" class="ee-amount" data-i="${i}" value="${parseFloat(e.amount) || 0}" style="width:96px; padding:5px 4px; border:1px solid #fecaca; border-radius:8px; font-size:0.72rem; text-align:center; color:#b91c1c; font-weight:700;"></td>
+            <td style="padding:4px;"><input type="number" step="0.01" min="0" class="ee-amount" data-i="${i}" value="${parseFloat(e.amount) || ''}" style="width:96px; padding:5px 4px; border:1px solid #fecaca; border-radius:8px; font-size:0.72rem; text-align:center; color:#b91c1c; font-weight:700;"></td>
             <td style="padding:4px;"><input type="text" class="ee-note" data-i="${i}" value="${escapeHtml(e.note || '')}" placeholder="📝 ملاحظة" style="width:100%; box-sizing:border-box; padding:5px 6px; border:1px solid #fecaca; border-radius:8px; font-size:0.72rem;"></td>
             <td style="padding:4px; text-align:center;"><button class="ee-del btn-danger" data-i="${i}" style="padding:3px 8px;" title="حذف المصروف">🗑️</button></td>
         </tr>`).join('') : '<tr><td colspan="3" class="empty-message" style="padding:18px 10px;">لا توجد مصاريف إضافية</td></tr>';
@@ -4127,7 +4152,7 @@ function renderProjectExpensesTable(projArg) {
         <tr data-exp-id="${e.id}">
             <td>${i + 1}</td>
             <td class="exp-date">${escapeHtml(e.date || '—')}</td>
-            <td><input type="number" step="0.01" min="0" class="exp-amount-input" value="${parseFloat(e.amount) || 0}"></td>
+            <td><input type="number" step="0.01" min="0" class="exp-amount-input" value="${parseFloat(e.amount) || ''}"></td>
             <td><input type="text" class="exp-note-input" value="${escapeHtml(e.note || '')}" placeholder="📝 ملاحظة"></td>
             <td class="exp-acc">${e.accRef ? '✅' : '—'}</td>
             <td><button class="exp-del" title="حذف المصروف">🗑️</button></td>
@@ -4251,7 +4276,7 @@ function renderRoomsTable(proj){
     tbody.innerHTML=proj.rooms.map((r,idx)=>{
         let result=getRoomMeters(r);
         let unit = r.type === 'linear' ? ' م' : ' م²';
-        return `<tr data-room-id="${r.id}"><td>${idx+1}</td><td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||0}"></td><td><input type="number" class="room-width" step="0.01" value="${r.widthVal||0}"></td><td>${getRoomTypeLabel(r)}</td><td class="calc-val">${result.toFixed(2)}${unit}</td><td class="room-total" style="font-weight:bold; color:#4f46e5;">${(r.totalCost||0).toFixed(2)}</td><td><button class="delete-room-btn btn-danger" data-id="${r.id}">✖</button></td></tr>`;
+        return `<tr data-room-id="${r.id}"><td>${idx+1}</td><td><input type="number" class="room-length" step="0.01" inputmode="decimal" placeholder="0" value="${r.lengthVal ? r.lengthVal : ''}"></td><td><input type="number" class="room-width" step="0.01" inputmode="decimal" placeholder="0" value="${r.widthVal ? r.widthVal : ''}"></td><td>${getRoomTypeLabel(r)}</td><td class="calc-val">${result.toFixed(2)}${unit}</td><td class="room-total" style="font-weight:bold; color:#4f46e5;">${(r.totalCost||0).toFixed(2)}</td><td><button class="delete-room-btn btn-danger" data-id="${r.id}">✖</button></td></tr>`;
     }).join('');
     attachRoomEvents(proj);
 }
@@ -4288,10 +4313,17 @@ function updateProjectSummary(proj) {
 
 function updateProjectTotal(proj){
     let priceEl = document.getElementById("globalPricePerMeter");
-    let price = priceEl ? (parseFloat(priceEl.value) || 0) : (parseFloat(proj.globalPricePerMeter) || 0);
+    // الحقل الفارغ لا يُصفّر السعر المحفوظ — يُستخدم السعر السابق، و0 لا يُكتب إلا يدويًا
+    let priceRaw = priceEl ? String(priceEl.value).trim() : '';
+    let price = priceRaw !== ''
+        ? (parseFloat(priceRaw) || 0)
+        : (parseFloat(proj.globalPricePerMeter) || 0);
     proj.globalPricePerMeter=price;
     let linPriceEl = document.getElementById("globalLinearPricePerMeter");
-    let linPrice = linPriceEl ? (parseFloat(linPriceEl.value) || 0) : (parseFloat(proj.globalLinearPricePerMeter) || 0);
+    let linRaw = linPriceEl ? String(linPriceEl.value).trim() : '';
+    let linPrice = linRaw !== ''
+        ? (parseFloat(linRaw) || 0)
+        : (parseFloat(proj.globalLinearPricePerMeter) || 0);
     proj.globalLinearPricePerMeter=linPrice;
     proj.rooms.forEach(r=>{
         r.totalCost=getRoomMeters(r) * (r.type === 'linear' ? linPrice : price);
@@ -4314,6 +4346,21 @@ function updateProjectTotal(proj){
     let linearMeters = proj.rooms.reduce((s,r)=>s+(r.type==='linear'?getRoomMeters(r):0),0);
     let linMetersEl = document.getElementById('projectLinearMeters');
     if(linMetersEl) linMetersEl.textContent = linearMeters.toFixed(2);
+    // مجموع الحمامات وتكلفتها + تكلفة الأمتار الطولية (في ملخص المشروع العلوي)
+    let baths = proj.rooms.filter(r => r.type === 'bath');
+    let bathsMeters = baths.reduce((s,r) => s + getRoomMeters(r), 0);
+    let bathsCost = baths.reduce((s,r) => s + (r.totalCost || 0), 0);
+    let bathsEl = document.getElementById('projectBathsSummary');
+    if (bathsEl) bathsEl.textContent = baths.length
+        ? (baths.length + ' حمام — ' + bathsMeters.toFixed(2) + ' م')
+        : '0';
+    let bathsCostEl = document.getElementById('projectBathsCost');
+    if (bathsCostEl) bathsCostEl.textContent = bathsCost.toFixed(2);
+    let linearCost = proj.rooms
+        .filter(r => r.type === 'linear')
+        .reduce((s,r) => s + (r.totalCost || 0), 0);
+    let linCostEl = document.getElementById('projectLinearCost');
+    if (linCostEl) linCostEl.textContent = linearCost.toFixed(2);
     let paidPercent = effectiveTotal > 0 ? Math.min((totalPaid / effectiveTotal) * 100, 100) : 0;
     let bar = document.getElementById('paymentProgressBar');
     let statusText = document.getElementById('paymentStatusText');
@@ -4323,7 +4370,7 @@ function updateProjectTotal(proj){
     }
     if(statusText) {
         if(paidPercent >= 100) { statusText.textContent = '✅ تم الدفع بالكامل'; statusText.className = 'payment-status-text paid'; }
-        else if(paidPercent > 0) { statusText.textContent = '⏳ متبقي ' + remaining.toFixed(2) + ' د.ع (' + paidPercent.toFixed(0) + '%)'; statusText.className = 'payment-status-text partial'; }
+        else if(paidPercent > 0) { statusText.textContent = '⏳ متبقي ' + remaining.toFixed(2) + ' د.ل (' + paidPercent.toFixed(0) + '%)'; statusText.className = 'payment-status-text partial'; }
         else { statusText.textContent = '❌ لم يتم الدفع'; statusText.className = 'payment-status-text unpaid'; }
     }
     updateProjectSummary(proj);
@@ -4361,6 +4408,10 @@ window.addRoom = function(type){
         renderRoomsTable(proj);
         updateProjectTotal(proj);
         autoSave();
+        // مؤشر الكتابة مباشرة في أول خانة فارغة للغرفة الجديدة
+        const rows = document.querySelectorAll('#roomsTableBody tr[data-room-id]');
+        const lastRow = rows[rows.length - 1];
+        lastRow?.querySelector('.room-length')?.focus();
     }
 };
 
@@ -4409,9 +4460,9 @@ function buildProjectInvoiceText() {
     lines.push('📅 التاريخ: ' + getEnglishDate());
     lines.push('');
     lines.push('📐 إجمالي القياس: ' + metrics);
-    if (proj.globalPricePerMeter) lines.push('💰 سعر المتر: ' + (parseFloat(proj.globalPricePerMeter) || 0).toFixed(2) + ' د.ع');
-    if (linearMeters > 0) lines.push('📏 سعر المتر الطولي: ' + (parseFloat(proj.globalLinearPricePerMeter) || 0).toFixed(2) + ' د.ع');
-    lines.push('💰 إجمالي السعر: ' + totalPrice.toFixed(2) + ' د.ع');
+    if (proj.globalPricePerMeter) lines.push('💰 سعر المتر: ' + (parseFloat(proj.globalPricePerMeter) || 0).toFixed(2) + ' د.ل');
+    if (linearMeters > 0) lines.push('📏 سعر المتر الطولي: ' + (parseFloat(proj.globalLinearPricePerMeter) || 0).toFixed(2) + ' د.ل');
+    lines.push('💰 إجمالي السعر: ' + totalPrice.toFixed(2) + ' د.ل');
     if ((proj.rooms || []).length) {
         lines.push('');
         lines.push('🏠 تفاصيل الوحدات:');
@@ -4421,12 +4472,12 @@ function buildProjectInvoiceText() {
             let unitPrice = r.type === 'linear' ? (parseFloat(proj.globalLinearPricePerMeter) || 0) : (parseFloat(proj.globalPricePerMeter) || 0);
             lines.push('  ' + (i + 1) + ') ' + typeName + ' ' + (parseFloat(r.lengthVal) || 0) + '×' + (parseFloat(r.widthVal) || 0) +
                 ' = ' + getRoomMeters(r).toFixed(2) + ' ' + unit + ' × ' + unitPrice.toFixed(2) +
-                ' = ' + (r.totalCost || 0).toFixed(2) + ' د.ع');
+                ' = ' + (r.totalCost || 0).toFixed(2) + ' د.ل');
         });
     }
     if (extraExpSum > 0) {
-        lines.push('   ├ سعر الغرف: ' + (totalPrice - extraExpSum).toFixed(2) + ' د.ع');
-        lines.push('   └ 🧾 مصاريف إضافية: ' + extraExpSum.toFixed(2) + ' د.ع');
+        lines.push('   ├ سعر الغرف: ' + (totalPrice - extraExpSum).toFixed(2) + ' د.ل');
+        lines.push('   └ 🧾 مصاريف إضافية: ' + extraExpSum.toFixed(2) + ' د.ل');
         extraExpenses.forEach(e => {
             lines.push('      • ' + (parseFloat(e.amount) || 0).toFixed(2) + (e.note ? ' — ' + e.note : ''));
         });
@@ -4443,9 +4494,9 @@ function buildProjectInvoiceText() {
         lines.push('  لا توجد دفعات');
     }
     lines.push('');
-    lines.push('💵 المدفوع: ' + totalPaid.toFixed(2) + ' د.ع');
-    if (totalDiscount > 0) lines.push('🏷️ الخصومات: ' + totalDiscount.toFixed(2) + ' د.ع');
-    lines.push('⏳ الباقي: ' + remaining.toFixed(2) + ' د.ع');
+    lines.push('💵 المدفوع: ' + totalPaid.toFixed(2) + ' د.ل');
+    if (totalDiscount > 0) lines.push('🏷️ الخصومات: ' + totalDiscount.toFixed(2) + ' د.ل');
+    lines.push('⏳ الباقي: ' + remaining.toFixed(2) + ' د.ل');
     return lines.join('\n');
 }
 
@@ -4893,11 +4944,11 @@ function buildWorkerPdfReport(workerId, weekKeys) {
     const R = createPdfReport();
     R.band('تقرير بيانات العامل', w.name + (w.phone ? '  •  📞 ' + w.phone : ''));
     R.boxes([
-        { k: 'الأجر اليومي (د.ع)', v: (parseFloat(w.price) || 0).toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
+        { k: 'الأجر اليومي (د.ل)', v: (parseFloat(w.price) || 0).toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
         { k: 'الأسابيع المختارة', v: String(chosen.length), bg: '#f5f3ff', color: '#6d28d9' }
     ], 2);
     if (w.expense) R.kv('🧾 المصروفات', w.expense);
-    if (w.previousBalance) R.kv('📌 دين سابق', (parseFloat(w.previousBalance) || 0).toFixed(2) + ' د.ع');
+    if (w.previousBalance) R.kv('📌 دين سابق', (parseFloat(w.previousBalance) || 0).toFixed(2) + ' د.ل');
     if (w.previousBalanceNote) R.kv('ملاحظة الدين السابق', w.previousBalanceNote);
     R.gap(6);
     R.heading('📅 الأسابيع المختارة');
@@ -4919,7 +4970,7 @@ function buildWorkerPdfReport(workerId, weekKeys) {
         { k: 'إجمالي المدفوع', v: tp.toFixed(2), bg: '#ecfdf5', color: '#059669' },
         { k: 'الباقي', v: rem.toFixed(2), bg: rem > 0 ? '#fef2f2' : '#ecfdf5', color: rem > 0 ? '#dc2626' : '#059669' }
     ], 3);
-    R.note('أُنشئ هذا التقرير في ' + getEnglishDate() + ' — جميع المبالغ بالدينار العراقي');
+    R.note('أُنشئ هذا التقرير في ' + getEnglishDate() + ' — جميع المبالغ بالدينار الليبي');
     return { R: R, name: w.name };
 }
 
@@ -5108,9 +5159,9 @@ function buildCustomerPdfReport(cust) {
     projects.forEach(p => { const t = calcProjectTotals(p); gt += t.totalPrice; gp += t.totalPaid; gr += t.remaining; });
     R.boxes([
         { k: 'عدد المشاريع', v: String(projects.length), bg: '#f5f3ff', color: '#6d28d9' },
-        { k: 'إجمالي السعر (د.ع)', v: gt.toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
-        { k: 'المدفوع (د.ع)', v: gp.toFixed(2), bg: '#ecfdf5', color: '#059669' },
-        { k: 'الباقي (د.ع)', v: gr.toFixed(2), bg: gr > 0 ? '#fef2f2' : '#ecfdf5', color: gr > 0 ? '#dc2626' : '#059669' }
+        { k: 'إجمالي السعر (د.ل)', v: gt.toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
+        { k: 'المدفوع (د.ل)', v: gp.toFixed(2), bg: '#ecfdf5', color: '#059669' },
+        { k: 'الباقي (د.ل)', v: gr.toFixed(2), bg: gr > 0 ? '#fef2f2' : '#ecfdf5', color: gr > 0 ? '#dc2626' : '#059669' }
     ], 2);
 
     if (!projects.length) {
@@ -5600,8 +5651,8 @@ window.renderGoodsTable = function() {
         return `<tr>
             <td>${idx+1}</td>
             <td><input class="g-name" data-idx="${idx}" value="${escapeHtml(g.name||'')}" placeholder="اسم البضاعة"></td>
-            <td><input class="g-qty" data-idx="${idx}" type="number" value="${g.quantity||0}" step="0.01"></td>
-            <td><input class="g-price" data-idx="${idx}" type="number" value="${g.price||0}" step="0.01"></td>
+            <td><input class="g-qty" data-idx="${idx}" type="number" value="${g.quantity || ''}" step="0.01"></td>
+            <td><input class="g-price" data-idx="${idx}" type="number" value="${g.price || ''}" step="0.01"></td>
             <td class="g-total" data-idx="${idx}">${total.toFixed(2)}</td>
             <td><button class="g-log-acc" data-idx="${idx}" title="${g._loggedInAccounting ? 'مسجل في المحاسبة' : 'تسجيل في المحاسبة'}" style="background:${loggedColor}; color:white; border:none; border-radius:50%; width:22px; height:22px; cursor:pointer; font-size:0.65rem;">${loggedIcon}</button></td>
             <td><button class="g-delete" data-idx="${idx}">✖</button></td>
@@ -6398,10 +6449,35 @@ document.addEventListener("DOMContentLoaded",()=>{
     ['newExpAmount','newExpNote'].forEach(id=>{ document.getElementById(id)?.addEventListener("keydown",(e)=>{ if(e.key==='Enter'){ e.preventDefault(); window.addExtraExpense(); } }); });
     document.getElementById("workerPaymentsModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerPaymentsModal') window.closeWorkerPayments(); });
     document.getElementById("weekEditModal")?.addEventListener("click",(e)=>{ if(e.target.id==='weekEditModal') window.closeWeekEditor(); });
+
+    // ملاحظة المشروع / الاتفاق مع الزبون: حفظ تلقائي عند الكتابة
+    const projNoteEl = document.getElementById('projectNoteInput');
+    if (projNoteEl) {
+        let noteTimer = null;
+        const persistNote = () => {
+            const cust = userData?.customers?.find(c => c.id === currentCustomerId);
+            const proj = cust?.projects?.find(p => p.id === currentProjectId);
+            if (!proj) return;
+            proj.note = projNoteEl.value;
+            clearTimeout(noteTimer);
+            noteTimer = setTimeout(() => { autoSave(); }, 400);
+        };
+        projNoteEl.addEventListener('input', persistNote);
+        projNoteEl.addEventListener('blur', () => { persistNote(); autoSave(); });
+    }
 });
 
 window.addEventListener('online',()=>{ isOnline=true; updateHeaderSync('online'); });
 window.addEventListener('offline',()=>{ isOnline=false; updateHeaderSync('offline'); });
+
+// عند التركيز على أي حقل رقمي: تحديد الرقم الموجود كاملًا حتى تكتب فوقه مباشرة (بدون 0 يعيق الكتابة)
+document.addEventListener('focusin', (e) => {
+    const el = e.target;
+    if (!el || el.tagName !== 'INPUT') return;
+    if (el.type === 'number' || el.getAttribute('inputmode') === 'decimal') {
+        setTimeout(() => { try { el.select(); } catch (_) {} }, 0);
+    }
+});
 
 (function init(){
     document.getElementById("loginScreen").style.display="flex";
