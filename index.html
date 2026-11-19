@@ -148,6 +148,39 @@
         .goods-table .g-total { color: #d97706; font-weight: bold; }
         .btn-goods { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border: none; padding: 5px 10px; border-radius: 20px; color: white; font-size: 0.6rem; cursor: pointer; }
 
+        /* ===== حقول الأسعار (سعر المتر + سعر المتر الطولي) ===== */
+        .price-fields { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; }
+        .price-field { display: flex; align-items: center; gap: 6px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 22px; padding: 4px 10px; }
+        .price-field label { font-size: 0.68rem; font-weight: 800; color: #475569; white-space: nowrap; }
+        .price-field input { padding: 5px 6px; border-radius: 14px; width: 96px; border: 1px solid #cbd5e1; text-align: center; font-weight: 800; font-size: 0.78rem; }
+        .price-field.linear { background: #f5f3ff; border-color: #ddd6fe; }
+        .price-field.linear label { color: #6d28d9; }
+        .price-field.linear input { border-color: #c4b5fd; color: #6d28d9; }
+
+        /* ===== جدول المصاريف الإضافية داخل صفحة المشروع ===== */
+        .expenses-section { background: #fff1f2; border: 1px solid #fecdd3; }
+        .expenses-section h4 { color: #9f1239; }
+        .exp-total-badge { background: #fff; border: 1px solid #fecdd3; border-radius: 20px; padding: 4px 12px; font-size: 0.68rem; color: #be123c; font-weight: 700; }
+        .exp-total-badge b { font-size: 0.8rem; }
+        .exp-add-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+        .exp-add-row input { padding: 7px 8px; border: 1px solid #fecdd3; border-radius: 12px; font-size: 0.72rem; background: #fff; }
+        .exp-add-row #projectExpDate { flex: 0 1 132px; }
+        .exp-add-row #projectExpAmount { flex: 0 1 100px; text-align: center; font-weight: 700; color: #b91c1c; }
+        .exp-add-row #projectExpNote { flex: 1 1 150px; min-width: 0; }
+        .btn-exp-add { background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%); color: #fff; border: none; border-radius: 14px; padding: 8px 14px; font-weight: 800; font-size: 0.72rem; cursor: pointer; flex: 0 0 auto; }
+        .btn-exp-add:active { transform: scale(0.96); }
+        .exp-table { width: 100%; border-collapse: collapse; font-size: 0.66rem; }
+        .exp-table th { background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%); color: #fff; padding: 6px 4px; font-size: 0.6rem; }
+        .exp-table td { padding: 5px 4px; text-align: center; border-bottom: 1px solid #fecdd3; background: #fff; }
+        .exp-table tr:last-child td { border-bottom: none; }
+        .exp-table .exp-amount-input { width: 92px; padding: 4px; border: 1px solid #fecdd3; border-radius: 8px; font-size: 0.68rem; text-align: center; font-weight: 700; color: #b91c1c; }
+        .exp-table .exp-note-input { width: 100%; box-sizing: border-box; padding: 4px 6px; border: 1px solid #fecdd3; border-radius: 8px; font-size: 0.68rem; }
+        .exp-table .exp-date { color: #64748b; font-size: 0.6rem; white-space: nowrap; }
+        .exp-table .exp-del { background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: 3px 8px; cursor: pointer; font-size: 0.62rem; }
+        .exp-table .exp-acc { font-size: 0.58rem; white-space: nowrap; }
+        .btn-room-type.linear { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
+        .room-type-chip.linear { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+
         .rooms-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
         .rooms-table th { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; padding: 5px 2px; font-size: 0.58rem; }
         .rooms-table td { padding: 3px 2px; text-align: center; border-bottom: 1px solid #e2e8f0; }
@@ -398,6 +431,86 @@
         .worker-weeks-section { background: #fff; margin: 12px 12px 0; border-radius: 18px; padding: 12px; border: 1px solid #eef2f7; }
         .worker-weeks-section h4 { font-size: 0.8rem; color: #1e293b; margin-bottom: 8px; }
 
+        /* ===== جدول الدوام والأجور (شكل صفحة العامل) ===== */
+        .worker-detail-card { max-width: 1080px; }
+        .wage-hint { margin: 14px 12px 0; background: #ecfdf5; border: 1.5px dashed #34d399; border-radius: 14px; padding: 8px 12px; text-align: center; font-size: 0.72rem; font-weight: 800; line-height: 1.95; color: #b91c1c; }
+        .wage-hint .row2 { color: #0f766e; }
+        .wage-band { margin: 12px 12px 0; background: linear-gradient(135deg, #2b3444 0%, #3b4557 100%); border-radius: 14px 14px 0 0; padding: 8px 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .wage-rank { width: 27px; height: 27px; border-radius: 50%; background: #10b981; color: #fff; font-weight: 800; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; box-shadow: 0 0 0 3px rgba(16,185,129,0.18); }
+        .wage-band-name { color: #fff; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .wage-band-name small { font-size: 0.6rem; color: #a5b4fc; font-weight: 700; }
+        .wage-spacer { flex: 1 1 12px; }
+        .wage-btn { border: none; cursor: pointer; color: #fff; font-weight: 800; font-size: 0.68rem; padding: 7px 12px; border-radius: 9px; white-space: nowrap; transition: transform 0.12s, filter 0.15s; }
+        .wage-btn:active { transform: scale(0.95); }
+        .wage-btn.add { background: #9333ea; }
+        .wage-btn.add:hover { filter: brightness(1.12); }
+        .wage-btn.del { background: #dc2626; }
+        .wage-table-wrap { margin: 0 12px 12px; background: #fff; border: 1px solid #cbd5e1; border-top: none; border-radius: 0 0 14px 14px; overflow-x: auto; }
+        .wage-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; min-width: 830px; }
+        .wage-table th { background: #f1f5f9; color: #334155; font-weight: 800; font-size: 0.62rem; padding: 9px 4px; border-bottom: 1px solid #cbd5e1; border-left: 1px solid #e2e8f0; white-space: nowrap; }
+        .wage-table th:first-child { border-left: none; }
+        .wage-table td { padding: 6px 4px; text-align: center; border-bottom: 1px solid #eef2f7; border-left: 1px solid #f8fafc; vertical-align: middle; }
+        .wage-table tbody tr:last-child td { border-bottom: none; }
+        .wage-table tbody tr.w-current { background: #faf5ff; }
+        .w-week { min-width: 96px; }
+        .w-week .w-num { display: inline-flex; width: 19px; height: 19px; border-radius: 50%; background: #10b981; color: #fff; font-size: 0.6rem; font-weight: 800; align-items: center; justify-content: center; margin-left: 4px; vertical-align: middle; }
+        .w-week .w-lbl { font-weight: 800; color: #334155; font-size: 0.7rem; }
+        .w-week .w-tag { display: block; font-size: 0.55rem; color: #7c3aed; font-weight: 800; margin-top: 2px; }
+        .w-date { white-space: nowrap; color: #334155; font-weight: 700; font-size: 0.68rem; }
+        .w-days, .w-price { background: #fdf7e3; }
+        .w-days input, .w-price input { width: 58px; padding: 3px 2px 3px 14px; border: 1px solid #e7dcb7; border-radius: 7px; background: #fffdf5; text-align: center; font-size: 0.72rem; font-weight: 800; color: #334155; }
+        .w-days input { width: 48px; }
+        .w-price input:focus, .w-days input:focus { outline: none; border-color: #a78bfa; box-shadow: 0 0 0 2px rgba(167,139,250,0.2); }
+        .w-pay-chips { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; max-width: 150px; margin: 0 auto; }
+        .w-chip { border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 0.62rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; cursor: pointer; }
+        .w-chip.add { background: #eef2ff; border-color: #c7d2fe; color: #4338ca; }
+        .w-chip:hover { background: #e0e7ff; }
+        .w-empty { color: #cbd5e1; font-size: 0.64rem; }
+        .w-pill { display: inline-block; min-width: 54px; padding: 3px 8px; border-radius: 7px; font-weight: 800; font-size: 0.7rem; border: 1px solid transparent; direction: ltr; unicode-bidi: isolate; text-align: center; }
+        .w-pill.green { background: #e7f8ef; color: #047857; border-color: #bbf7d0; }
+        .w-pill.purple { background: #f3e8ff; color: #7e22ce; border-color: #e9d5ff; }
+        .w-pill.red { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+        .w-pill.teal { background: #ccfbf1; color: #0f766e; border-color: #99f6e4; }
+        .w-adj { display: block; font-size: 0.52rem; color: #b45309; font-weight: 700; margin-top: 2px; white-space: nowrap; }
+        .w-act { width: 34px; white-space: nowrap; }
+        .w-del { border: none; cursor: pointer; background: #dc2626; color: #fff; width: 20px; height: 20px; border-radius: 6px; font-size: 0.62rem; line-height: 1; font-weight: 800; }
+        .w-edit { border: 1px solid #cbd5e1; background: #fff; color: #475569; width: 20px; height: 20px; border-radius: 6px; font-size: 0.6rem; cursor: pointer; margin-left: 3px; }
+        .wage-table tfoot td { background: #fef9e7; border-top: 2px solid #e2d9a8; font-weight: 800; color: #0f172a; font-size: 0.74rem; padding: 9px 4px; }
+        .wage-table tfoot .num { direction: ltr; unicode-bidi: isolate; }
+        .wage-table tfoot .t-label { background: #334155; color: #fff; font-size: 0.7rem; }
+        .wage-table tfoot .num.due { color: #7e22ce; }
+        .wage-table tfoot .num.paid { color: #047857; }
+        .wage-table tfoot .num.rem { color: #dc2626; }
+        .wage-table tfoot .num.rem.neg { color: #dc2626; }
+        .wage-empty { padding: 26px 10px; text-align: center; color: #94a3b8; font-size: 0.78rem; font-weight: 700; }
+        @media (max-width: 820px) {
+            .wage-hint { font-size: 0.68rem; padding: 7px 9px; margin: 12px 10px 0; }
+            .wage-band { margin: 10px 10px 0; border-radius: 12px 12px 0 0; }
+            .wage-btn { flex: 1 1 auto; padding: 7px 8px; font-size: 0.64rem; }
+            .wage-table-wrap { margin: 0 10px 12px; padding: 8px; background: #f8fafc; border-radius: 0 0 12px 12px; overflow: visible; }
+            .wage-table { min-width: 0; }
+            .wage-table thead { display: none; }
+            .wage-table, .wage-table tbody, .wage-table tfoot, .wage-table tr, .wage-table td { display: block; width: 100%; }
+            .wage-table tbody tr { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 8px; position: relative; padding: 7px 8px 6px 36px; box-shadow: 0 2px 6px rgba(15,23,42,0.05); }
+            .wage-table tbody tr.w-current { background: #faf5ff; border-color: #ddd6fe; }
+            .wage-table td { border: none !important; background: transparent !important; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 0; text-align: left; }
+            .wage-table td::before { content: attr(data-label); color: #64748b; font-size: 0.64rem; font-weight: 700; }
+            .wage-table td.w-week { display: block; text-align: right; padding-bottom: 6px; border-bottom: 1px dashed #e2e8f0 !important; margin-bottom: 5px; }
+            .wage-table td.w-week::before { content: none; }
+            .wage-table td.w-week .w-tag { display: inline; margin: 0 4px; }
+            .wage-table td.w-pays::before { content: none; }
+            .w-pay-chips { justify-content: flex-end; max-width: none; margin: 0; }
+            .wage-table td.w-act { position: absolute; top: 7px; left: 7px; width: auto; padding: 0; }
+            .wage-table td.w-act::before { content: none; }
+            .w-edit { display: none; }
+            .w-days input, .w-price input { width: 72px; }
+            .wage-table tfoot tr { display: grid; grid-template-columns: 1fr 1fr; background: #fef9e7; border: 1px solid #e2d9a8; border-radius: 12px; overflow: hidden; }
+            .wage-table tfoot td { border: none; padding: 8px 10px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #fef9e7; }
+            .wage-table tfoot td::before { content: attr(data-label); color: #92400e; font-size: 0.6rem; font-weight: 700; }
+            .wage-table tfoot td.t-label { grid-column: 1 / -1; text-align: center; background: #334155; order: -1; }
+            .wage-table tfoot td.t-label::before { content: none; }
+        }
+
         .invoice-modal .modal-content { max-width: 600px; max-height: 90vh; padding: 0; overflow: hidden; }
         .invoice-header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 20px; text-align: center; }
         .invoice-header h2 { margin: 0; font-size: 1.2rem; }
@@ -548,14 +661,23 @@
                     <button onclick="window.goBack()" class="nav-back">🔙 رجوع</button>
                 </div>
                 <div class="project-detail-card" id="projectDetailCard" style="background:white; border-radius:20px; padding:16px;">
-                    <div><label>💰 سعر المتر:</label><input type="number" id="globalPricePerMeter" step="0.01" value="50" style="margin:8px 0; padding:6px; border-radius:20px; width:120px;"></div>
+                    <div class="price-fields">
+                        <div class="price-field">
+                            <label>💰 سعر المتر:</label>
+                            <input type="number" id="globalPricePerMeter" step="0.01" value="50">
+                        </div>
+                        <div class="price-field linear">
+                            <label>📏 سعر المتر الطولي:</label>
+                            <input type="number" id="globalLinearPricePerMeter" step="0.01" value="0">
+                        </div>
+                    </div>
 
                     <div class="project-summary-box">
                         <h4>📊 ملخص المشروع</h4>
                         <div class="summary-row"><span>💵 إجمالي المشروع:</span><span id="projectGrandTotal">0.00</span> د.ع</div>
                         <div class="summary-row"><span>💰 مجموع الدفعات:</span><span id="totalPayments">0.00</span> د.ع</div>
                         <div class="summary-row"><span>🏷️ الخصومات:</span><span id="totalDiscounts">0.00</span> د.ع</div>
-                        <div class="summary-row"><span>📦 تكلفة البضاعة:</span><span id="totalGoodsCostSum">0.00</span> د.ع</div>
+                        <div class="summary-row"><span>📏 الأمتار الطولية:</span><span id="projectLinearMeters">0.00</span> م</div>
                         <div class="summary-row"><span>🧾 مصاريف إضافية:</span><span id="projectExtraExpensesSum" style="color:#dc2626;">0.00</span> د.ع</div>
                         <div class="summary-row"><span>📐 مساحة المشروع:</span><span id="projectTotalArea">0.00</span> م²</div>
                         <div class="summary-row total"><span>📊 أرباح المشروع:</span><span id="projectProfitSum">0.00</span> د.ع</div>
@@ -585,27 +707,35 @@
                                 <button id="addRoomInProject" class="btn-primary">➕ غرفة</button>
                                 <button id="addBathInProject" class="btn-room-type bath">🛁 حمام</button>
                                 <button id="addCorridorInProject" class="btn-room-type corridor">🚪 ممر</button>
+                                <button id="addLinearInProject" class="btn-room-type linear" title="الطولي: (الطول + العرض) × 2 — وإذا أُدخل حقل واحد تُحسب هذه الخانة فقط">📏 طولي</button>
                             </div>
                         </div>
                         <div class="table-wrapper">
                             <table class="rooms-table">
-                                <thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>النتيجة</th><th>القيمة</th><th></th></tr></thead>
+                                <thead><tr><th>#</th><th>الطول</th><th>العرض</th><th>النوع</th><th>القياس</th><th>القيمة</th><th></th></tr></thead>
                                 <tbody id="roomsTableBody"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <div class="section-box goods-section">
+                    <div class="section-box expenses-section">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                            <h4 style="margin:0;">📦 البضاعة</h4>
-                            <button class="btn-goods" onclick="window.addGoodsRow()">➕ إضافة</button>
+                            <h4 style="margin:0;">🧾 المصاريف الإضافية</h4>
+                            <span class="exp-total-badge">الإجمالي: <b id="projectExpensesTotal">0.00</b> د.ع</span>
+                        </div>
+                        <div class="exp-add-row">
+                            <input type="date" id="projectExpDate" title="تاريخ المصروف">
+                            <input type="number" id="projectExpAmount" step="0.01" min="0" placeholder="القيمة">
+                            <input type="text" id="projectExpNote" placeholder="📝 الملاحظة / البيان">
+                            <button class="btn-exp-add" onclick="window.addProjectExpenseInline()">➕ إضافة</button>
                         </div>
                         <div class="table-wrapper">
-                            <table class="goods-table">
-                                <thead><tr><th>#</th><th>البضاعة</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th><th>محاسبة</th><th></th></tr></thead>
-                                <tbody id="goodsBody"></tbody>
+                            <table class="exp-table">
+                                <thead><tr><th>#</th><th>التاريخ</th><th>القيمة</th><th>الملاحظة</th><th>محاسبة</th><th></th></tr></thead>
+                                <tbody id="projectExpensesBody"></tbody>
                             </table>
                         </div>
+                        <div style="font-size:0.6rem; color:#b91c1c; margin-top:4px; text-align:center;">كل مصروف يُسجَّل تلقائياً في المحاسبة (أحمر 💸) ويُضاف على إجمالي المشروع</div>
                     </div>
 
                     <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
@@ -790,9 +920,23 @@
             </div>
         </div>
 
-        <!-- جدول سجل الأسابيع -->
-        <div class="wd-section" style="margin-bottom:14px;">
-            <div class="wd-section-title">📋 سجل الأسابيع</div>
+        <!-- جدول الدوام والأجور -->
+        <div class="wage-hint">
+            <div>✂️ <b>إجمالي المستحق = السعر × أيام العمل</b> &nbsp;•&nbsp; ✂️ <b>الباقي = إجمالي المستحق − إجمالي الدفعات</b></div>
+            <div class="row2">🗓️ أسبوع العمل يبدأ السبت — يُضاف كل أسبوع منتهٍ تلقائيًا إلى الجدول</div>
+        </div>
+
+        <div class="wage-band">
+            <span class="wage-rank" id="wageRank">1</span>
+            <span class="wage-band-name" onclick="window.openWorkerEdit()" title="تعديل اسم العامل">
+                <span id="wageBandName"></span> <small>✏️</small>
+            </span>
+            <span class="wage-spacer"></span>
+            <button class="wage-btn add" onclick="window.addWorkerWeek()">➕ إضافة أسبوع</button>
+            <button class="wage-btn del" onclick="window.deleteCurrentWorker()">🗑️ حذف الشخص</button>
+        </div>
+
+        <div class="wage-table-wrap">
             <div id="workerWeeksList"></div>
         </div>
     </div>
@@ -1365,6 +1509,11 @@ function autoRollWeek() {
             if (k === currentWeekKey) continue;
             let content = userData.workersByWeek[k];
             if (!content || !content.length) continue;
+            // أسبوع عليه دفعات مسجّلة ليس نسخة مكرّرة — لا يُحذف أبداً
+            let hasPayments = Object.keys(userData.workerPayments || {}).some(id =>
+                (userData.workerPayments[id] || []).some(p => (p.weekKey || 'أخرى') === k)
+            );
+            if (hasPayments) continue;
             // الأسابيع الفارغة (أصفار) لا تُ considered مكرّرة — تمييزها يبقى كما هو
             let hasData = content.some(w => dayKeys.reduce((s,d)=>s+((w.days&&w.days[d])||0),0) > 0 || (w.expense||0) > 0);
             if (!hasData) continue;
@@ -2002,6 +2151,13 @@ window.showWorkerDetail = function(workerId) {
     }
     let avEl = document.getElementById('workerDetailAvatar');
     if (avEl) avEl.textContent = (w.name || '؟').trim().charAt(0);
+    const bandName = document.getElementById('wageBandName');
+    if (bandName) bandName.textContent = w.name;
+    const rankEl = document.getElementById('wageRank');
+    if (rankEl) {
+        const idx = (getWorkersToDisplay() || []).findIndex(x => x.id === workerId) + 1;
+        rankEl.textContent = idx > 0 ? idx : '•';
+    }
     updateWorkerHideBtn();
 
     let priceInput = document.getElementById('workerDetailPriceInput');
@@ -2015,37 +2171,45 @@ window.showWorkerDetail = function(workerId) {
     // إغلاق لوحات الإدخال
     document.querySelectorAll('.wd-box').forEach(b => b.style.display = 'none');
 
-    document.getElementById('workerDetailDeleteBtn').onclick = function() {
-        if (weekOffset !== 0) {
-            if(confirm("⚠️ إزالة العامل '" + w.name + "' من هذا الأسبوع فقط؟\n\n✅ لن يُحذف من الأسابيع الأخرى")) {
-                let weekKey = getWeekKey(weekOffset);
-                if (userData.workersByWeek && userData.workersByWeek[weekKey]) {
-                    userData.workersByWeek[weekKey] = userData.workersByWeek[weekKey].filter(x => x.id !== workerId);
-                }
-                displayedWorkers = displayedWorkers.filter(x => x.id !== workerId);
-                window.closeWorkerDetail();
-                window.renderWorkersTable();
-                saveToLocal();
-                autoSave();
-                showToast(`✅ تم إزالة "${w.name}" من الأسبوع ${weekKey}`);
-            }
-        } else {
-            if(confirm("⚠️ إزالة العامل '" + w.name + "' من الأسبوع الحالي فقط؟\n\n✅ لن يُحذف من الأسابيع السابقة")) {
-                userData.workers = userData.workers.filter(x => x.id !== workerId);
-                let wk = getCurrentWeekKey();
-                if (userData.workersByWeek) {
-                    userData.workersByWeek[wk] = JSON.parse(JSON.stringify(userData.workers));
-                }
-                window.closeWorkerDetail();
-                window.renderWorkersTable();
-                autoSave();
-                showToast(`✅ تم إزالة "${w.name}" من الأسبوع الحالي`);
-            }
-        }
-    };
+    document.getElementById('workerDetailDeleteBtn').onclick = window.deleteCurrentWorker;
 
     renderWorkerWeeks(workerId);
     document.getElementById('workerDetailPage').style.display = 'block';
+};
+
+// 🗑️ حذف العامل من الأسبوع المعروض (الحالي أو المؤرشف)
+window.deleteCurrentWorker = function() {
+    const workerId = window._currentDetailWorkerId;
+    if (!workerId) return;
+    const w = (getWorkersToDisplay() || []).find(x => x.id === workerId)
+           || (userData.workers || []).find(x => x.id === workerId);
+    if (!w) return;
+    if (weekOffset !== 0) {
+        if(confirm("⚠️ إزالة العامل '" + w.name + "' من هذا الأسبوع فقط؟\n\n✅ لن يُحذف من الأسابيع الأخرى")) {
+            let weekKey = getWeekKey(weekOffset);
+            if (userData.workersByWeek && userData.workersByWeek[weekKey]) {
+                userData.workersByWeek[weekKey] = userData.workersByWeek[weekKey].filter(x => x.id !== workerId);
+            }
+            displayedWorkers = displayedWorkers.filter(x => x.id !== workerId);
+            window.closeWorkerDetail();
+            window.renderWorkersTable();
+            saveToLocal();
+            autoSave();
+            showToast(`✅ تم إزالة "${w.name}" من الأسبوع ${weekKey}`);
+        }
+    } else {
+        if(confirm("⚠️ إزالة العامل '" + w.name + "' من الأسبوع الحالي فقط؟\n\n✅ لن يُحذف من الأسابيع السابقة")) {
+            userData.workers = userData.workers.filter(x => x.id !== workerId);
+            let wk = getCurrentWeekKey();
+            if (userData.workersByWeek) {
+                userData.workersByWeek[wk] = JSON.parse(JSON.stringify(userData.workers));
+            }
+            window.closeWorkerDetail();
+            window.renderWorkersTable();
+            autoSave();
+            showToast(`✅ تم إزالة "${w.name}" من الأسبوع الحالي`);
+        }
+    }
 };
 
 window.closeWorkerDetail = function() {
@@ -2110,6 +2274,8 @@ window.openWorkerEdit = function() {
         close();
         const heroName = document.getElementById('workerDetailName');
         if (heroName) heroName.textContent = name;
+        const bandName = document.getElementById('wageBandName');
+        if (bandName) bandName.textContent = name;
         const heroAvatar = document.getElementById('workerDetailAvatar');
         if (heroAvatar) heroAvatar.textContent = name.charAt(0);
         const wdPhone = document.getElementById('workerDetailPhone');
@@ -2126,7 +2292,7 @@ window.openWorkerEdit = function() {
     });
 };
 
-function getWorkerLedger(workerId) {
+function getWorkerLedger(workerId, opts) {
     let activeWeekKey = (weekOffset === 0) ? getCurrentWeekKey() : getWeekKey(weekOffset);
     let activeWorker = (weekOffset === 0)
         ? userData.workers.find(x => x.id === workerId)
@@ -2144,27 +2310,63 @@ function getWorkerLedger(workerId) {
     }
 
     let paidByWeek = {};
+    let paymentsByWeek = {};
     let wpm = (userData.workerPayments && userData.workerPayments[workerId]) || [];
     wpm.forEach(pm => {
         let wk = pm.weekKey || 'أخرى';
         paidByWeek[wk] = (paidByWeek[wk] || 0) + (pm.amount || 0);
+        (paymentsByWeek[wk] = paymentsByWeek[wk] || []).push(pm);
     });
 
-    let weekKeys = Object.keys(weeksMap).sort((a, b) => b.localeCompare(a));
+    // الأسابيع المعروضة: الأقدم ← الأحدث
+    let weekKeys = Object.keys(weeksMap).sort();
+
+    // (اختياري) ملء الفراغات: كل أسبوع انتهى يظهر تلقائياً في الجدول حتى الأسبوع الحالي
+    if (opts && opts.fillGaps && weekKeys.length) {
+        let first = weekKeys[0];
+        let last = weekKeys[weekKeys.length - 1];
+        let cur = getCurrentWeekKey();
+        let end = last > cur ? last : cur;
+        let filled = [];
+        let k = first;
+        let guard = 0;
+        while (k && k <= end && guard < 130) {
+            filled.push(k);
+            k = weekKeyAfter(k);
+            guard++;
+        }
+        // حد أقصى معقول: الأحدث 130 أسبوعاً فقط (لتجنّب جداول ضخمة)
+        if (filled.length > 130) filled = filled.slice(-130);
+        weekKeys = filled;
+    }
+
+    // السعر الموروث: أسبوع بلا سجل يأخذ سعر آخر أسبوع معروف
+    let runningPrice = (activeWorker && activeWorker.price) || 0;
+    let baseWorker = (userData.workers || []).find(x => x.id === workerId)
+        || (displayedWorkers || []).find(x => x.id === workerId);
+
     let rows = weekKeys.map(wkKey => {
         let w = weeksMap[wkKey];
-        let daysCount = dayKeys.reduce((s, k) => s + (w.days?.[k] || 0), 0);
-        let due = calculateWorkerTotal(w);
+        if (w && (w.price || 0) > 0) runningPrice = w.price;
+        else if (!w && !runningPrice && baseWorker) runningPrice = baseWorker.price || 0;
+        let daysCount = w ? dayKeys.reduce((s, k) => s + (w.days?.[k] || 0), 0) : 0;
+        let due = w ? calculateWorkerTotal(w) : 0;
         let paid = paidByWeek[wkKey] || 0;
+        let price = w ? (w.price || 0) : runningPrice;
         return {
             weekKey: wkKey,
             dateRange: (getWeekDateRangeFromKey(wkKey).replace(/[()]/g, '').trim()) || wkKey,
-            days: dayKeys.map(k => !!(w.days && w.days[k])),
+            days: w ? dayKeys.map(k => !!(w.days && w.days[k])) : dayKeys.map(() => false),
             daysCount: daysCount,
             due: due,
             paid: paid,
             remain: due - paid,
-            isCurrent: wkKey === activeWeekKey
+            price: price,
+            gross: daysCount * price,
+            adj: w ? ((w.previousBalance || 0) - (w.expense || 0)) : 0,
+            payments: paymentsByWeek[wkKey] || [],
+            isCurrent: wkKey === activeWeekKey,
+            noRecord: !w
         };
     });
 
@@ -2175,79 +2377,220 @@ function renderWorkerWeeks(workerId) {
     let container = document.getElementById('workerWeeksList');
     if (!container) return;
 
-    let rows = getWorkerLedger(workerId);
+    // الأقدم أولاً: الأسبوع 1 (مرجعي) ← الأسبوع الحالي (مع كل الأسابيع المنتهية)
+    let rows = getWorkerLedger(workerId, { fillGaps: true }).slice().sort((a, b) => a.weekKey.localeCompare(b.weekKey));
 
     if (rows.length === 0) {
-        container.innerHTML = '<div class="empty-message">لا توجد أسابيع محفوظة</div>';
+        container.innerHTML = '<div class="wage-empty">لا توجد أسابيع محفوظة — اضغط ➕ إضافة أسبوع للبدء</div>';
         return;
     }
 
-    let dayLetters = ['س', 'ح', 'ن', 'ث', 'ر', 'خ', 'ج'];
-    let headLetters = dayLetters.map(l => `<span class="day-mark head">${l}</span>`).join('');
-
-    let totalDue = 0, totalPaid = 0;
-    let body = rows.map(r => {
-        totalDue += r.due;
+    let totalDays = 0, totalDue = 0, totalPaid = 0, totalAdj = 0;
+    let body = rows.map((r, i) => {
+        totalDays += r.daysCount;
+        totalDue += r.gross;
         totalPaid += r.paid;
-        let remain = r.remain;
-        let marks = r.days.map((on, i) =>
-            `<span class="day-mark ${on ? 'on' : 'off'}" title="${dayLetters[i]}">${on ? '✓' : '·'}</span>`
-        ).join('');
-        let now = r.isCurrent ? '<span class="wd-now">الحالي</span>' : '';
-        return `<tr class="${r.isCurrent ? 'wd-current' : ''}">
-            <td class="wd-date">${escapeHtml(r.dateRange)}${now}</td>
-            <td><div class="day-marks">${marks}</div></td>
-            <td class="num due">${r.due.toFixed(2)}</td>
-            <td class="num paid">${r.paid.toFixed(2)}</td>
-            <td class="num ${remain >= 0 ? 'pos' : 'neg'}">${remain.toFixed(2)}</td>
-            <td><button class="pay-edit-btn" data-wk="${escapeHtml(r.weekKey)}" title="تعديل هذا الأسبوع كاملاً (أيام + مستحق + دفعات)">✏️ تعديل</button></td>
+        totalAdj += r.adj;
+        let remain = r.gross + r.adj - r.paid;
+
+        let tags = '';
+        if (r.isCurrent) tags = '<span class="w-tag">(الحالي)</span>';
+        else if (i === 0) tags = '<span class="w-tag">(مرجعي)</span>';
+
+        let chips = (r.payments || []).map(p => {
+            let v = p.amount || 0;
+            let txt = Number.isInteger(v) ? String(v) : v.toFixed(2);
+            return `<button class="w-chip" data-pay-week="${escapeHtml(r.weekKey)}" title="تعديل دفعات هذا الأسبوع">${txt}</button>`;
+        }).join('');
+
+        let adjLine = Math.abs(r.adj) > 0.001
+            ? `<span class="w-adj">${r.adj > 0 ? 'دين سابق +' : 'مصاريف −'}${Math.abs(r.adj).toFixed(2)}</span>`
+            : '';
+
+        return `<tr class="${r.isCurrent ? 'w-current' : ''}" data-wk="${escapeHtml(r.weekKey)}">
+            <td class="w-week" data-label="الأسبوع">
+                <span class="w-num">${i + 1}</span><span class="w-lbl">الأسبوع ${i + 1}</span>${tags}
+            </td>
+            <td class="w-date" data-label="التاريخ (السبت)">📅 ${escapeHtml(wageDateLabel(r.weekKey))}</td>
+            <td class="w-days" data-label="أيام العمل">
+                <input type="number" class="w-days-in" min="0" max="7" step="1" value="${r.daysCount}" title="عدد أيام العمل — للأيام بالتحديد اضغط ✏️">
+            </td>
+            <td class="w-price" data-label="السعر (اليوم)">
+                <input type="number" class="w-price-in" min="0" step="0.01" value="${r.price}" title="أجر اليوم لهذا الأسبوع">
+            </td>
+            <td class="w-pays" data-label="الدفعات (منفصلة)">
+                <div class="w-pay-chips">
+                    ${chips || '<span class="w-empty">—</span>'}
+                    <button class="w-chip add" data-add-pay="${escapeHtml(r.weekKey)}" title="إضافة دفعة لهذا الأسبوع">＋</button>
+                </div>
+            </td>
+            <td class="w-paid-cell" data-label="إجمالي الدفعات"><span class="w-pill green">${r.paid.toFixed(2)}</span></td>
+            <td class="w-due-cell" data-label="إجمالي المستحق (السعر × الأيام)"><span class="w-pill purple">${r.gross.toFixed(2)}</span></td>
+            <td class="w-remain-cell" data-label="الباقي">
+                <span class="w-pill red">${remain.toFixed(2)}</span>${adjLine}
+            </td>
+            <td class="w-act">
+                <button class="w-edit" data-edit-week="${escapeHtml(r.weekKey)}" title="تعديل الأسبوع كاملاً (الأيام + الدفعات + الدين السابق)">✏️</button>
+                <button class="w-del" data-del-week="${escapeHtml(r.weekKey)}" title="حذف سجل هذا الأسبوع">✖</button>
+            </td>
         </tr>`;
     }).join('');
 
-    let totalRemain = totalDue - totalPaid;
+    let totalRemain = totalDue + totalAdj - totalPaid;
+    let adjFoot = Math.abs(totalAdj) > 0.001
+        ? `<span class="w-adj" style="color:#92400e;">دين سابق/مصاريف ${totalAdj > 0 ? '+' : '−'}${Math.abs(totalAdj).toFixed(2)}</span>`
+        : '';
 
     container.innerHTML = `
-        <div class="wd-ledger-wrap">
-            <table class="wd-ledger">
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>أيام العمل</th>
-                        <th>المستحق</th>
-                        <th>الدفعات</th>
-                        <th>الباقي</th>
-                        <th>تعديل</th>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <th><div class="day-marks">${headLetters}</div></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>${body}</tbody>
-                <tfoot>
-                    <tr>
-                        <td>الإجمالي</td>
-                        <td></td>
-                        <td>${totalDue.toFixed(2)}</td>
-                        <td>${totalPaid.toFixed(2)}</td>
-                        <td class="num ${totalRemain >= 0 ? 'pos' : 'neg'}">${totalRemain.toFixed(2)}</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>`;
+        <table class="wage-table">
+            <thead>
+                <tr>
+                    <th>الأسابيع</th>
+                    <th>التاريخ (السبت)</th>
+                    <th>أيام العمل</th>
+                    <th>السعر (اليوم)</th>
+                    <th>الدفعات (منفصلة)</th>
+                    <th>إجمالي الدفعات</th>
+                    <th>إجمالي المستحق (السعر × الأيام)</th>
+                    <th>الباقي</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>${body}</tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td class="num" data-label="أيام العمل">${totalDays}</td>
+                    <td data-label="السعر">-</td>
+                    <td data-label="الدفعات">-</td>
+                    <td class="num paid" data-label="إجمالي الدفعات">${totalPaid.toFixed(2)}</td>
+                    <td class="num due" data-label="إجمالي المستحق">${totalDue.toFixed(2)}${adjFoot}</td>
+                    <td class="num rem ${totalRemain < 0 ? 'neg' : ''}" data-label="الباقي">${totalRemain.toFixed(2)}</td>
+                    <td class="t-label" data-label="مجموع الشخص">مجموع الشخص</td>
+                </tr>
+            </tfoot>
+        </table>`;
 
-    container.querySelectorAll('.pay-edit-btn').forEach(btn => {
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            window.openWeekEditor(workerId, btn.dataset.wk);
+    // الأيام: العدد يوزَّع من السبت، والتعديل الدقيق من ✏️
+    container.querySelectorAll('.w-days-in').forEach(inp => {
+        inp.onchange = () => {
+            let wk = inp.closest('tr') && inp.closest('tr').dataset.wk;
+            if (!wk) return;
+            let n = Math.max(0, Math.min(7, Math.round(parseFloat(inp.value) || 0)));
+            let rec = resolveWeekRecord(workerId, wk);
+            if (!rec) { renderWorkerWeeks(workerId); return; }
+            let priceInp = inp.closest('tr').querySelector('.w-price-in');
+            if (priceInp) rec.price = Math.max(0, parseFloat(priceInp.value) || 0);
+            let days = {};
+            dayKeys.forEach((k, i) => { days[k] = i < n ? 1 : 0; });
+            rec.days = days;
+            applyWeekEdit(workerId, wk, rec);
+            renderWorkerWeeks(workerId);
+            window.renderWorkersTable();
+            updateWorkersStats();
+            saveToLocal();
         };
     });
+
+    // السعر: أجر اليوم لهذا الأسبوع فقط
+    container.querySelectorAll('.w-price-in').forEach(inp => {
+        inp.onchange = () => {
+            let wk = inp.closest('tr') && inp.closest('tr').dataset.wk;
+            if (!wk) return;
+            let rec = resolveWeekRecord(workerId, wk);
+            if (!rec) { renderWorkerWeeks(workerId); return; }
+            rec.price = Math.max(0, parseFloat(inp.value) || 0);
+            applyWeekEdit(workerId, wk, rec);
+            renderWorkerWeeks(workerId);
+            window.renderWorkersTable();
+            updateWorkersStats();
+            saveToLocal();
+        };
+    });
+
+    container.querySelectorAll('[data-pay-week]').forEach(b => {
+        b.onclick = () => window.openWorkerPaymentsForWorker(workerId, b.dataset.payWeek, false);
+    });
+    container.querySelectorAll('[data-add-pay]').forEach(b => {
+        b.onclick = () => window.openWorkerPaymentsForWorker(workerId, b.dataset.addPay, true);
+    });
+    container.querySelectorAll('[data-edit-week]').forEach(b => {
+        b.onclick = () => window.openWeekEditor(workerId, b.dataset.editWeek);
+    });
+    container.querySelectorAll('[data-del-week]').forEach(b => {
+        b.onclick = () => window.deleteWorkerWeek(workerId, b.dataset.delWeek);
+    });
 }
+
+// تاريخ السبت (بداية الأسبوع) من مفتاح الأسبوع — بصيغة YYYY/MM/DD
+function weekKeySaturdayDate(wk) {
+    let m = /^(\d{4})-W(\d{1,2})$/.exec(String(wk || ''));
+    if (!m) return null;
+    let Y = parseInt(m[1]), W = parseInt(m[2]);
+    for (let d = 7 * W - 6; d <= 7 * W; d++) {
+        let cand = new Date(Y, 0, d);
+        if (cand.getDay() === 6) return cand;
+    }
+    return null;
+}
+
+function wageDateLabel(wk) {
+    let d = weekKeySaturdayDate(wk);
+    if (!d) return wk;
+    return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+}
+
+// ➕ إضافة أسبوع جديد: يفتح محرر الأسبوع التالي لآخر أسبوع مسجّل
+window.addWorkerWeek = function(workerId) {
+    workerId = workerId || window._currentDetailWorkerId;
+    if (!workerId) return;
+    let keys = getWorkerLedger(workerId, { fillGaps: true }).map(r => r.weekKey).sort();
+    let lastKey = keys.length ? keys[keys.length - 1] : getCurrentWeekKey();
+    let nextKey = weekKeyAfter(lastKey) || getCurrentWeekKey();
+    if (!resolveWeekRecord(workerId, nextKey)) {
+        alert('⚠️ تعذّر إنشاء أسبوع جديد لهذا العامل.\nأضِفه أولاً إلى الأسبوع الحالي.');
+        return;
+    }
+    window.openWeekEditor(workerId, nextKey);
+    showToast('📅 أضف أيام وسعر الأسبوع ثم اضغط 💾');
+};
+
+// 🗑️ حذف سجل أسبوع من جدول العامل
+window.deleteWorkerWeek = function(workerId, weekKey) {
+    if (!workerId || !weekKey) return;
+    let isLive = weekKey === getCurrentWeekKey();
+
+    if (isLive) {
+        if (!confirm('⚠️ حذف بيانات الأسبوع الحالي (الأيام والدفعات) لهذا العامل؟\n\nسيبقى العامل في جدول الأسبوع الحالي، ويمكنك إعادة إدخال أيامه.')) return;
+        let rec = resolveWeekRecord(workerId, weekKey);
+        if (rec) {
+            rec.days = {}; dayKeys.forEach(k => rec.days[k] = 0);
+            applyWeekEdit(workerId, weekKey, rec);
+        }
+    } else {
+        if (!confirm('⚠️ حذف سجل هذا الأسبوع (الأيام + السعر + الدفعات) من جدول العامل؟\n\nسيُحذف هذا الأسبوع فقط.')) return;
+        if (userData.workersByWeek && userData.workersByWeek[weekKey]) {
+            userData.workersByWeek[weekKey] = userData.workersByWeek[weekKey].filter(x => x.id !== workerId);
+        }
+        let arc = (userData.workersArchives || []).find(a => a.weekKey === weekKey);
+        if (arc && arc.workers) arc.workers = arc.workers.filter(x => x.id !== workerId);
+        if (weekOffset !== 0 && getWeekKey(weekOffset) === weekKey) {
+            displayedWorkers = (displayedWorkers || []).filter(x => x.id !== workerId);
+        }
+    }
+
+    if (userData.workerPayments && userData.workerPayments[workerId]) {
+        userData.workerPayments[workerId] = userData.workerPayments[workerId].filter(p => (p.weekKey || 'أخرى') !== weekKey);
+    }
+
+    renderWorkerWeeks(workerId);
+    window.renderWorkersTable();
+    updateWorkersStats();
+    saveToLocal();
+    autoSave();
+    showToast('🗑️ تم حذف سجل الأسبوع');
+};
 
 // ===== تعديل الأسبوع الكامل (أيام + مستحق + دفعات) =====
 let weekEditorState = null; // { workerId, weekKey, rec }
@@ -2459,8 +2802,9 @@ window.openWeekEditor = function(workerId, weekKey) {
 
     document.getElementById('weTitle').textContent = '✏️ تعديل: ' + (rec.name || '');
     let range = (getWeekDateRangeFromKey(weekKey) || '').replace(/[()]/g, '').trim();
-    document.getElementById('weWeekInfo').textContent = '📅 ' + (range || weekKey) +
-        (weekKey === getCurrentWeekKey() ? ' — الأسبوع الحالي ⭐' : ' — أسبوع سابق ✏️');
+    let weekState = weekKey === getCurrentWeekKey() ? ' — الأسبوع الحالي ⭐'
+        : (weekKey > getCurrentWeekKey() ? ' — أسبوع قادم 📅' : ' — أسبوع سابق ✏️');
+    document.getElementById('weWeekInfo').textContent = '📅 ' + (range || weekKey) + weekState;
     document.getElementById('wePrice').value = rec.price || 0;
     document.getElementById('weExpense').value = rec.expense || 0;
 
@@ -3415,10 +3759,13 @@ window.openProjectDetail = function(custId,projId) {
         document.getElementById("navCustomerName").innerText=cust.name;
         document.getElementById("navProjectName").innerText=proj.name;
         document.getElementById("globalPricePerMeter").value=proj.globalPricePerMeter||50;
+        document.getElementById("globalLinearPricePerMeter").value=proj.globalLinearPricePerMeter||0;
+        let expDateEl = document.getElementById('projectExpDate');
+        if(expDateEl) expDateEl.value = todayIsoDate();
         renderPaymentsTable(proj);
         renderRoomsTable(proj);
         updateProjectTotal(proj);
-        window.renderGoodsTable();
+        renderProjectExpensesTable(proj);
         let card = document.getElementById('projectDetailCard');
         let btn = document.getElementById('completeProjectBtn');
         if(proj.completed) { card.classList.add('project-completed'); btn.textContent = '↩️ إلغاء الإنهاء'; }
@@ -3713,6 +4060,7 @@ function renderExtraExpensesList() {
             syncExpenseToAccounting(proj, e);
             if (totalEl) totalEl.textContent = sumExtraExpenses(proj).toFixed(2);
             updateProjectTotal(proj);
+            renderProjectExpensesTable(proj);
             autoSave();
         };
     });
@@ -3721,6 +4069,7 @@ function renderExtraExpensesList() {
             let i = parseInt(inp.dataset.i); let e = rows[i]; if (!e) return;
             e.note = inp.value.trim();
             syncExpenseToAccounting(proj, e);   // تحديث ملاحظة صف المحاسبة بنفس القيمة
+            renderProjectExpensesTable(proj);
             autoSave();
         };
     });
@@ -3728,21 +4077,121 @@ function renderExtraExpensesList() {
         btn.onclick = () => {
             let i = parseInt(btn.dataset.i); let e = rows[i]; if (!e) return;
             if (!confirm('🗑️ حذف هذا المصروف؟ سيُحذف صفّه من المحاسبة أيضاً.')) return;
-            removeExpenseFromAccounting(proj, e);
-            rows.splice(i, 1);
-            renderExtraExpensesList();
-            updateProjectTotal(proj);
-            autoSave();
-            showToast('🗑️ تم حذف المصروف');
+            deleteProjectExpense(proj, e);
         };
     });
 }
 
+// ===== جدول المصاريف الإضافية داخل صفحة المشروع (بدل جدول البضاعة) =====
+function genExpenseId() { return (Date.now() % 100000000) + Math.floor(Math.random() * 1000); }
+function todayIsoDate() {
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+function isoToEnglishDate(iso) {
+    if (!iso) return getEnglishDate();
+    const parts = String(iso).split('-');
+    if (parts.length !== 3) return iso;
+    return parseInt(parts[2], 10) + '/' + parseInt(parts[1], 10) + '/' + parts[0];
+}
+function deleteProjectExpense(proj, exp) {
+    removeExpenseFromAccounting(proj, exp);
+    proj.extraExpenses = getExtraExpenses(proj).filter(e => e !== exp && String(e.id) !== String(exp.id));
+    renderProjectExpensesTable(proj);
+    renderExtraExpensesList();
+    updateProjectTotal(proj);
+    autoSave();
+    showToast('🗑️ تم حذف المصروف');
+}
+function renderProjectExpensesTable(projArg) {
+    let proj = projArg;
+    if (!proj) {
+        let cust = userData.customers.find(c => c.id === currentCustomerId);
+        proj = cust?.projects.find(p => p.id === currentProjectId);
+    }
+    if (!proj) return;
+    let rows = getExtraExpenses(proj);
+    let changed = false;
+    rows.forEach(e => { if (!e.id) { e.id = genExpenseId(); changed = true; } });
+    if (changed) autoSave();
+    let totalEl = document.getElementById('projectExpensesTotal');
+    if (totalEl) totalEl.textContent = sumExtraExpenses(proj).toFixed(2);
+    let tbody = document.getElementById('projectExpensesBody');
+    if (!tbody) return;
+    if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-message" style="padding:16px 8px;">لا توجد مصاريف إضافية — سجّل أول مصروف من الحقول أعلاه</td></tr>';
+        return;
+    }
+    let sorted = rows.slice().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    tbody.innerHTML = sorted.map((e, i) => `
+        <tr data-exp-id="${e.id}">
+            <td>${i + 1}</td>
+            <td class="exp-date">${escapeHtml(e.date || '—')}</td>
+            <td><input type="number" step="0.01" min="0" class="exp-amount-input" value="${parseFloat(e.amount) || 0}"></td>
+            <td><input type="text" class="exp-note-input" value="${escapeHtml(e.note || '')}" placeholder="📝 ملاحظة"></td>
+            <td class="exp-acc">${e.accRef ? '✅' : '—'}</td>
+            <td><button class="exp-del" title="حذف المصروف">🗑️</button></td>
+        </tr>`).join('');
+
+    tbody.querySelectorAll('tr[data-exp-id]').forEach(tr => {
+        let exp = rows.find(x => String(x.id) === tr.dataset.expId);
+        if (!exp) return;
+        let amtInp = tr.querySelector('.exp-amount-input');
+        if (amtInp) amtInp.oninput = () => {
+            exp.amount = parseFloat(amtInp.value) || 0;
+            syncExpenseToAccounting(proj, exp);
+            if (totalEl) totalEl.textContent = sumExtraExpenses(proj).toFixed(2);
+            renderExtraExpensesList();
+            updateProjectTotal(proj);
+            autoSave();
+        };
+        let noteInp = tr.querySelector('.exp-note-input');
+        if (noteInp) noteInp.onchange = () => {
+            exp.note = noteInp.value.trim();
+            syncExpenseToAccounting(proj, exp);
+            renderExtraExpensesList();
+            autoSave();
+        };
+        let delBtn = tr.querySelector('.exp-del');
+        if (delBtn) delBtn.onclick = () => {
+            if (!confirm('🗑️ حذف هذا المصروف؟ سيُحذف صفّه من المحاسبة أيضاً.')) return;
+            deleteProjectExpense(proj, exp);
+        };
+    });
+}
+
+window.addProjectExpenseInline = function() {
+    let cust = userData.customers.find(c => c.id === currentCustomerId);
+    let proj = cust?.projects.find(p => p.id === currentProjectId);
+    if (!proj) return;
+    let amtEl = document.getElementById('projectExpAmount');
+    let noteEl = document.getElementById('projectExpNote');
+    let dateEl = document.getElementById('projectExpDate');
+    let amt = parseFloat(amtEl?.value) || 0;
+    if (amt <= 0) { alert('⚠️ أدخل قيمة صحيحة للمصروف'); amtEl?.focus(); return; }
+    let exp = {
+        id: genExpenseId(),
+        amount: amt,
+        note: (noteEl?.value || '').trim(),
+        date: isoToEnglishDate(dateEl?.value),
+        timestamp: Date.now()
+    };
+    getExtraExpenses(proj).push(exp);
+    syncExpenseToAccounting(proj, exp);
+    if (amtEl) amtEl.value = '';
+    if (noteEl) noteEl.value = '';
+    renderProjectExpensesTable(proj);
+    renderExtraExpensesList();
+    updateProjectTotal(proj);
+    autoSave();
+    showToast('🧾 أُضيف المصروف وسُجَّل في المحاسبة');
+    if (amtEl) amtEl.focus();
+};
+
 window.openExtraExpenses = function() {
     renderExtraExpensesList();
     document.getElementById('extraExpensesModal').style.display = 'flex';
-};
-window.closeExtraExpenses = function() { document.getElementById('extraExpensesModal').style.display = 'none'; };
+};window.closeExtraExpenses = function() { document.getElementById('extraExpensesModal').style.display = 'none'; };
 
 window.addExtraExpense = function() {
     let cust = userData.customers.find(c => c.id === currentCustomerId);
@@ -3753,7 +4202,7 @@ window.addExtraExpense = function() {
     let amt = parseFloat(amtEl?.value) || 0;
     if (amt <= 0) { alert('⚠️ أدخل قيمة صحيحة للمصروف'); amtEl?.focus(); return; }
     let exp = {
-        id: (Date.now() % 100000000) + Math.floor(Math.random() * 1000),
+        id: genExpenseId(),
         amount: amt,
         note: (noteEl?.value || '').trim(),
         date: getEnglishDate(),
@@ -3764,24 +4213,32 @@ window.addExtraExpense = function() {
     if (amtEl) amtEl.value = '';
     if (noteEl) noteEl.value = '';
     renderExtraExpensesList();
+    renderProjectExpensesTable(proj);
     updateProjectTotal(proj);
     autoSave();
     showToast('🧾 أُضيف المصروف وسُجَّل في المحاسبة');
     if (amtEl) amtEl.focus();
 };
 
-// أنواع الغرف: غرفة = مساحة (طول×عرض) — حمام وممر = محيط ((طول+عرض)×2)
+// أنواع الغرف: غرفة = مساحة (طول×عرض) — حمام وممر = محيط ((طول+عرض)×2) — طولي = سعر المتر الطولي
 function getRoomCalcMode(r) {
+    if (r.type === 'linear') return 'linear';
     if (r.type === 'bath' || r.type === 'corridor') return 'perimeter';
     if (r.type === 'room') return 'area';
     return r.calcMode === 'perimeter' ? 'perimeter' : 'area'; // بيانات قديمة بدون نوع
 }
 function getRoomMeters(r) {
-    let L = r.lengthVal || 0, W = r.widthVal || 0;
+    let L = parseFloat(r.lengthVal) || 0, W = parseFloat(r.widthVal) || 0;
+    if (r.type === 'linear') {
+        // الطول والعرض → المحيط (طول + عرض) × 2 — خانة واحدة فقط → تُحسب هي نفسها
+        if (L > 0 && W > 0) return (L + W) * 2;
+        return L > 0 ? L : (W > 0 ? W : 0);
+    }
     if (!L && !W) return 0;
     return getRoomCalcMode(r) === 'perimeter' ? (L + W) * 2 : L * W;
 }
 function getRoomTypeLabel(r) {
+    if (r.type === 'linear') return '<span class="room-type-chip linear">📏 طولي</span>';
     if (r.type === 'bath') return '<span class="room-type-chip bath">🛁 حمام</span>';
     if (r.type === 'corridor') return '<span class="room-type-chip corridor">🚪 ممر</span>';
     if (r.type === 'room') return '<span class="room-type-chip">غرفة</span>';
@@ -3793,7 +4250,8 @@ function renderRoomsTable(proj){
     if(!proj.rooms) proj.rooms=[];
     tbody.innerHTML=proj.rooms.map((r,idx)=>{
         let result=getRoomMeters(r);
-        return `<tr data-room-id="${r.id}"><td>${idx+1}</td><td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||0}"></td><td><input type="number" class="room-width" step="0.01" value="${r.widthVal||0}"></td><td>${getRoomTypeLabel(r)}</td><td class="calc-val">${result.toFixed(2)}</td><td class="room-total" style="font-weight:bold; color:#4f46e5;">${(r.totalCost||0).toFixed(2)}</td><td><button class="delete-room-btn btn-danger" data-id="${r.id}">✖</button></td></tr>`;
+        let unit = r.type === 'linear' ? ' م' : ' م²';
+        return `<tr data-room-id="${r.id}"><td>${idx+1}</td><td><input type="number" class="room-length" step="0.01" value="${r.lengthVal||0}"></td><td><input type="number" class="room-width" step="0.01" value="${r.widthVal||0}"></td><td>${getRoomTypeLabel(r)}</td><td class="calc-val">${result.toFixed(2)}${unit}</td><td class="room-total" style="font-weight:bold; color:#4f46e5;">${(r.totalCost||0).toFixed(2)}</td><td><button class="delete-room-btn btn-danger" data-id="${r.id}">✖</button></td></tr>`;
     }).join('');
     attachRoomEvents(proj);
 }
@@ -3829,10 +4287,14 @@ function updateProjectSummary(proj) {
 }
 
 function updateProjectTotal(proj){
-    let price=parseFloat(document.getElementById("globalPricePerMeter").value)||0;
+    let priceEl = document.getElementById("globalPricePerMeter");
+    let price = priceEl ? (parseFloat(priceEl.value) || 0) : (parseFloat(proj.globalPricePerMeter) || 0);
     proj.globalPricePerMeter=price;
+    let linPriceEl = document.getElementById("globalLinearPricePerMeter");
+    let linPrice = linPriceEl ? (parseFloat(linPriceEl.value) || 0) : (parseFloat(proj.globalLinearPricePerMeter) || 0);
+    proj.globalLinearPricePerMeter=linPrice;
     proj.rooms.forEach(r=>{
-        r.totalCost=getRoomMeters(r)*price;
+        r.totalCost=getRoomMeters(r) * (r.type === 'linear' ? linPrice : price);
     });
     let grandRooms = proj.rooms.reduce((s,r)=>s+r.totalCost,0);
     let extraExp = sumExtraExpenses(proj);              // المصاريف الإضافية تُضاف على السعر الجمالي
@@ -3847,8 +4309,11 @@ function updateProjectTotal(proj){
     document.getElementById("remainingAmount").innerHTML=remaining.toFixed(2);
     document.getElementById("totalPayments").textContent=totalPaid.toFixed(2);
     document.getElementById("totalDiscounts").textContent=totalDiscount.toFixed(2);
-    let totalArea = proj.rooms.reduce((s,r)=>s+getRoomMeters(r),0);
+    let totalArea = proj.rooms.reduce((s,r)=>s+(r.type==='linear'?0:getRoomMeters(r)),0);
     document.getElementById("projectTotalArea").textContent=totalArea.toFixed(2);
+    let linearMeters = proj.rooms.reduce((s,r)=>s+(r.type==='linear'?getRoomMeters(r):0),0);
+    let linMetersEl = document.getElementById('projectLinearMeters');
+    if(linMetersEl) linMetersEl.textContent = linearMeters.toFixed(2);
     let paidPercent = effectiveTotal > 0 ? Math.min((totalPaid / effectiveTotal) * 100, 100) : 0;
     let bar = document.getElementById('paymentProgressBar');
     let statusText = document.getElementById('paymentStatusText');
@@ -3864,12 +4329,23 @@ function updateProjectTotal(proj){
     updateProjectSummary(proj);
 }
 
+function refreshProjectPricing() {
+    if (!currentProjectId) return;
+    let cust = userData.customers.find(c => c.id === currentCustomerId);
+    let proj = cust?.projects.find(p => p.id === currentProjectId);
+    if (!proj) return;
+    syncRoomsFromDOM(proj);
+    updateProjectTotal(proj);
+    renderRoomsTable(proj);
+    autoSave();
+}
+
 window.addProject = function(){
     let cust=userData.customers.find(c=>c.id===currentCustomerId);
     if(cust){
         let name=prompt("اسم المشروع:");
         if(name && name.trim()){
-            cust.projects.push({id:userData.nextProjId++, name:name.trim(), rooms:[], workers:[], goods:[], globalPricePerMeter:50, payments:[]});
+            cust.projects.push({id:userData.nextProjId++, name:name.trim(), rooms:[], workers:[], goods:[], extraExpenses:[], globalPricePerMeter:50, globalLinearPricePerMeter:0, payments:[]});
             window.openCustomerProjects(currentCustomerId);
             autoSave();
         }
@@ -3880,7 +4356,7 @@ window.addRoom = function(type){
     let cust=userData.customers.find(c=>c.id===currentCustomerId);
     let proj=cust?.projects.find(p=>p.id===currentProjectId);
     if(proj){
-        let t = (type === 'bath' || type === 'corridor') ? type : 'room';
+        let t = (type === 'bath' || type === 'corridor' || type === 'linear') ? type : 'room';
         proj.rooms.push({id:userData.nextRoomId++, type:t, lengthVal:0, widthVal:0, totalCost:0});
         renderRoomsTable(proj);
         updateProjectTotal(proj);
@@ -3913,7 +4389,10 @@ function buildProjectInvoiceText() {
     let proj = cust?.projects.find(p => p.id === currentProjectId);
     if (!cust || !proj) return '';
 
-    let totalArea = (proj.rooms || []).reduce((s, r) => s + getRoomMeters(r), 0);
+    let areaMeters = (proj.rooms || []).reduce((s, r) => s + (r.type === 'linear' ? 0 : getRoomMeters(r)), 0);
+    let linearMeters = (proj.rooms || []).reduce((s, r) => s + (r.type === 'linear' ? getRoomMeters(r) : 0), 0);
+    let metrics = areaMeters.toFixed(2) + ' م²';
+    if (linearMeters > 0) metrics += ' + ' + linearMeters.toFixed(2) + ' م طولي';
     let extraExpenses = (proj.extraExpenses || []);
     let extraExpSum = extraExpenses.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
     let totalPrice = (proj.rooms || []).reduce((s, r) => s + (r.totalCost || 0), 0) + extraExpSum;
@@ -3929,8 +4408,22 @@ function buildProjectInvoiceText() {
     lines.push('🏢 المشروع: ' + proj.name);
     lines.push('📅 التاريخ: ' + getEnglishDate());
     lines.push('');
-    lines.push('📐 إجمالي المساحة: ' + totalArea.toFixed(2) + ' م²');
+    lines.push('📐 إجمالي القياس: ' + metrics);
+    if (proj.globalPricePerMeter) lines.push('💰 سعر المتر: ' + (parseFloat(proj.globalPricePerMeter) || 0).toFixed(2) + ' د.ع');
+    if (linearMeters > 0) lines.push('📏 سعر المتر الطولي: ' + (parseFloat(proj.globalLinearPricePerMeter) || 0).toFixed(2) + ' د.ع');
     lines.push('💰 إجمالي السعر: ' + totalPrice.toFixed(2) + ' د.ع');
+    if ((proj.rooms || []).length) {
+        lines.push('');
+        lines.push('🏠 تفاصيل الوحدات:');
+        proj.rooms.forEach((r, i) => {
+            let typeName = r.type === 'linear' ? '📏 طولي' : r.type === 'bath' ? '🛁 حمام' : r.type === 'corridor' ? '🚪 ممر' : 'غرفة';
+            let unit = r.type === 'linear' ? 'م' : 'م²';
+            let unitPrice = r.type === 'linear' ? (parseFloat(proj.globalLinearPricePerMeter) || 0) : (parseFloat(proj.globalPricePerMeter) || 0);
+            lines.push('  ' + (i + 1) + ') ' + typeName + ' ' + (parseFloat(r.lengthVal) || 0) + '×' + (parseFloat(r.widthVal) || 0) +
+                ' = ' + getRoomMeters(r).toFixed(2) + ' ' + unit + ' × ' + unitPrice.toFixed(2) +
+                ' = ' + (r.totalCost || 0).toFixed(2) + ' د.ع');
+        });
+    }
     if (extraExpSum > 0) {
         lines.push('   ├ سعر الغرف: ' + (totalPrice - extraExpSum).toFixed(2) + ' د.ع');
         lines.push('   └ 🧾 مصاريف إضافية: ' + extraExpSum.toFixed(2) + ' د.ع');
@@ -4036,7 +4529,13 @@ function createPdfReport() {
     let y = 0;
 
     // تكبير اللوحة عند الحاجة مع الحفاظ على المحتوى المرسوم
+    // + قفزة تلقائية لصفحة جديدة قبل أي عنصر يتقاطع مع مساحة تذييل الصفحة
+    const PAGE_TOP = 12, PAGE_FOOT = 78;
     const ensure = (h) => {
+        const pageStart = Math.floor(y / PDF_H) * PDF_H;
+        if (y + h > pageStart + PDF_H - PAGE_FOOT && y > pageStart + PAGE_TOP + 2) {
+            y = (Math.floor(y / PDF_H) + 1) * PDF_H + PAGE_TOP;
+        }
         if (y + h <= cv.height) return;
         const nc = document.createElement('canvas');
         nc.width = cv.width;
@@ -4075,7 +4574,7 @@ function createPdfReport() {
         },
 
         heading(text, color) {
-            ensure(60);
+            ensure(176); // يحجز مساحة للعنوان مع أول عنصر تحته حتى لا يبقى وحده أسفل الصفحة
             ctx.fillStyle = color || '#4f46e5';
             box(PDF_M, y + 8, 8, 34, 4);
             ctx.direction = 'rtl';
@@ -4371,7 +4870,8 @@ function calcProjectTotals(proj) {
     const totalDiscount = discounts.reduce((s, p) => s + (p.amount || 0), 0);
     const totalPrice = roomsSum + extraExpSum;
     return {
-        totalArea: rooms.reduce((s, r) => s + getRoomMeters(r), 0),
+        totalArea: rooms.reduce((s, r) => s + (r.type === 'linear' ? 0 : getRoomMeters(r)), 0),
+        linearMeters: rooms.reduce((s, r) => s + (r.type === 'linear' ? getRoomMeters(r) : 0), 0),
         extraExpenses: extraExpenses, extraExpSum: extraExpSum, roomsSum: roomsSum,
         totalPrice: totalPrice, payments: payments, discounts: discounts,
         totalPaid: totalPaid, totalDiscount: totalDiscount,
@@ -4423,46 +4923,178 @@ function buildWorkerPdfReport(workerId, weekKeys) {
     return { R: R, name: w.name };
 }
 
-// ————— تقرير مشروع واحد (بيانات المشروع للعميل) —————
+// ————— فاتورة مشروع (بيان مشروع) — تصميم مطابق لنموذج الطباعة —————
 function buildProjectPdfReport(cust, proj) {
     const t = calcProjectTotals(proj);
-    const R = createPdfReport();
-    R.band('فاتورة مشروع', proj.name);
-    R.kv('👤 العميل', cust.name);
-    if (cust.phone) R.kv('📱 هاتف العميل', cust.phone);
-    R.kv('📅 التاريخ', getEnglishDate());
-    R.gap(4);
-    R.heading('📊 ملخص المشروع');
-    R.boxes([
-        { k: 'إجمالي المساحة (م²)', v: t.totalArea.toFixed(2), bg: '#eff6ff', color: '#1d4ed8' },
-        { k: 'إجمالي السعر (د.ع)', v: t.totalPrice.toFixed(2), bg: '#f5f3ff', color: '#6d28d9' },
-        { k: 'المدفوع (د.ع)', v: t.totalPaid.toFixed(2), bg: '#ecfdf5', color: '#059669' },
-        { k: 'الباقي (د.ع)', v: t.remaining.toFixed(2), bg: t.remaining > 0 ? '#fef2f2' : '#ecfdf5', color: t.remaining > 0 ? '#dc2626' : '#059669' }
-    ], 2);
-    if (t.extraExpSum > 0) {
-        R.kv('🧾 سعر الغرف', t.roomsSum.toFixed(2) + ' د.ع');
-        R.kv('🧾 مصاريف إضافية', t.extraExpSum.toFixed(2) + ' د.ع');
-        if (t.extraExpenses.length) {
-            R.table(['القيمة', 'الملاحظة'], t.extraExpenses.map(e => [
-                { v: (parseFloat(e.amount) || 0).toFixed(2), color: '#dc2626' },
-                { v: e.note || '—', bold: false, color: '#64748b' }
-            ]), [1.4, 4]);
+    const M = 70, W = PDF_W, H = PDF_H, CW = W - M * 2;
+    const BLUE = '#3498db', INK = '#222222', BORDER = '#cccccc';
+    const fnt = (s, w) => (w || 600) + ' ' + s + 'px "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif';
+    const pays = (proj.payments || []).filter(p => p.type !== 'discount');
+    const extras = (proj.extraExpenses || []);
+    const areaText = t.totalArea.toFixed(2) + ' م²' +
+        (t.linearMeters > 0 ? ' + ' + t.linearMeters.toFixed(2) + ' م' : '');
+    const d = new Date(), pad2 = n => String(n).padStart(2, '0');
+    const today = d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate());
+
+    const pages = [];
+    let cv, ctx, y = 0;
+    const startPage = () => {
+        cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+        ctx = cv.getContext('2d'); ctx.direction = 'rtl';
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+        pages.push(cv); y = M;
+    };
+    const ensure = (h) => { if (y + h > H - 100) startPage(); };
+    const rr = (x, yy, w, h, r) => {
+        ctx.beginPath();
+        if (typeof ctx.roundRect === 'function') ctx.roundRect(x, yy, w, h, r);
+        else ctx.rect(x, yy, w, h);
+    };
+    const fieldBox = (x, yy, w, h, value, align) => {
+        ctx.fillStyle = '#fafafa'; ctx.strokeStyle = BORDER; ctx.lineWidth = 2;
+        rr(x, yy, w, h, 8); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = INK; ctx.font = fnt(25, 600); ctx.textBaseline = 'middle';
+        ctx.textAlign = align === 'center' ? 'center' : 'right';
+        const tx = align === 'center' ? x + w / 2 : x + w - 14;
+        ctx.fillText(pdfClip(ctx, String(value == null ? '' : value), w - 28), tx, yy + h / 2 + 1);
+    };
+    const section = (title) => {
+        ctx.font = fnt(31, 800); ctx.fillStyle = BLUE; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+        ctx.fillText(title, W - M, y + 34);
+        ctx.strokeStyle = '#cccccc'; ctx.lineWidth = 2; ctx.setLineDash([8, 7]);
+        ctx.beginPath(); ctx.moveTo(M, y + 50); ctx.lineTo(W - M, y + 50); ctx.stroke(); ctx.setLineDash([]);
+        y += 72;
+    };
+    const table = (cols, rows) => {
+        const totalW = cols.reduce((s, c) => s + c.w, 0);
+        const widths = cols.map(c => CW * c.w / totalW);
+        const drawHead = () => {
+            ctx.strokeStyle = '#222'; ctx.lineWidth = 2;
+            ctx.strokeRect(M, y, CW, 46);
+            let cx = W - M;
+            widths.forEach((w, i) => {
+                if (i < widths.length - 1) { ctx.beginPath(); ctx.moveTo(cx - w, y); ctx.lineTo(cx - w, y + 46); ctx.stroke(); }
+                cx -= w;
+            });
+            ctx.fillStyle = '#111'; ctx.font = fnt(24, 800); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            cx = W - M;
+            cols.forEach((c, i) => {
+                ctx.fillText(pdfClip(ctx, c.t, widths[i] - 16), cx - widths[i] / 2, y + 25);
+                cx -= widths[i];
+            });
+            y += 46;
+        };
+        ensure(46 + 48 + 30);
+        drawHead();
+        if (!rows.length) {
+            ensure(48);
+            ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(M, y, CW, 48);
+            ctx.fillStyle = '#888'; ctx.font = fnt(23, 600); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('لا توجد بيانات', W - M - CW / 2, y + 25);
+            y += 48 + 20;
+            return;
         }
-    }
-    R.heading('💳 الدفعات والخصومات');
-    if ((proj.payments || []).length) {
-        R.table(['التاريخ', 'النوع', 'المبلغ', 'ملاحظة'], proj.payments.map(p => [
-            { v: p.date || '—', bold: false, color: '#64748b' },
-            { v: p.type === 'discount' ? '🏷️ خصم' : '💰 دفعة', color: p.type === 'discount' ? '#d97706' : '#059669' },
-            { v: (parseFloat(p.amount) || 0).toFixed(2), color: p.type === 'discount' ? '#dc2626' : '#1d4ed8' },
-            { v: p.note || '—', bold: false, color: '#64748b' }
-        ]), [1.6, 1.3, 1.4, 2.7]);
-    } else {
-        R.note('لا توجد دفعات مسجّلة');
-    }
-    if (t.totalDiscount > 0) R.kv('🏷️ إجمالي الخصومات', t.totalDiscount.toFixed(2) + ' د.ع', { bg: '#fffbeb', valueColor: '#b45309' });
-    R.note('أُنشئت هذه الفاتورة في ' + getEnglishDate());
-    return { R: R, name: proj.name };
+        rows.forEach(row => {
+            const before = pages.length;
+            ensure(48);
+            if (pages.length !== before) drawHead();
+            // كل خلية في صندوق مستقل بحدود خفيفة تمامًا كنموذج «بيان مشروع»
+            let cx = W - M;
+            cols.forEach((c, i) => {
+                const bw = widths[i] - 10;
+                const bx = cx - widths[i] + 5;
+                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 1.6;
+                rr(bx, y + 3, bw, 42, 6); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = INK; ctx.font = fnt(23, 600); ctx.textBaseline = 'middle';
+                ctx.textAlign = c.align === 'right' ? 'right' : 'center';
+                const tx = c.align === 'right' ? bx + bw - 12 : bx + bw / 2;
+                ctx.fillText(pdfClip(ctx, String(row[i] == null ? '' : row[i]), bw - 24), tx, y + 25);
+                cx -= widths[i];
+            });
+            y += 48;
+        });
+        y += 20;
+    };
+
+    // ===== الصفحة الأولى =====
+    startPage();
+
+    // العنوان + التاريخ
+    ctx.fillStyle = BLUE; ctx.font = fnt(58, 800); ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('بيان مشروع', W - M, 128);
+    fieldBox(M, 82, 260, 56, today, 'center');
+    ctx.fillStyle = INK; ctx.font = fnt(27, 700); ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('التاريخ:', M + 430, 119);
+    ctx.strokeStyle = BLUE; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(M, 172); ctx.lineTo(W - M, 172); ctx.stroke();
+
+    // اسم العميل / اسم المشروع
+    y = 210;
+    const namedRow = (label, value) => {
+        fieldBox(M, y, CW - 300, 54, value);
+        ctx.fillStyle = INK; ctx.font = fnt(28, 700); ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+        ctx.fillText(label, W - M, y + 37);
+        y += 68;
+    };
+    namedRow('اسم العميل:', cust.name);
+    namedRow('اسم المشروع:', proj.name);
+
+    // ===== الملخص المالي =====
+    ensure(72 + 66 * 7 + 20);
+    section('الملخص المالي');
+    const sumRow = (label, value) => {
+        ensure(54 + 12);
+        fieldBox(M, y, CW - 330, 54, value);
+        ctx.fillStyle = INK; ctx.font = fnt(28, 700); ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+        ctx.fillText(label, W - M, y + 37);
+        y += 66;
+    };
+    sumRow('إجمالي المساحة:', areaText);
+    sumRow('تكلفة المساحة:', t.roomsSum.toFixed(2));
+    sumRow('المصاريف الإضافية:', t.extraExpSum.toFixed(2));
+    sumRow('إجمالي المشروع:', t.totalPrice.toFixed(2));
+    sumRow('إجمالي الدفعات:', t.totalPaid.toFixed(2));
+    sumRow('التخفيض:', t.totalDiscount.toFixed(2));
+    sumRow('الباقي:', t.remaining.toFixed(2));
+
+    // ===== تفصيل المصاريف الإضافية =====
+    ensure(72 + 46 + 48 + 40);
+    section('المصاريف الإضافية (التفصيل)');
+    table([
+        { t: 'الملاحظة (البيان)', w: 0.52, align: 'right' },
+        { t: 'التاريخ', w: 0.26, align: 'center' },
+        { t: 'المبلغ', w: 0.22, align: 'center' }
+    ], extras.map(e => [e.note || '—', e.date || '—', (parseFloat(e.amount) || 0).toFixed(2)]));
+
+    // ===== تفصيل الدفعات =====
+    ensure(72 + 46 + 48 + 40);
+    section('الدفعات (التفصيل)');
+    table([
+        { t: 'الملاحظة (البيان)', w: 0.52, align: 'right' },
+        { t: 'التاريخ', w: 0.26, align: 'center' },
+        { t: 'المبلغ', w: 0.22, align: 'center' }
+    ], pays.map(p => [p.note || '—', p.date || '—', (parseFloat(p.amount) || 0).toFixed(2)]));
+
+    return {
+        name: proj.name,
+        R: {
+            finish() {
+                pages.forEach((p, i) => {
+                    const g = p.getContext('2d');
+                    g.direction = 'rtl';
+                    g.strokeStyle = '#e2e8f0'; g.lineWidth = 2;
+                    g.beginPath(); g.moveTo(M, H - 62); g.lineTo(W - M, H - 62); g.stroke();
+                    g.fillStyle = '#888'; g.font = fnt(19, 600); g.textBaseline = 'alphabetic';
+                    g.textAlign = 'right';
+                    g.fillText(pdfClip(g, 'بيان مشروع — ' + proj.name, CW - 160), W - M, H - 34);
+                    g.textAlign = 'left';
+                    g.fillText('صفحة ' + (i + 1) + ' من ' + pages.length, M, H - 34);
+                });
+                return pages;
+            }
+        }
+    };
 }
 
 // ————— تقرير العميل الكامل (كل مشاريعه) —————
@@ -4577,8 +5209,8 @@ window.shareProjectPdf = async function() {
     if (!cust || !proj) { showToast('⚠️ لم يتم العثور على المشروع'); return; }
     try {
         const report = buildProjectPdfReport(cust, proj);
-        await makeAndSharePdf(report, 'فاتورة_' + proj.name, 'فاتورة ' + proj.name,
-            'فاتورة مشروع ' + proj.name + ' — ' + cust.name);
+        await makeAndSharePdf(report, 'بيان_مشروع_' + proj.name, 'بيان مشروع ' + proj.name,
+            'بيان مشروع ' + proj.name + ' — ' + cust.name);
     } catch (e) { console.error('pdf:', e); showToast('⚠️ تعذّر إنشاء ملف PDF'); }
 };
 
@@ -5749,15 +6381,17 @@ document.addEventListener("DOMContentLoaded",()=>{
     document.getElementById("addRoomInProject")?.addEventListener("click",()=>window.addRoom('room'));
     document.getElementById("addBathInProject")?.addEventListener("click",()=>window.addRoom('bath'));
     document.getElementById("addCorridorInProject")?.addEventListener("click",()=>window.addRoom('corridor'));
+    document.getElementById("addLinearInProject")?.addEventListener("click",()=>window.addRoom('linear'));
     document.getElementById("saveProjectData")?.addEventListener("click",window.saveProject);
     document.getElementById("deleteProjectBtn")?.addEventListener("click",window.deleteProject);
     document.getElementById("addPaymentBtn")?.addEventListener("click",window.addPayment);
     document.getElementById("globalPricePerMeter")?.addEventListener("change",()=>{
-        if(currentProjectId){
-            let cust=userData.customers.find(c=>c.id===currentCustomerId);
-            if(cust) updateProjectTotal(cust.projects.find(p=>p.id===currentProjectId));
-        }
+        refreshProjectPricing();
     });
+    document.getElementById("globalLinearPricePerMeter")?.addEventListener("change",()=>{
+        refreshProjectPricing();
+    });
+    ['projectExpAmount','projectExpNote'].forEach(id=>{ document.getElementById(id)?.addEventListener("keydown",(e)=>{ if(e.key==='Enter'){ e.preventDefault(); window.addProjectExpenseInline(); } }); });
     document.getElementById("workerInvoiceModal")?.addEventListener("click",(e)=>{ if(e.target.id==='workerInvoiceModal') window.closeWorkerInvoice(); });
     document.getElementById("customerDetailModal")?.addEventListener("click",(e)=>{ if(e.target.id==='customerDetailModal') window.closeCustomerDetail(); });
     document.getElementById("extraExpensesModal")?.addEventListener("click",(e)=>{ if(e.target.id==='extraExpensesModal') window.closeExtraExpenses(); });
