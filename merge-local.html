@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دمج بيانات مدير المشاريع (محلي)</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background:#0f172a; color:#e2e8f0; margin:0; padding:16px; }
+  .card { max-width: 640px; margin: 0 auto; background:#1e293b; border-radius:16px; padding:18px; }
+  h1 { font-size:1.1rem; margin:0 0 10px; }
+  .sub { color:#94a3b8; font-size:.8rem; line-height:1.9; margin-bottom:14px; }
+  button { width:100%; padding:14px; border:0; border-radius:12px; font-size:1rem; font-weight:800;
+    background:linear-gradient(135deg,#10b981,#059669); color:#fff; cursor:pointer; margin-bottom:12px; }
+  button:disabled { opacity:.5; cursor:default; }
+  pre { white-space:pre-wrap; background:#0b1220; border-radius:10px; padding:12px; font-size:.82rem; line-height:1.9; margin:0; }
+  iframe { width:380px; height:700px; border:0; position:fixed; left:-9999px; top:0; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>📥 دمج بيانات «مدير المشاريع (محلي)» في هذا التطبيق</h1>
+  <div class="sub">
+    يقرأ الملف <b>director-data.json</b> الموجود بجانب الصفحة ويدمجه في بيانات هذا الجهاز.<br>
+    القاعدة: المطابق 100% يُتخطّى، والجديد يُضاف فقط — لن تُحذف أي بيانات حالية.
+  </div>
+  <button id="go">📥 دمج الآن</button>
+  <pre id="log">جارٍ تجهيز التطبيق…</pre>
+</div>
+<iframe id="app" src="index.html?merge=1"></iframe>
+<script>
+const log = (s) => { document.getElementById('log').textContent += s + '\n'; };
+const status = (s) => { document.getElementById('log').textContent = s; };
+const W = () => document.getElementById('app').contentWindow;
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+const counts = () => W().eval(`({
+  customers: (userData.customers||[]).length,
+  projects: (userData.customers||[]).reduce((a,c)=>a+((c.projects||[]).length),0),
+  workers: (userData.workers||[]).length,
+  weeks: Object.keys(userData.workersByWeek||{}).length,
+  acc: (userData.accountingRows||[]).length
+})`);
+
+let ready = false;
+(async () => {
+  const ifr = document.getElementById('app');
+  for (let i = 0; i < 100; i++) {
+    try {
+      if (ifr.contentWindow && typeof ifr.contentWindow.loginLocalOnly === 'function') break;
+    } catch (e) {}
+    await wait(150);
+  }
+  try {
+    W().loginLocalOnly();
+    await W().selectAccountingUser('main');
+    await wait(1200); // اترك فرصة الاستيراد التلقائي إن كان مفعّلًا
+    const before = await counts();
+    status('📊 قبل الدمج:\n' + JSON.stringify(before, null, 2) + '\n\nاضغط الزر للدمج.');
+    ready = true;
+    if (new URLSearchParams(location.search).get('auto') === '1') run();
+  } catch (e) {
+    status('⚠️ خطأ في تجهيز التطبيق: ' + e.message);
+  }
+})();
+
+async function run() {
+  if (!ready) return;
+  const btn = document.getElementById('go');
+  btn.disabled = true;
+  try {
+    status('⏳ جارٍ الدمج…');
+    const rep = await W().importDirectorData(true);
+    if (!rep) { status('⚠️ تعذّر القراءة — تأكد من وجود director-data.json بجانب الصفحة.'); btn.disabled = false; return; }
+    try { W().localStorage.setItem('director_import_v1_' + (W().eval('currentUser.uid')), 'done'); } catch (e) {}
+    const after = await counts();
+    status('✅ تم الدمج\n\n' + JSON.stringify(rep, null, 2) + '\n\n📊 بعد الدمج:\n' + JSON.stringify(after, null, 2));
+    btn.textContent = '✅ تم — يمكنك الإغلاق';
+  } catch (e) {
+    status('⚠️ خطأ: ' + e.message);
+    btn.disabled = false;
+  }
+}
+document.getElementById('go').onclick = run;
+</script>
+</body>
+</html>
